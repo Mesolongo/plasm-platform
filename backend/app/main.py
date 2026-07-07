@@ -10,12 +10,15 @@ Docs: http://127.0.0.1:8000/docs
 """
 import datetime
 import io
+import re
 import shutil
 import subprocess
 import tempfile
+import urllib.parse
 from pathlib import Path
 from typing import List, Literal, Optional
 
+import httpx
 import pandas as pd
 from fastapi import FastAPI, HTTPException, UploadFile, Form
 from fastapi.responses import FileResponse, RedirectResponse
@@ -49,6 +52,34 @@ def _read_sav(raw: bytes) -> tuple[pd.DataFrame, dict]:
     return df, labels
 
 
+def _persist_dataset(df: pd.DataFrame, source: str, missing_value: Optional[str],
+                     variable_labels: Optional[dict] = None) -> dict:
+    """Normalize an ingested frame to a dataset: write raw.csv + meta.json, return meta.
+
+    Shared by every ingestion path (file upload, SQL, Google Sheets) so the variable
+    dictionary and audit are identical regardless of where the data came from.
+    """
+    if df.empty:
+        raise HTTPException(422, "the source returned no data rows")
+
+    dataset_id = new_id("ds")
+    d = dataset_dir(dataset_id, create=True)
+    df.to_csv(d / "raw.csv", index=False)
+
+    meta = {
+        "id": dataset_id,
+        "filename": source,
+        "uploaded_at": datetime.datetime.now().isoformat(timespec="seconds"),
+        "missing_value": missing_value,
+        "n_observations": len(df),
+        "variables": variable_dictionary(df, missing_value),
+        "variable_labels": variable_labels,
+        "audit": run_audit(df, missing_value),
+    }
+    write_json(d / "meta.json", meta)
+    return meta
+
+
 @app.post("/api/datasets")
 async def upload_dataset(file: UploadFile, missing_value: Optional[str] = Form(None)):
     """Upload CSV, Excel, or SPSS .sav; returns the variable dictionary and data audit."""
@@ -69,25 +100,101 @@ async def upload_dataset(file: UploadFile, missing_value: Optional[str] = Form(N
     except Exception as exc:
         raise HTTPException(422, f"could not parse file: {exc}")
 
-    if df.empty:
-        raise HTTPException(422, "the file contains no data rows")
+    return _persist_dataset(df, file.filename or "upload", missing_value, variable_labels)
 
-    dataset_id = new_id("ds")
-    d = dataset_dir(dataset_id, create=True)
-    df.to_csv(d / "raw.csv", index=False)
 
-    meta = {
-        "id": dataset_id,
-        "filename": file.filename,
-        "uploaded_at": datetime.datetime.now().isoformat(timespec="seconds"),
-        "missing_value": missing_value,
-        "n_observations": len(df),
-        "variables": variable_dictionary(df, missing_value),
-        "variable_labels": variable_labels,
-        "audit": run_audit(df, missing_value),
-    }
-    write_json(d / "meta.json", meta)
-    return meta
+# --------------------------------------------------------------------------- #
+# Dataset connectors (Phase 3): pull data from a SQL database or a Google Sheet
+# instead of a file upload. Both funnel through _persist_dataset, so downstream
+# audit / modelling / assessment are unchanged.
+# --------------------------------------------------------------------------- #
+
+# Reject statements that write to or mutate the database. Ingestion is read-only:
+# the connector runs the user's query verbatim, so this is a guardrail against a
+# fat-fingered (or pasted) DDL/DML statement, not a security boundary — pair it
+# with a read-only database account.
+_SQL_FORBIDDEN = {"insert", "update", "delete", "drop", "alter", "create",
+                  "truncate", "grant", "revoke", "merge", "replace", "call", "exec"}
+
+
+def _reject_non_select(query: str) -> None:
+    stripped = query.strip().rstrip(";")
+    if not stripped:
+        raise HTTPException(422, "query is empty")
+    # Block multiple statements and any leading write keyword.
+    if ";" in stripped:
+        raise HTTPException(422, "only a single SELECT statement is allowed")
+    first = stripped.split(None, 1)[0].lower()
+    if first in _SQL_FORBIDDEN or (first not in {"select", "with"}):
+        raise HTTPException(422, "only read-only SELECT queries are permitted")
+
+
+class SqlDatasetRequest(BaseModel):
+    dsn: str = Field(..., description="SQLAlchemy database URL, e.g. postgresql+psycopg://user:pw@host/db")
+    query: str = Field(..., description="A single read-only SELECT statement")
+    missing_value: Optional[str] = None
+
+
+@app.post("/api/datasets/sql")
+def connect_sql(req: SqlDatasetRequest):
+    """Ingest a dataset from a SQL database via a SQLAlchemy DSN and a SELECT query."""
+    _reject_non_select(req.query)
+    try:
+        from sqlalchemy import create_engine, text
+    except ModuleNotFoundError:
+        raise HTTPException(501, "SQL connector requires SQLAlchemy on the server")
+    try:
+        engine = create_engine(req.dsn)
+        with engine.connect() as conn:
+            df = pd.read_sql_query(text(req.query), conn)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(422, f"SQL connection or query failed: {exc}")
+    finally:
+        try:
+            engine.dispose()
+        except Exception:
+            pass
+
+    label = urllib.parse.urlsplit(req.dsn).path.lstrip("/") or "sql"
+    return _persist_dataset(df, f"sql:{label}", req.missing_value)
+
+
+class SheetDatasetRequest(BaseModel):
+    url: str = Field(..., description="A Google Sheets share/edit URL (sheet must be link-viewable)")
+    missing_value: Optional[str] = None
+
+
+def _gsheet_csv_url(url: str) -> str:
+    """Turn a Google Sheets URL into its CSV-export URL, preserving the tab (gid)."""
+    m = re.search(r"/spreadsheets/d/([a-zA-Z0-9_-]+)", url)
+    if not m:
+        raise HTTPException(422, "not a Google Sheets URL")
+    sheet_id = m.group(1)
+    gid_match = re.search(r"[#&?]gid=(\d+)", url)
+    gid = gid_match.group(1) if gid_match else "0"
+    return f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
+
+
+@app.post("/api/datasets/gsheet")
+def connect_gsheet(req: SheetDatasetRequest):
+    """Ingest a dataset from a link-viewable Google Sheet (no OAuth; uses CSV export)."""
+    csv_url = _gsheet_csv_url(req.url)
+    try:
+        resp = httpx.get(csv_url, follow_redirects=True, timeout=30)
+        resp.raise_for_status()
+    except Exception as exc:
+        raise HTTPException(422, f"could not fetch the sheet: {exc}")
+    ctype = resp.headers.get("content-type", "")
+    if "text/csv" not in ctype:
+        raise HTTPException(422, "the sheet is not link-viewable — set sharing to "
+                                 "'Anyone with the link' (Viewer)")
+    try:
+        df = pd.read_csv(io.BytesIO(resp.content))
+    except Exception as exc:
+        raise HTTPException(422, f"could not parse the sheet as CSV: {exc}")
+    return _persist_dataset(df, "gsheet", req.missing_value)
 
 
 @app.get("/api/datasets/{dataset_id}")

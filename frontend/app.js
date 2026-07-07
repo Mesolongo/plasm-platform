@@ -53,7 +53,31 @@ api("/api/ai/status").then(({ configured }) => {
 });
 
 /* ------------------------------ Step 1: data ------------------------------ */
-$("#upload-form").addEventListener("submit", async (e) => {
+/* Source tabs: file upload, SQL database, or Google Sheet. All three land the same
+   dataset shape, so the rest of the app is source-agnostic. */
+document.querySelectorAll(".source-tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    const src = tab.dataset.source;
+    document.querySelectorAll(".source-tab").forEach((t) =>
+      t.classList.toggle("active", t === tab));
+    document.querySelectorAll(".source-panel").forEach((p) =>
+      p.classList.toggle("hidden", p.dataset.source !== src));
+    setStatus("#upload-status", "");
+  });
+});
+
+async function ingest(promise, busyMsg) {
+  setStatus("#upload-status", busyMsg);
+  try {
+    state.dataset = await promise;
+    renderDataset();
+    setStatus("#upload-status", "");
+  } catch (err) {
+    setStatus("#upload-status", err.message, true);
+  }
+}
+
+$("#upload-form").addEventListener("submit", (e) => {
   e.preventDefault();
   const file = $("#file-input").files[0];
   if (!file) return;
@@ -61,14 +85,32 @@ $("#upload-form").addEventListener("submit", async (e) => {
   fd.append("file", file);
   const code = $("#missing-code").value.trim();
   if (code) fd.append("missing_value", code);
-  setStatus("#upload-status", "Uploading and auditing…");
-  try {
-    state.dataset = await api("/api/datasets", { method: "POST", body: fd });
-    renderDataset();
-    setStatus("#upload-status", "");
-  } catch (err) {
-    setStatus("#upload-status", err.message, true);
-  }
+  ingest(api("/api/datasets", { method: "POST", body: fd }), "Uploading and auditing…");
+});
+
+$("#sql-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const body = {
+    dsn: $("#sql-dsn").value.trim(),
+    query: $("#sql-query").value.trim(),
+    missing_value: $("#sql-missing").value.trim() || null,
+  };
+  ingest(api("/api/datasets/sql", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  }), "Querying database and auditing…");
+});
+
+$("#gsheet-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const body = {
+    url: $("#gsheet-url").value.trim(),
+    missing_value: $("#gsheet-missing").value.trim() || null,
+  };
+  ingest(api("/api/datasets/gsheet", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  }), "Importing sheet and auditing…");
 });
 
 function renderDataset() {
@@ -487,9 +529,18 @@ function renderSlopes(a) {
   lines.forEach((l) => {
     el("line", { x1: sx(-2), y1: sy(l.y(-2)), x2: sx(2), y2: sy(l.y(2)),
                  stroke: SLOPE_COLORS[l.label], "stroke-width": 2, fill: "none" });
-    el("text", { x: sx(2) + 8, y: sy(l.y(2)) + 4, class: "slope-label",
-                 fill: SLOPE_COLORS[l.label] }, `${x.moderator} ${l.label}`);
   });
+  // Direct labels at the line ends, nudged apart when the lines converge
+  let lastLabelY = -1e9;
+  lines
+    .map((l) => ({ l, ly: sy(l.y(2)) + 4 }))
+    .sort((a, b) => a.ly - b.ly)
+    .forEach((entry) => {
+      if (entry.ly - lastLabelY < 14) entry.ly = lastLabelY + 14;
+      lastLabelY = entry.ly;
+      el("text", { x: sx(2) + 8, y: entry.ly, class: "slope-label",
+                   fill: SLOPE_COLORS[entry.l.label] }, `${x.moderator} ${entry.l.label}`);
+    });
   el("text", { x: M.left + 6, y: M.top + 8, class: "quadrant-caption" },
      `slope = ${(b1 + b3).toFixed(3)} at +1 SD · ${b1.toFixed(3)} at mean · ${(b1 - b3).toFixed(3)} at −1 SD`);
 }

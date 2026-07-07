@@ -11,10 +11,16 @@ mediation (bootstrap specific indirect effects with the Zhao et al. 2010
 typology), IPMA with the priority-map visualization (Ringle & Sarstedt 2016),
 and **multi-group analysis**: permutation MGA (Chin & Dibbern 2010) gated on
 MICOM measurement invariance (Henseler et al. 2016) — path comparisons are
-withheld unless at least partial invariance holds. Engine outputs reproduce the
-published Hair et al. (2022) examples: two-stage interaction β = −0.071;
-indirect effects COMP→CUSA→CUSL = 0.074 (indirect-only mediation) and
-LIKE→CUSA→CUSL = 0.220 (complementary); servicetype MICOM reaches full
+withheld unless at least partial invariance holds. Also: blindfolding Q²
+(cross-validated redundancy, D = 7), NFI and RMS_theta fit indices,
+simple-slopes plots for moderation, assumption-checking gates before every run
+(10-times rule, >5% missing, straight-lining; override is recorded), Excel and
+PowerPoint export, PDF report export (needs LibreOffice), a grounded
+research-assistant chat, and SQL / Google Sheets data connectors. Engine
+outputs reproduce the published Hair et al. examples: two-stage interaction
+β = −0.071; indirect effects COMP→CUSA→CUSL = 0.074 (indirect-only mediation)
+and LIKE→CUSA→CUSL = 0.220 (complementary); blindfolding Q² CUSA = 0.279 /
+CUSL = 0.408 (published 0.280 / 0.415); servicetype MICOM reaches full
 invariance on the corp-rep data.
 
 ## Layout
@@ -39,7 +45,10 @@ docs/references/                 # published SmartPLS case-study PDFs + extracte
 
 - R ≥ 4.6 with `seminr`, `jsonlite`
 - Python ≥ 3.12; `.venv` contains `fastapi`, `pandas`, `python-docx`, `pyreadstat`
-  (SPSS import), `anthropic`, `pydantic`
+  (SPSS import), `openpyxl` + `python-pptx` (Excel/PowerPoint export), `sqlalchemy`
+  (SQL connector), `httpx` (Google Sheets connector), `anthropic`, `pydantic`
+- Optional: LibreOffice (`soffice` on PATH) for PDF report export; a database driver
+  for the SQL connector's dialect (e.g. `psycopg` for PostgreSQL) — SQLite needs none
 - Anthropic API credentials for `ai/model_architect.py` (`ANTHROPIC_API_KEY` or `ant auth login`)
 
 ## Run the backend (Phase 1)
@@ -49,7 +58,8 @@ docs/references/                 # published SmartPLS case-study PDFs + extracte
 .venv/bin/python -m pytest backend/tests/         # end-to-end test suite
 ```
 
-The web UI (served at `/`) walks the full flow: upload CSV/Excel/SPSS `.sav` →
+The web UI (served at `/`) walks the full flow: bring in data (upload CSV/Excel/SPSS
+`.sav`, or pull from a SQL database or a link-viewable Google Sheet) →
 data audit → model builder with live path diagram (manual, example, or
 AI-proposed; supports moderation via two-stage interaction terms and
 higher-order constructs) → run → results dashboard with threshold verdicts,

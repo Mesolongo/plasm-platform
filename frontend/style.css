@@ -60,6 +60,21 @@ main { max-width: 68rem; margin: 0 auto; padding: 1.5rem; }
 }
 .form-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
 .form-row label { color: var(--ink-soft); font-size: 0.9rem; }
+
+/* Data-source tabs (file / SQL / Google Sheet) */
+.source-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.75rem; }
+.source-tab {
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft);
+  padding: 0.4rem 0.9rem; border-radius: 999px; cursor: pointer; font-size: 0.9rem;
+}
+.source-tab.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.form-col { display: flex; flex-direction: column; gap: 0.75rem; align-items: stretch; }
+.form-col > label { display: flex; flex-direction: column; gap: 0.3rem; color: var(--ink-soft); font-size: 0.9rem; }
+.form-col input[type="text"], .form-col textarea {
+  width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 0.35rem 0.5rem;
+  font-family: inherit; font-size: 0.9rem;
+}
+.form-col textarea { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; resize: vertical; }
 input[type="text"], select {
   border: 1px solid var(--line); border-radius: 6px; padding: 0.35rem 0.5rem;
   font: inherit; background: var(--surface);

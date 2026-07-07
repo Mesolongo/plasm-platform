@@ -20,12 +20,44 @@
 <main>
   <!-- ============ Step 1: Data ============ -->
   <section id="panel-1" class="panel">
-    <h1>Upload survey data</h1>
-    <p class="lead">CSV, Excel, or SPSS (.sav). Each row is a respondent; columns are indicators.</p>
-    <form id="upload-form" class="card form-row">
+    <h1>Bring in survey data</h1>
+    <p class="lead">Each row is a respondent; columns are indicators.</p>
+    <div class="source-tabs" role="tablist">
+      <button class="source-tab active" data-source="file">File</button>
+      <button class="source-tab" data-source="sql">SQL database</button>
+      <button class="source-tab" data-source="gsheet">Google Sheet</button>
+    </div>
+
+    <form id="upload-form" class="card form-row source-panel" data-source="file">
       <input type="file" id="file-input" accept=".csv,.xlsx,.xls,.sav" required>
       <label>Missing-value code <input type="text" id="missing-code" placeholder="e.g. -99" size="6"></label>
       <button type="submit" class="primary">Upload &amp; audit</button>
+      <p class="hint">CSV, Excel, or SPSS (.sav).</p>
+    </form>
+
+    <form id="sql-form" class="card form-col source-panel hidden" data-source="sql">
+      <label>Database URL (SQLAlchemy DSN)
+        <input type="text" id="sql-dsn" placeholder="postgresql+psycopg://user:pw@host:5432/dbname" required>
+      </label>
+      <label>SELECT query
+        <textarea id="sql-query" rows="3" placeholder="SELECT * FROM survey_responses" required></textarea>
+      </label>
+      <div class="form-row">
+        <label>Missing-value code <input type="text" id="sql-missing" placeholder="e.g. -99" size="6"></label>
+        <button type="submit" class="primary">Run query &amp; audit</button>
+      </div>
+      <p class="hint">Read-only: a single SELECT is run verbatim. Use a read-only account; the DSN is not stored after ingestion.</p>
+    </form>
+
+    <form id="gsheet-form" class="card form-col source-panel hidden" data-source="gsheet">
+      <label>Google Sheet URL
+        <input type="text" id="gsheet-url" placeholder="https://docs.google.com/spreadsheets/d/…/edit#gid=0" required>
+      </label>
+      <div class="form-row">
+        <label>Missing-value code <input type="text" id="gsheet-missing" placeholder="e.g. -99" size="6"></label>
+        <button type="submit" class="primary">Import &amp; audit</button>
+      </div>
+      <p class="hint">Set sharing to “Anyone with the link” (Viewer). The tab is taken from the URL’s gid.</p>
     </form>
     <div id="upload-status" class="status"></div>
     <div id="data-summary" class="hidden">

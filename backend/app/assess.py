@@ -320,7 +320,7 @@ def assess(results: dict, request: dict) -> dict:
                 "citation": "Cohen (1988)",
             })
 
-    # --- Model fit: SRMR (saturated model) ------------------------------------
+    # --- Model fit: SRMR, NFI, RMS_theta (saturated model) --------------------
     srmr = _num(results.get("srmr"))
     if srmr is not None:
         structural.append({
@@ -329,6 +329,40 @@ def assess(results: dict, request: dict) -> dict:
             "threshold": "< 0.08",
             "verdict": "pass" if srmr < 0.08 else ("review" if srmr <= 0.10 else "fail"),
             "citation": "Henseler et al. (2014); Hu & Bentler (1999)",
+        })
+    nfi = _num(results.get("nfi"))
+    if nfi is not None:
+        structural.append({
+            "family": "model_fit", "construct": "overall model",
+            "metric": "NFI", "value": round(nfi, 3),
+            "threshold": ">= 0.90 (descriptive for PLS)",
+            "verdict": "pass" if nfi >= 0.90 else "review",
+            "citation": "Bentler & Bonett (1980); Lohmöller (1989)",
+        })
+    rms_theta = _num(results.get("rms_theta"))
+    if rms_theta is not None:
+        structural.append({
+            "family": "model_fit", "construct": "overall model",
+            "metric": "RMS_theta", "value": round(rms_theta, 3),
+            "threshold": "< 0.12 (descriptive for PLS)",
+            "verdict": "pass" if rms_theta < 0.12 else "review",
+            "citation": "Henseler et al. (2014)",
+        })
+
+    # --- Predictive relevance: blindfolding Q2 (cross-validated redundancy) ---
+    for rec in _rows(results.get("blindfolding")):
+        q2 = _col(rec, "q2")
+        if q2 is None:
+            continue
+        label = ("substantial" if q2 >= 0.35 else "moderate" if q2 >= 0.15 else
+                 "small" if q2 > 0 else "none")
+        structural.append({
+            "family": "predictive_relevance_q2", "construct": rec["row"],
+            "metric": f"Q^2 (blindfolding, D={int(_col(rec, 'omission_distance') or 7)})",
+            "value": round(q2, 3),
+            "threshold": "> 0; 0.02 small / 0.15 moderate / 0.35 substantial",
+            "verdict": label,
+            "citation": "Hair et al. (2022)",
         })
 
     # --- Predictive power: PLSpredict (Q2predict > 0; PLS RMSE vs LM) ---------

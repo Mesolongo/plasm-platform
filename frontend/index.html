@@ -67,6 +67,9 @@
             <select id="nboot"><option>1000</option><option selected>5000</option><option>10000</option></select>
           </label>
           <button id="btn-run" class="primary">Run analysis</button>
+          <label class="hint" title="Assumption checks (sample size 10x rule, >5% missing, straight-lining) block the run; tick to run anyway — the override is recorded with the analysis.">
+            <input type="checkbox" id="override-gates"> override assumption gates
+          </label>
           <div id="run-status" class="status"></div>
         </div>
       </div>
@@ -78,7 +81,10 @@
     <h1>Results</h1>
     <div class="cards" id="result-cards"></div>
     <div class="toolbar">
-      <a id="btn-report" class="button primary" href="#" download>⬇ Download report (.docx)</a>
+      <a id="btn-report" class="button primary" href="#" download>⬇ Report (.docx)</a>
+      <button id="btn-pdf">⬇ PDF</button>
+      <a id="btn-xlsx" class="button" href="#" download>⬇ Excel (.xlsx)</a>
+      <a id="btn-pptx" class="button" href="#" download>⬇ Slides (.pptx)</a>
       <button id="btn-interpret">✨ Generate AI interpretation</button>
       <a id="btn-json" class="button" href="#" target="_blank">Raw results JSON</a>
     </div>
@@ -92,6 +98,12 @@
     <div id="mediation-block" class="hidden">
       <h3>Mediation — specific indirect effects <span class="hint">Zhao et al. (2010)</span></h3>
       <div class="tablewrap"><table id="med-table"></table></div>
+    </div>
+    <div id="slopes-block" class="hidden">
+      <h3>Simple slopes <span class="hint">moderation probing, ±1 SD of the moderator</span></h3>
+      <div class="card diagram-card chart-card">
+        <svg id="slopes-plot" width="100%" height="330"></svg>
+      </div>
     </div>
     <h2>Measurement model</h2>
     <div class="tablewrap"><table id="rel-table"></table></div>
@@ -129,6 +141,15 @@
         <h3>Path differences</h3>
         <div class="tablewrap"><table id="mga-path-table"></table></div>
       </div>
+    </div>
+    <div id="chat-block" class="hidden">
+      <h2>Research assistant <span class="hint">grounded in this analysis only</span></h2>
+      <div id="chat-log" class="card chat-log"></div>
+      <form id="chat-form" class="form-row">
+        <input type="text" id="chat-input" placeholder="Ask about a result, a threshold, what to fix…" size="60">
+        <button type="submit" class="primary">Send</button>
+      </form>
+      <div id="chat-status" class="status"></div>
     </div>
   </section>
 </main>

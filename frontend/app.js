@@ -43,7 +43,9 @@ document.querySelectorAll(".step").forEach((s) =>
   s.addEventListener("click", () => !s.disabled && goStep(+s.dataset.step)));
 
 /* ------------------------------ AI badge ------------------------------ */
+let aiConfigured = false;
 api("/api/ai/status").then(({ configured }) => {
+  aiConfigured = configured;
   const el = $("#ai-badge");
   el.textContent = configured ? "AI: connected" : "AI: no API key";
   el.classList.toggle("off", !configured);
@@ -328,6 +330,7 @@ $("#btn-run").addEventListener("click", async () => {
     paths: state.paths,
     interactions: state.interactions,
     nboot: +$("#nboot").value,
+    override_gates: $("#override-gates").checked,
   };
   if (!payload.constructs.length || !payload.paths.length) {
     setStatus("#run-status", "Define at least two constructs and one path.", true);
@@ -388,7 +391,12 @@ function renderResults() {
   const a = state.analysis.assessment;
   const s = a.summary;
   $("#btn-report").href = `/api/analyses/${state.analysis.id}/report.docx`;
+  $("#btn-xlsx").href = `/api/analyses/${state.analysis.id}/results.xlsx`;
+  $("#btn-pptx").href = `/api/analyses/${state.analysis.id}/summary.pptx`;
   $("#btn-json").href = `/api/analyses/${state.analysis.id}/results`;
+  state.chatHistory = [];
+  $("#chat-log").innerHTML = "";
+  $("#chat-block").classList.toggle("hidden", !aiConfigured);
 
   const fit = a.structural_model.find((m) => m.family === "model_fit");
   $("#result-cards").innerHTML = `
@@ -427,9 +435,108 @@ function renderResults() {
       <td>${m.threshold}</td><td>${verdictBadge(m.verdict)}</td></tr>`).join("");
 
   renderMediation(a.mediation || []);
+  renderSlopes(a);
   renderIpma(state.analysis.results);
   setupMga();
 }
+
+/* Simple-slopes plot: relationship IV -> Y at moderator = -1 SD, mean, +1 SD
+   (standardized construct scores; two-stage interaction estimates). */
+const SLOPE_COLORS = { "+1 SD": "#0c7fa8", "mean": "#b45309", "−1 SD": "#7c5cd6" };
+function renderSlopes(a) {
+  const x = state.interactions[0];
+  const est = {};
+  a.hypotheses.forEach((h) => { est[h.path] = h.estimate; });
+  const target = x && state.paths.find((p) => p.from_construct === interactionName(x));
+  const show = x && target && est[`${interactionName(x)} -> ${target.to_construct}`] != null;
+  $("#slopes-block").classList.toggle("hidden", !show);
+  if (!show) return;
+  const Y = target.to_construct;
+  const b1 = est[`${x.iv} -> ${Y}`] || 0;
+  const b2 = est[`${x.moderator} -> ${Y}`] || 0;
+  const b3 = est[`${interactionName(x)} -> ${Y}`] || 0;
+
+  const svg = $("#slopes-plot");
+  svg.innerHTML = "";
+  const NS = "http://www.w3.org/2000/svg";
+  const W = svg.clientWidth || 640, H = 330;
+  const M = { top: 16, right: 120, bottom: 42, left: 52 };
+  const lines = [["+1 SD", 1], ["mean", 0], ["−1 SD", -1]]
+    .map(([label, m]) => ({ label, m, y: (xx) => (b1 + b3 * m) * xx + b2 * m }));
+  const ys = lines.flatMap((l) => [l.y(-2), l.y(2)]);
+  const [y0, y1] = [Math.min(...ys) - 0.2, Math.max(...ys) + 0.2];
+  const sx = (v) => M.left + ((v + 2) / 4) * (W - M.left - M.right);
+  const sy = (v) => H - M.bottom - ((v - y0) / (y1 - y0)) * (H - M.top - M.bottom);
+  const el = (tag, attrs, text) => {
+    const e = document.createElementNS(NS, tag);
+    Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v));
+    if (text != null) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  };
+  [-2, -1, 0, 1, 2].forEach((v) => {
+    el("line", { x1: sx(v), y1: H - M.bottom, x2: sx(v), y2: H - M.bottom + 4, class: "axis" });
+    el("text", { x: sx(v), y: H - M.bottom + 16, "text-anchor": "middle", class: "tick" }, v);
+  });
+  el("line", { x1: M.left, y1: H - M.bottom, x2: W - M.right, y2: H - M.bottom, class: "axis" });
+  el("line", { x1: M.left, y1: M.top, x2: M.left, y2: H - M.bottom, class: "axis" });
+  el("text", { x: (M.left + W - M.right) / 2, y: H - 6, "text-anchor": "middle", class: "axis-title" },
+     `${x.iv} (standardized)`);
+  const yt = el("text", { x: 0, y: 0, "text-anchor": "middle", class: "axis-title" }, `${Y} (standardized)`);
+  yt.setAttribute("transform", `translate(14, ${(M.top + H - M.bottom) / 2}) rotate(-90)`);
+  lines.forEach((l) => {
+    el("line", { x1: sx(-2), y1: sy(l.y(-2)), x2: sx(2), y2: sy(l.y(2)),
+                 stroke: SLOPE_COLORS[l.label], "stroke-width": 2, fill: "none" });
+    el("text", { x: sx(2) + 8, y: sy(l.y(2)) + 4, class: "slope-label",
+                 fill: SLOPE_COLORS[l.label] }, `${x.moderator} ${l.label}`);
+  });
+  el("text", { x: M.left + 6, y: M.top + 8, class: "quadrant-caption" },
+     `slope = ${(b1 + b3).toFixed(3)} at +1 SD · ${b1.toFixed(3)} at mean · ${(b1 - b3).toFixed(3)} at −1 SD`);
+}
+
+/* ------------------------------ Research chat ------------------------------ */
+$("#chat-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const input = $("#chat-input");
+  const message = input.value.trim();
+  if (!message || !state.analysis) return;
+  const log = $("#chat-log");
+  log.innerHTML += `<div class="chat-msg user">${message}</div>`;
+  input.value = "";
+  setStatus("#chat-status", "Thinking…");
+  try {
+    const { reply } = await api(`/api/analyses/${state.analysis.id}/chat`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, history: state.chatHistory }),
+    });
+    state.chatHistory.push({ role: "user", content: message },
+                           { role: "assistant", content: reply });
+    log.innerHTML += `<div class="chat-msg assistant">${reply.replaceAll("\n", "<br>")}</div>`;
+    log.scrollTop = log.scrollHeight;
+    setStatus("#chat-status", "");
+  } catch (err) {
+    setStatus("#chat-status", err.message, true);
+  }
+});
+
+/* PDF export needs LibreOffice on the server; surface the message if missing. */
+$("#btn-pdf").addEventListener("click", async () => {
+  if (!state.analysis) return;
+  setStatus("#interpret-status", "Converting to PDF…");
+  const resp = await fetch(`/api/analyses/${state.analysis.id}/report.pdf`);
+  if (!resp.ok) {
+    const body = await resp.json().catch(() => ({}));
+    setStatus("#interpret-status", body.detail || "PDF export failed", true);
+    return;
+  }
+  const blob = await resp.blob();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `plsem_report_${state.analysis.id}.pdf`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  setStatus("#interpret-status", "");
+});
 
 /* ------------------------------ MGA (MICOM-gated) ------------------------------ */
 function setupMga() {

@@ -194,13 +194,24 @@ def build_report(dataset_meta: dict, request: dict, results: dict, assessment: d
         _table(doc, ["Interaction", "f²", "Class"],
                [[s["construct"], _fmt(s["value"]), s["verdict"]] for s in mod_f2])
 
-    fit = next((s for s in assessment["structural_model"] if s["family"] == "model_fit"), None)
-    if fit:
+    fits = [s for s in assessment["structural_model"] if s["family"] == "model_fit"]
+    if fits:
+        doc.add_paragraph()
+        doc.add_paragraph("Model fit: " + "; ".join(
+            f"{s['metric']} = {_fmt(s['value'])} (criterion {s['threshold']}; "
+            f"{s['citation']}) — {s['verdict'].upper()}" for s in fits) + ".")
+
+    q2_blind = [s for s in assessment["structural_model"]
+                if s["family"] == "predictive_relevance_q2"]
+    if q2_blind:
         doc.add_paragraph()
         doc.add_paragraph(
-            f"Model fit: SRMR (saturated model) = {_fmt(fit['value'])} "
-            f"(criterion {fit['threshold']}; {fit['citation']}) — {fit['verdict'].upper()}."
+            "Predictive relevance — blindfolding Q² (cross-validated redundancy, "
+            "omission distance 7; 0.02 small / 0.15 moderate / 0.35 substantial; "
+            "Hair et al., 2022):"
         )
+        _table(doc, ["Endogenous construct", "Q²", "Class"],
+               [[s["construct"], _fmt(s["value"]), s["verdict"]] for s in q2_blind])
 
     # --- Predictive power: PLSpredict ------------------------------------------
     q2 = [s for s in assessment["structural_model"] if s["family"] == "predictive_relevance"]

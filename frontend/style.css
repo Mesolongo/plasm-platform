@@ -154,3 +154,11 @@ td { font-variant-numeric: tabular-nums; }
   font-size: 0.75rem; line-height: 1.35; padding: 0.35rem 0.55rem; border-radius: 6px;
   max-width: 15rem; z-index: 10;
 }
+
+/* Simple slopes + research chat */
+#slopes-plot .slope-label { font-size: 11.5px; font-weight: 600; }
+.chat-log { max-height: 22rem; overflow-y: auto; padding: 0.8rem; }
+.chat-msg { margin: 0.4rem 0; padding: 0.5rem 0.8rem; border-radius: 10px; max-width: 46rem; line-height: 1.45; }
+.chat-msg.user { background: var(--accent-soft); margin-left: auto; text-align: right; }
+.chat-msg.assistant { background: var(--ground); border: 1px solid var(--line); }
+.run-card label.hint input { vertical-align: -2px; }

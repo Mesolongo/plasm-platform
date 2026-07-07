@@ -10,6 +10,8 @@ Docs: http://127.0.0.1:8000/docs
 """
 import datetime
 import io
+import shutil
+import subprocess
 import tempfile
 from pathlib import Path
 from typing import List, Literal, Optional
@@ -24,6 +26,7 @@ from . import ai
 from .assess import assess, assess_mga
 from .audit import run_audit, variable_dictionary
 from .engine import MGA_SCRIPT, EngineError, run_engine
+from .export import write_pptx, write_xlsx
 from .report import build_report
 from .storage import ROOT, analysis_dir, dataset_dir, new_id, read_json, write_json
 
@@ -126,6 +129,7 @@ class AnalysisRequest(BaseModel):
     nboot: int = Field(default=5000, ge=100, le=10000)
     seed: int = 123
     prediction: bool = True  # PLSpredict k-fold out-of-sample metrics
+    override_gates: bool = False  # run despite assumption-gate violations
 
     def validate_spec(self):
         for c in self.constructs:
@@ -137,6 +141,53 @@ class AnalysisRequest(BaseModel):
                 raise HTTPException(422, f"construct {c.name} has no indicators")
 
 
+def assumption_gates(ds_meta: dict, req: AnalysisRequest) -> list[dict]:
+    """Pre-estimation gates from the dataset audit + the model's demands.
+
+    Violations block the run unless the user explicitly overrides — the override
+    is recorded with the analysis so the report can disclose it.
+    """
+    violations = []
+    n = ds_meta["n_observations"]
+    used = {i for c in req.constructs for i in c.indicators}
+
+    incoming: dict[str, int] = {}
+    for p in req.paths:
+        incoming[p.to_construct] = incoming.get(p.to_construct, 0) + 1
+    max_arrows = max([len(c.indicators) for c in req.constructs
+                      if c.measurement == "formative"] + list(incoming.values()) + [0])
+    if max_arrows and n < 10 * max_arrows:
+        violations.append({
+            "gate": "sample_size_10x",
+            "detail": f"n = {n} is below 10 x {max_arrows} (the largest number of "
+                      f"arrows pointing at any construct)",
+            "citation": "Hair et al. (2022)",
+        })
+    for f in (ds_meta.get("audit") or {}).get("findings") or []:
+        var = f.get("variable")
+        if f["check"] == "missing_values" and f["severity"] == "warning" and var in used:
+            violations.append({
+                "gate": "excessive_missing",
+                "detail": f"indicator {var} has {f['pct']}% missing (> 5% — mean "
+                          f"replacement is not defensible)",
+                "citation": "Hair et al. (2022)",
+            })
+        elif f["check"] == "zero_variance" and var in used:
+            violations.append({
+                "gate": "zero_variance",
+                "detail": f"indicator {var} is constant and cannot be estimated",
+                "citation": "engine requirement",
+            })
+        elif f["check"] == "straight_lining":
+            violations.append({
+                "gate": "straight_lining",
+                "detail": f"{f['count']} respondent(s) answered identically across "
+                          f"all items — review before trusting the estimates",
+                "citation": "Hair et al. (2022)",
+            })
+    return violations
+
+
 @app.post("/api/analyses")
 def create_analysis(req: AnalysisRequest):
     ds_dir = dataset_dir(req.dataset_id)
@@ -144,10 +195,19 @@ def create_analysis(req: AnalysisRequest):
         raise HTTPException(404, "dataset not found")
     ds_meta = read_json(ds_dir / "meta.json")
 
+    req.validate_spec()
+    violations = assumption_gates(ds_meta, req)
+    if violations and not req.override_gates:
+        raise HTTPException(422, {
+            "stage": "assumption_gates",
+            "message": "assumption checks failed: "
+                       + " · ".join(v["detail"] for v in violations)
+                       + " — review the data, or run again with the override",
+            "violations": violations,
+        })
+
     analysis_id = new_id("an")
     a_dir = analysis_dir(analysis_id, create=True)
-
-    req.validate_spec()
     engine_request = {
         "schema_version": 2,
         "data_csv": str(ds_dir / "raw.csv"),
@@ -164,6 +224,8 @@ def create_analysis(req: AnalysisRequest):
         "dataset_id": req.dataset_id,
         "created_at": datetime.datetime.now().isoformat(timespec="seconds"),
         "status": "running",
+        "assumption_gates": {"violations": violations,
+                             "overridden": bool(violations)},
     }
     write_json(a_dir / "meta.json", meta)
 
@@ -261,14 +323,90 @@ def get_report(analysis_id: str):
     dataset_meta = read_json(dataset_dir(meta["dataset_id"]) / "meta.json")
     interp_path = a_dir / "interpretation.json"
     interpretation = read_json(interp_path) if interp_path.exists() else None
-    mga_path = a_dir / "mga.json"
-    mga = assess_mga(read_json(mga_path)) if mga_path.exists() else None
     doc = build_report(dataset_meta, request, results, assess(results, request),
-                       interpretation=interpretation, mga=mga)
+                       interpretation=interpretation, mga=_mga_if_any(a_dir))
     out = a_dir / "report.docx"
     doc.save(out)
     return FileResponse(out, filename=f"plsem_report_{analysis_id}.docx",
                         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+
+def _mga_if_any(a_dir):
+    p = a_dir / "mga.json"
+    return assess_mga(read_json(p)) if p.exists() else None
+
+
+@app.get("/api/analyses/{analysis_id}/results.xlsx")
+def get_xlsx(analysis_id: str):
+    """Full results workbook — every engine table on its own sheet."""
+    a_dir, _, request, results = _load_analysis(analysis_id)
+    out = a_dir / "results.xlsx"
+    write_xlsx(out, results, assess(results, request), mga=_mga_if_any(a_dir))
+    return FileResponse(out, filename=f"plsem_results_{analysis_id}.xlsx",
+                        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+
+@app.get("/api/analyses/{analysis_id}/summary.pptx")
+def get_pptx(analysis_id: str):
+    """Compact findings deck (hypotheses, mediation, IPMA, MGA)."""
+    a_dir, meta, request, results = _load_analysis(analysis_id)
+    dataset_meta = read_json(dataset_dir(meta["dataset_id"]) / "meta.json")
+    out = a_dir / "summary.pptx"
+    write_pptx(out, dataset_meta, request, results, assess(results, request),
+               mga=_mga_if_any(a_dir))
+    return FileResponse(out, filename=f"plsem_summary_{analysis_id}.pptx",
+                        media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation")
+
+
+def _find_soffice() -> str | None:
+    return (shutil.which("soffice")
+            or next((p for p in ("/Applications/LibreOffice.app/Contents/MacOS/soffice",)
+                     if Path(p).exists()), None))
+
+
+@app.get("/api/analyses/{analysis_id}/report.pdf")
+def get_report_pdf(analysis_id: str):
+    """Word report converted to PDF via LibreOffice (when installed)."""
+    soffice = _find_soffice()
+    if not soffice:
+        raise HTTPException(501, "PDF export needs LibreOffice (`brew install --cask "
+                                 "libreoffice`); the Word report is available meanwhile")
+    a_dir, meta, request, results = _load_analysis(analysis_id)
+    dataset_meta = read_json(dataset_dir(meta["dataset_id"]) / "meta.json")
+    interp_path = a_dir / "interpretation.json"
+    interpretation = read_json(interp_path) if interp_path.exists() else None
+    doc = build_report(dataset_meta, request, results, assess(results, request),
+                       interpretation=interpretation, mga=_mga_if_any(a_dir))
+    doc.save(a_dir / "report.docx")
+    proc = subprocess.run([soffice, "--headless", "--convert-to", "pdf",
+                           "--outdir", str(a_dir), str(a_dir / "report.docx")],
+                          capture_output=True, text=True, timeout=120)
+    pdf = a_dir / "report.pdf"
+    if proc.returncode != 0 or not pdf.exists():
+        raise HTTPException(500, f"PDF conversion failed: {proc.stderr[-500:]}")
+    return FileResponse(pdf, filename=f"plsem_report_{analysis_id}.pdf",
+                        media_type="application/pdf")
+
+
+class ChatRequest(BaseModel):
+    message: str
+    history: List[dict] = []  # [{role: user|assistant, content: str}], client-held
+
+
+@app.post("/api/analyses/{analysis_id}/chat")
+def analysis_chat(analysis_id: str, req: ChatRequest):
+    """Research-assistant chat, grounded in this analysis's assessment."""
+    if not ai.is_configured():
+        raise HTTPException(503, ai.NOT_CONFIGURED)
+    a_dir, _, request, results = _load_analysis(analysis_id)
+    history = [{"role": h["role"], "content": h["content"]} for h in req.history
+               if h.get("role") in ("user", "assistant") and isinstance(h.get("content"), str)]
+    try:
+        reply = ai.chat(request, assess(results, request), history, req.message,
+                        mga=_mga_if_any(a_dir))
+    except Exception as exc:
+        raise HTTPException(502, f"AI chat failed: {exc}")
+    return {"reply": reply}
 
 
 class InterpretRequest(BaseModel):

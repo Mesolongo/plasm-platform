@@ -101,6 +101,102 @@ srmr_saturated <- function(model) {
 }
 srmr <- tryCatch(srmr_saturated(model), error = function(e) NULL)
 
+# --- NFI (Bentler & Bonett 1980, saturated-model discrepancy) ------------------
+# 1 - F_model/F_null with the ML discrepancy on the same implied correlation
+# matrix as SRMR; the null model assumes uncorrelated indicators.
+nfi_saturated <- function(model) {
+  L <- model$outer_loadings
+  keep <- colnames(L) %in% colnames(model$construct_scores) &
+    !grepl("*", colnames(L), fixed = TRUE)
+  L <- L[, keep, drop = FALSE]
+  L <- L[rowSums(abs(L)) > 0, , drop = FALSE]
+  C <- cor(model$construct_scores[, colnames(L), drop = FALSE])
+  implied <- L %*% C %*% t(L)
+  diag(implied) <- 1
+  S <- cor(model$data[, rownames(L), drop = FALSE])
+  p <- nrow(S)
+  f_ml <- function(sigma) {
+    log(det(sigma)) - log(det(S)) + sum(diag(S %*% solve(sigma))) - p
+  }
+  1 - f_ml(implied) / f_ml(diag(p))
+}
+nfi <- tryCatch(nfi_saturated(model), error = function(e) NULL)
+
+# --- RMS_theta (Henseler et al. 2014): RMS of outer-residual correlations -------
+# Reflective multi-item blocks only; single items and formative blocks have no
+# meaningful measurement residual.
+rms_theta_of <- function(model) {
+  reflective_items <- unlist(lapply(req$constructs, function(c) {
+    if (identical(c$measurement, "reflective") && length(c$indicators) > 1)
+      unlist(c$indicators) else NULL
+  }))
+  L <- model$outer_loadings
+  items <- intersect(rownames(L), reflective_items)
+  if (length(items) < 4) return(NULL)
+  keep <- colnames(L) %in% colnames(model$construct_scores) &
+    !grepl("*", colnames(L), fixed = TRUE)
+  L <- L[items, keep, drop = FALSE]
+  X <- scale(as.matrix(model$data)[, items, drop = FALSE])
+  resid <- X - model$construct_scores[, colnames(L), drop = FALSE] %*% t(L)
+  theta <- cor(resid)
+  sqrt(mean(theta[lower.tri(theta)]^2))
+}
+rms_theta <- tryCatch(rms_theta_of(model), error = function(e) NULL)
+
+# --- Blindfolding Q2 (Hair et al. 2022, ch. 6): cross-validated redundancy ------
+# Per endogenous construct block: omit every D-th data point (round-robin over
+# the block), mean-replace, re-estimate, and predict the omitted points from the
+# predecessor scores via the structural model (all in standardized units).
+blindfold_q2 <- function(model, D = 7L) {
+  endo <- unique(vapply(req$paths, function(p) p$to_construct, character(1)))
+  endo <- endo[endo %in% colnames(model$outer_loadings) &
+                 !grepl("*", endo, fixed = TRUE)]
+  preds_of <- function(y) vapply(
+    Filter(function(p) identical(p$to_construct, y), req$paths),
+    function(p) p$from_construct, character(1))
+  base_args <- list(measurement_model = measurement, structural_model = structural)
+  if (!is.null(req$missing_value)) {
+    base_args$missing <- mean_replacement
+    base_args$missing_value <- as.character(req$missing_value)
+  }
+  rows <- lapply(endo, function(y) {
+    items <- rownames(model$outer_loadings)[abs(model$outer_loadings[, y]) > 1e-12]
+    items <- intersect(items, colnames(data))
+    if (length(items) == 0) return(NULL)
+    n <- nrow(model$data)
+    k <- length(items)
+    cell <- matrix(seq_len(n * k) - 1L, n, k, byrow = TRUE)  # row-major pattern
+    sse <- 0; sso <- 0
+    for (d in seq_len(D) - 1L) {
+      omit <- (cell %% D) == d
+      dd <- as.data.frame(data)
+      block <- as.matrix(model$data[, items, drop = FALSE])
+      train <- block
+      train[omit] <- NA
+      mu <- colMeans(train, na.rm = TRUE)
+      sdv <- apply(train, 2, sd, na.rm = TRUE)
+      filled <- train
+      for (j in seq_len(k)) filled[is.na(filled[, j]), j] <- mu[j]
+      dd[, items] <- filled
+      m_d <- suppressMessages(suppressWarnings(
+        do.call(estimate_pls, c(list(data = dd), base_args))))
+      sc <- m_d$construct_scores
+      yhat <- rowSums(cbind(sapply(preds_of(y), function(f)
+        m_d$path_coef[f, y] * sc[, f])))
+      xhat <- outer(yhat, m_d$outer_loadings[items, y])
+      x_std <- sweep(sweep(block, 2, mu), 2, sdv, "/")
+      sse <- sse + sum((x_std[omit] - xhat[omit])^2)
+      sso <- sso + sum(x_std[omit]^2)
+    }
+    data.frame(row = y, q2 = 1 - sse / sso, omission_distance = D,
+               stringsAsFactors = FALSE)
+  })
+  rows <- Filter(Negate(is.null), rows)
+  if (length(rows) == 0) return(NULL)
+  do.call(rbind, rows)
+}
+blindfolding <- tryCatch(blindfold_q2(model), error = function(e) NULL)
+
 # --- PLSpredict: k-fold out-of-sample prediction (Shmueli et al. 2019) --------
 # Q2_predict = 1 - SSE_oos / SSO (benchmark: indicator mean). RMSE compared
 # against a linear regression benchmark (LM) per SmartPLS convention.
@@ -235,6 +331,9 @@ out <- list(
     timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z")
   ),
   srmr            = srmr,
+  nfi             = nfi,
+  rms_theta       = rms_theta,
+  blindfolding    = if (!is.null(blindfolding)) blindfolding else NULL,
   prediction      = if (!is.null(prediction)) {
     cbind(prediction, rmse_diff = prediction$rmse_pls - prediction$rmse_lm)
   } else NULL,

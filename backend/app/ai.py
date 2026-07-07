@@ -12,6 +12,7 @@ from .storage import ROOT
 
 ARCHITECT_PROMPT = ROOT / "ai" / "prompts" / "model_architect.md"
 INTERPRETER_PROMPT = ROOT / "ai" / "prompts" / "interpreter.md"
+ASSISTANT_PROMPT = ROOT / "ai" / "prompts" / "assistant.md"
 
 NOT_CONFIGURED = (
     "AI features need Anthropic API credentials. Set ANTHROPIC_API_KEY "
@@ -68,6 +69,36 @@ def interpret(request: dict, assessment: dict, study_description: str) -> dict:
         output_format=Interpretation,
     )
     return json.loads(response.parsed_output.model_dump_json())
+
+
+def chat(request: dict, assessment: dict, history: list[dict], message: str,
+         mga: dict | None = None) -> str:
+    """Research assistant: answers questions grounded in this analysis only.
+
+    History is client-held (stateless server); the assessment travels in the
+    system prompt so every turn is grounded in the same computed statistics.
+    """
+    import anthropic
+
+    grounding = {
+        "model": {
+            "constructs": [{"name": c["name"], "measurement": c["measurement"]}
+                           for c in request["constructs"]],
+            "paths": [f"{p['from_construct']} -> {p['to_construct']}"
+                      for p in request["paths"]],
+        },
+        "assessment": assessment,
+        "mga": mga,
+    }
+    client = anthropic.Anthropic()
+    response = client.messages.create(
+        model="claude-opus-4-8",
+        max_tokens=2000,
+        system=ASSISTANT_PROMPT.read_text()
+        + "\n\nAnalysis on the table:\n" + json.dumps(grounding, indent=2),
+        messages=[*history[-20:], {"role": "user", "content": message}],
+    )
+    return "".join(b.text for b in response.content if b.type == "text")
 
 
 def propose_model(variables: list[dict], study_description: str) -> dict:

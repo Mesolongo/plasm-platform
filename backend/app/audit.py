@@ -35,6 +35,11 @@ def variable_dictionary(df: pd.DataFrame, missing_value: str | None = None) -> l
             if len(valid) > 0:
                 entry["min"] = float(valid.min())
                 entry["max"] = float(valid.max())
+        # Low-cardinality variables are candidate grouping variables (MGA);
+        # ship their value counts so the UI can offer them without a round trip.
+        if 2 <= entry["n_unique"] <= 10:
+            counts = s.dropna().value_counts()
+            entry["values"] = {str(k): int(v) for k, v in counts.items()}
         out.append(entry)
     return out
 

@@ -11,6 +11,7 @@ from pathlib import Path
 from .storage import ROOT
 
 ESTIMATE_SCRIPT = ROOT / "engine" / "R" / "estimate.R"
+MGA_SCRIPT = ROOT / "engine" / "R" / "mga.R"
 TIMEOUT_SECONDS = 600
 
 
@@ -21,10 +22,10 @@ class EngineError(Exception):
         super().__init__(f"[{stage}] {message}")
 
 
-def run_engine(request_path: Path, results_path: Path) -> dict:
-    """Run the engine on a written request.json; returns parsed results."""
+def run_engine(request_path: Path, results_path: Path, script: Path = ESTIMATE_SCRIPT) -> dict:
+    """Run an engine script on a written request.json; returns parsed results."""
     proc = subprocess.run(
-        ["Rscript", str(ESTIMATE_SCRIPT), str(request_path), str(results_path)],
+        ["Rscript", str(script), str(request_path), str(results_path)],
         capture_output=True, text=True, timeout=TIMEOUT_SECONDS,
     )
     if proc.returncode == 2:

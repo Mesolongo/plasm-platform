@@ -2,20 +2,27 @@
 
 AI-powered PLS-SEM analysis platform — from raw survey data to a publication-ready
 structural equation modeling report. Blueprint: see the project artifact
-(architecture, user flow, roadmap). Status: **Phase 0 (engine parity, 70/70),
-Phase 1 (web app + AI layer), and Phase 2 (advanced analyses) complete** — see
-[docs/phase0_parity_report.md](docs/phase0_parity_report.md). Phase 2 covers
+(architecture, user flow, roadmap). Status: engine parity (70/70), web app + AI
+layer, and the advanced statistical suite are complete — see
+[docs/phase0_parity_report.md](docs/phase0_parity_report.md). Implemented:
 moderation (two-stage interaction terms), higher-order constructs (two-stage),
 SRMR model fit, PLSpredict (Q²predict + LM benchmark), SPSS `.sav` import,
 mediation (bootstrap specific indirect effects with the Zhao et al. 2010
-typology), and IPMA (importance–performance map; Ringle & Sarstedt 2016).
-Engine outputs reproduce the published Hair et al. (2022) ch. 7 examples:
-two-stage interaction β = −0.071; indirect effects COMP→CUSA→CUSL = 0.074
-(indirect-only mediation) and LIKE→CUSA→CUSL = 0.220 (complementary).
+typology), IPMA with the priority-map visualization (Ringle & Sarstedt 2016),
+and **multi-group analysis**: permutation MGA (Chin & Dibbern 2010) gated on
+MICOM measurement invariance (Henseler et al. 2016) — path comparisons are
+withheld unless at least partial invariance holds. Engine outputs reproduce the
+published Hair et al. (2022) examples: two-stage interaction β = −0.071;
+indirect effects COMP→CUSA→CUSL = 0.074 (indirect-only mediation) and
+LIKE→CUSA→CUSL = 0.220 (complementary); servicetype MICOM reaches full
+invariance on the corp-rep data.
 
 ## Layout
 
 ```
+engine/R/estimate.R              # engine service: model spec JSON -> full results JSON
+engine/R/mga.R                   # MGA service: MICOM + permutation group comparison
+engine/R/spec_lib.R              # shared spec validation + seminr model builder
 engine/R/benchmark_corp_rep.R    # PLS-SEM engine benchmark (seminr) -> JSON results
 engine/corp_rep_results.json     # engine output (simple + extended corp-rep models)
 parity/published_values.json     # SmartPLS 4 reference values (Hair et al. primer, ch. 4+6)

@@ -428,6 +428,83 @@ function renderResults() {
 
   renderMediation(a.mediation || []);
   renderIpma(state.analysis.results);
+  setupMga();
+}
+
+/* ------------------------------ MGA (MICOM-gated) ------------------------------ */
+function setupMga() {
+  $("#mga-results").classList.add("hidden");
+  setStatus("#mga-status", "");
+  // The engine compares lower-order models only; hide the panel when the model
+  // has interactions or higher-order constructs, or no candidate grouping variable.
+  const unsupported = state.interactions.length || state.constructs.some(isHOC);
+  const indicators = new Set(state.constructs.flatMap((c) => c.indicators));
+  const candidates = (state.dataset.variables || [])
+    .filter((v) => v.values && !indicators.has(v.name));
+  $("#mga-panel").classList.toggle("hidden", !!unsupported || !candidates.length);
+  if (unsupported || !candidates.length) return;
+
+  const varSel = $("#mga-var");
+  varSel.innerHTML = candidates.map((v) => `<option>${v.name}</option>`).join("");
+  const fillValues = () => {
+    const v = candidates.find((c) => c.name === varSel.value);
+    const opts = Object.entries(v.values)
+      .map(([val, n]) => `<option value="${val}">${val} (n=${n})</option>`).join("");
+    $("#mga-a").innerHTML = opts;
+    $("#mga-b").innerHTML = opts;
+    if ($("#mga-b").options.length > 1) $("#mga-b").selectedIndex = 1;
+  };
+  varSel.onchange = fillValues;
+  fillValues();
+}
+
+$("#btn-mga").addEventListener("click", async () => {
+  if (!state.analysis) return;
+  const nperm = +$("#mga-nperm").value;
+  setStatus("#mga-status", `Testing invariance and comparing groups (${nperm.toLocaleString()} permutations)…`);
+  try {
+    const mga = await api(`/api/analyses/${state.analysis.id}/mga`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        group_variable: $("#mga-var").value,
+        value_a: $("#mga-a").value,
+        value_b: $("#mga-b").value,
+        npermutations: nperm,
+      }),
+    });
+    renderMga(mga);
+    setStatus("#mga-status", "Done — the Word report now includes the MGA section.");
+  } catch (err) {
+    setStatus("#mga-status", err.message, true);
+  }
+});
+
+function renderMga(mga) {
+  const m = mga.meta, micom = mga.micom;
+  $("#mga-results").classList.remove("hidden");
+  const inv = micom.invariance;
+  $("#mga-verdict").innerHTML =
+    `${m.group_variable}: <b>${m.value_a}</b> (n=${m.n_a}) vs <b>${m.value_b}</b> (n=${m.n_b}) · ` +
+    `${m.effective_permutations.toLocaleString()} permutations · MICOM: ` +
+    badge(`${inv} invariance`, inv === "none" ? "fail" : "pass") +
+    (micom.comparison_permissible ? "" : `<br>${micom.note}`);
+  $("#micom2-table").innerHTML =
+    `<tr><th>Construct</th><th>c</th><th>Criterion</th><th>Verdict</th></tr>` +
+    micom.step2.map((s) => `<tr><td>${s.construct}</td><td>${s.value.toFixed(4)}</td>
+      <td>${s.threshold}</td><td>${verdictBadge(s.verdict)}</td></tr>`).join("");
+  $("#micom3-table").innerHTML =
+    `<tr><th>Construct</th><th>Δ mean</th><th>95% CI</th><th>Equal</th>
+      <th>Δ log var</th><th>95% CI</th><th>Equal</th></tr>` +
+    micom.step3.map((s) => `<tr><td>${s.construct}</td>
+      <td>${fmt(s.mean_diff)}</td><td>[${fmt(s.mean_ci_95[0])}; ${fmt(s.mean_ci_95[1])}]</td>
+      <td>${verdictBadge(s.mean_equal ? "pass" : "review")}</td>
+      <td>${fmt(s.logvar_diff)}</td><td>[${fmt(s.var_ci_95[0])}; ${fmt(s.var_ci_95[1])}]</td>
+      <td>${verdictBadge(s.var_equal ? "pass" : "review")}</td></tr>`).join("");
+  $("#mga-path-table").innerHTML =
+    `<tr><th>Path</th><th>β (A)</th><th>β (B)</th><th>Δ</th><th>p (permutation)</th><th>Verdict</th></tr>` +
+    mga.paths.map((p) => `<tr><td>${p.path}</td><td>${fmt(p.estimate_a)}</td>
+      <td>${fmt(p.estimate_b)}</td><td>${fmt(p.difference)}</td><td>${fmt(p.p_value)}</td>
+      <td>${badge(p.verdict, { different: "review", withheld: "fail" }[p.verdict] || "neutral")}</td></tr>`).join("");
 }
 
 function renderMediation(mediation) {
@@ -474,4 +551,84 @@ function renderIpma(results) {
       <th>Performance (0–100)</th></tr>` +
     rows.map(([t, p, imp, pf]) => `<tr><td>${t}</td><td><b>${p}</b></td>
       <td>${fmt(imp)}</td><td>${pf.toFixed(1)}</td></tr>`).join("");
+  drawIpmaMap(rows.filter(([t]) => t === targets[0]), targets[0]);
+}
+
+/* IPMA priority map: importance (x) vs performance (y), quadrants split at the
+   means. High importance + low performance (bottom right) = act first. */
+function drawIpmaMap(rows, target) {
+  const svg = $("#ipma-map");
+  svg.innerHTML = "";
+  if (rows.length < 2) return;
+  const NS = "http://www.w3.org/2000/svg";
+  const W = svg.clientWidth || 640, H = 380;
+  const M = { top: 18, right: 96, bottom: 42, left: 52 };
+  const pts = rows.map(([, name, imp, perf]) => ({ name, imp, perf }));
+  const pad = (lo, hi) => { const d = (hi - lo) || 1; return [lo - 0.12 * d, hi + 0.12 * d]; };
+  const [x0, x1] = pad(Math.min(0, ...pts.map((p) => p.imp)), Math.max(...pts.map((p) => p.imp)));
+  const [y0, y1] = pad(Math.min(...pts.map((p) => p.perf)), Math.max(...pts.map((p) => p.perf)));
+  const sx = (v) => M.left + ((v - x0) / (x1 - x0)) * (W - M.left - M.right);
+  const sy = (v) => H - M.bottom - ((v - y0) / (y1 - y0)) * (H - M.top - M.bottom);
+  const el = (tag, attrs, text) => {
+    const e = document.createElementNS(NS, tag);
+    Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v));
+    if (text != null) e.textContent = text;
+    svg.appendChild(e);
+    return e;
+  };
+
+  // Recessive axes with ~4 ticks each
+  const ticks = (lo, hi, n) => {
+    const step = (hi - lo) / n;
+    const mag = 10 ** Math.floor(Math.log10(step));
+    const s = Math.ceil(step / mag) * mag;
+    const out = [];
+    for (let v = Math.ceil(lo / s) * s; v <= hi + 1e-9; v += s) out.push(v);
+    return out;
+  };
+  ticks(x0, x1, 4).forEach((v) => {
+    el("line", { x1: sx(v), y1: H - M.bottom, x2: sx(v), y2: H - M.bottom + 4, class: "axis" });
+    el("text", { x: sx(v), y: H - M.bottom + 16, "text-anchor": "middle", class: "tick" },
+       Math.abs(v) < 1 ? v.toFixed(2) : v.toFixed(1));
+  });
+  ticks(y0, y1, 4).forEach((v) => {
+    el("line", { x1: M.left - 4, y1: sy(v), x2: M.left, y2: sy(v), class: "axis" });
+    el("text", { x: M.left - 7, y: sy(v) + 3.5, "text-anchor": "end", class: "tick" }, v.toFixed(0));
+  });
+  el("line", { x1: M.left, y1: H - M.bottom, x2: W - M.right, y2: H - M.bottom, class: "axis" });
+  el("line", { x1: M.left, y1: M.top, x2: M.left, y2: H - M.bottom, class: "axis" });
+  el("text", { x: (M.left + W - M.right) / 2, y: H - 6, "text-anchor": "middle", class: "axis-title" },
+     `Importance — unstandardized total effect on ${target}`);
+  const yt = el("text", { x: 0, y: 0, "text-anchor": "middle", class: "axis-title" }, "Performance (0–100)");
+  yt.setAttribute("transform", `translate(14, ${(M.top + H - M.bottom) / 2}) rotate(-90)`);
+
+  // Quadrant split at the means; the action quadrant gets a muted caption
+  const mx = pts.reduce((s, p) => s + p.imp, 0) / pts.length;
+  const my = pts.reduce((s, p) => s + p.perf, 0) / pts.length;
+  el("line", { x1: sx(mx), y1: M.top, x2: sx(mx), y2: H - M.bottom, class: "quadrant" });
+  el("line", { x1: M.left, y1: sy(my), x2: W - M.right, y2: sy(my), class: "quadrant" });
+  el("text", { x: W - M.right - 6, y: H - M.bottom - 8, "text-anchor": "end", class: "quadrant-caption" },
+     "high importance · low performance → act first");
+
+  // Marks: 10px dots with a surface ring, direct label per construct
+  const tip = $("#ipma-tip");
+  pts.sort((a, b) => a.perf - b.perf);
+  let lastY = -1e9;
+  pts.forEach((p) => {
+    const cx = sx(p.imp), cy = sy(p.perf);
+    const dot = el("circle", { cx, cy, r: 5, class: "ipma-dot" });
+    let ly = cy + 4;
+    if (Math.abs(ly - lastY) < 13) ly = lastY - 13;  // nudge colliding labels apart
+    lastY = ly;
+    const right = cx < W - M.right - 60;
+    el("text", { x: right ? cx + 9 : cx - 9, y: ly,
+                 "text-anchor": right ? "start" : "end", class: "ipma-label" }, p.name);
+    dot.addEventListener("mouseenter", () => {
+      tip.innerHTML = `<b>${p.name}</b><br>importance ${p.imp.toFixed(3)} · performance ${p.perf.toFixed(1)}`;
+      tip.style.left = `${cx + 12}px`;
+      tip.style.top = `${cy - 10}px`;
+      tip.classList.remove("hidden");
+    });
+    dot.addEventListener("mouseleave", () => tip.classList.add("hidden"));
+  });
 }

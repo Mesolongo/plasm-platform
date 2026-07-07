@@ -32,6 +32,10 @@ suppressPackageStartupMessages({
   library(jsonlite)
 })
 
+script_dir <- dirname(normalizePath(sub("^--file=", "",
+  grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)[[1]])))
+source(file.path(script_dir, "spec_lib.R"))
+
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 2) stop("usage: Rscript estimate.R <request.json> <output.json>")
 req_path <- args[[1]]
@@ -48,76 +52,14 @@ req <- tryCatch(fromJSON(req_path, simplifyVector = FALSE),
 data <- tryCatch(read.csv(req$data_csv, check.names = FALSE),
                  error = function(e) fail("read_data", conditionMessage(e)))
 
-# --- Validate the spec against the data before touching seminr --------------
-`%||%` <- function(a, b) if (is.null(a)) b else a
-is_hoc <- function(c) grepl("^higher_order", c$measurement %||% "")
+# --- Validate the spec and build the seminr model (spec_lib.R) ---------------
+spec <- parse_spec(req, data)
+if (!is.null(spec$error)) fail(spec$error$stage, spec$error$message)
+higher_constructs <- spec$higher_constructs
+interaction_names <- spec$interaction_names
 
-lower_constructs  <- Filter(function(c) !is_hoc(c), req$constructs)
-higher_constructs <- Filter(is_hoc, req$constructs)
-interactions <- req$interactions %||% list()
-
-all_indicators <- unlist(lapply(lower_constructs, function(c) unlist(c$indicators)))
-missing_cols <- setdiff(all_indicators, colnames(data))
-if (length(missing_cols) > 0) {
-  fail("validate_spec", paste("indicators not found in dataset:",
-                              paste(missing_cols, collapse = ", ")))
-}
-dup <- all_indicators[duplicated(all_indicators)]
-if (length(dup) > 0) {
-  fail("validate_spec", paste("indicator assigned to multiple constructs:",
-                              paste(unique(dup), collapse = ", ")))
-}
-lower_names <- vapply(lower_constructs, function(c) c$name, character(1))
-for (h in higher_constructs) {
-  dims <- unlist(h$dimensions)
-  if (length(dims) < 2) {
-    fail("validate_spec", paste("higher-order construct", h$name,
-                                "needs at least 2 dimensions"))
-  }
-  bad <- setdiff(dims, lower_names)
-  if (length(bad) > 0) {
-    fail("validate_spec", paste("higher-order construct", h$name,
-                                "references unknown dimensions:", paste(bad, collapse = ", ")))
-  }
-}
-interaction_names <- character(0)
-for (ix in interactions) {
-  if (!(ix$iv %in% lower_names) || !(ix$moderator %in% lower_names)) {
-    fail("validate_spec", paste("interaction references unknown construct:",
-                                ix$iv, "x", ix$moderator))
-  }
-  interaction_names <- c(interaction_names, paste0(ix$iv, "*", ix$moderator))
-}
-construct_names <- c(lower_names,
-                     vapply(higher_constructs, function(c) c$name, character(1)),
-                     interaction_names)
-for (p in req$paths) {
-  if (!(p$from_construct %in% construct_names) || !(p$to_construct %in% construct_names)) {
-    fail("validate_spec", paste("path references unknown construct:",
-                                p$from_construct, "->", p$to_construct))
-  }
-}
-
-# --- Build the seminr model from the spec ------------------------------------
-make_composite <- function(c) {
-  items <- unlist(c$indicators)
-  if (identical(c$measurement, "single_item")) return(composite(c$name, single_item(items[[1]])))
-  if (identical(c$measurement, "formative"))   return(composite(c$name, items, weights = mode_B))
-  composite(c$name, items)  # reflective (mode A)
-}
-make_hoc <- function(c) {
-  w <- if (identical(c$measurement, "higher_order_formative")) mode_B else mode_A
-  higher_composite(c$name, dimensions = unlist(c$dimensions), method = two_stage, weights = w)
-}
-make_interaction <- function(ix) {
-  interaction_term(iv = ix$iv, moderator = ix$moderator, method = two_stage)
-}
-measurement <- do.call(constructs, c(lapply(lower_constructs, make_composite),
-                                     lapply(higher_constructs, make_hoc),
-                                     lapply(interactions, make_interaction)))
-structural <- do.call(relationships, lapply(req$paths, function(p) {
-  paths(from = p$from_construct, to = p$to_construct)
-}))
+measurement <- build_measurement(spec)
+structural  <- build_structural(req)
 
 nboot <- if (!is.null(req$options$nboot)) as.integer(req$options$nboot) else 5000L
 seed  <- if (!is.null(req$options$seed)) as.integer(req$options$seed) else 123L

@@ -48,6 +48,92 @@ def verdict(ok: bool) -> str:
     return "pass" if ok else "fail"
 
 
+def assess_mga(mga: dict) -> dict:
+    """Verdicts for a multi-group analysis, gated on measurement invariance.
+
+    MICOM (Henseler et al. 2016): group comparisons are only defensible with at
+    least partial invariance (steps 1 + 2). Path-difference verdicts are withheld
+    when compositional invariance fails — the blueprint's non-skippable gate.
+    """
+    step2, step3 = [], []
+    failed_step2 = []
+    for rec in _rows(mga.get("micom_step2")):
+        invariant = bool(rec.get("invariant"))
+        if not invariant:
+            failed_step2.append(rec["row"])
+        step2.append({
+            "construct": rec["row"],
+            "metric": "c (compositional invariance)",
+            "value": round(_num(rec.get("c_value")), 4),
+            "threshold": f">= 5% permutation quantile ({round(_num(rec.get('c_quantile_5')), 4)})",
+            "verdict": verdict(invariant),
+            "citation": "Henseler et al. (2016)",
+        })
+    partial_only = []
+    for rec in _rows(mga.get("micom_step3")):
+        mean_equal = bool(rec.get("mean_equal"))
+        var_equal = bool(rec.get("var_equal"))
+        if not (mean_equal and var_equal):
+            partial_only.append(rec["row"])
+        step3.append({
+            "construct": rec["row"],
+            "mean_diff": round(_num(rec.get("mean_diff")), 3),
+            "mean_ci_95": [round(_num(rec.get("mean_ci_lo")), 3), round(_num(rec.get("mean_ci_hi")), 3)],
+            "mean_equal": mean_equal,
+            "logvar_diff": round(_num(rec.get("logvar_diff")), 3),
+            "var_ci_95": [round(_num(rec.get("var_ci_lo")), 3), round(_num(rec.get("var_ci_hi")), 3)],
+            "var_equal": var_equal,
+            "citation": "Henseler et al. (2016)",
+        })
+
+    if failed_step2:
+        invariance = "none"
+    elif partial_only:
+        invariance = "partial"
+    else:
+        invariance = "full"
+    permissible = invariance != "none"
+
+    paths = []
+    for rec in _rows(mga.get("paths")):
+        p = _num(rec.get("p_value"))
+        if not permissible:
+            v = "withheld"
+        else:
+            v = "different" if p is not None and p < 0.05 else "not different"
+        paths.append({
+            "path": rec["row"],
+            "estimate_a": round(_num(rec.get("est_a")), 3),
+            "estimate_b": round(_num(rec.get("est_b")), 3),
+            "difference": round(_num(rec.get("diff")), 3),
+            "p_value": round(p, 3) if p is not None else None,
+            "verdict": v,
+            "criterion": "two-sided permutation test, alpha = 0.05",
+            "citation": "Chin & Dibbern (2010)",
+        })
+
+    meta = mga.get("meta") or {}
+    return {
+        "meta": meta,
+        "micom": {
+            "step1": mga.get("micom_step1"),
+            "step2": step2,
+            "step3": step3,
+            "invariance": invariance,
+            "comparison_permissible": permissible,
+            "note": (None if permissible else
+                     "compositional invariance failed for: " + ", ".join(failed_step2)
+                     + " — group path comparisons are withheld (Henseler et al. 2016)"),
+        },
+        "paths": paths,
+        "summary": {
+            "invariance": invariance,
+            "paths_different": sum(1 for x in paths if x["verdict"] == "different"),
+            "paths_total": len(paths),
+        },
+    }
+
+
 def assess(results: dict, request: dict) -> dict:
     """Build the full assessment from engine results + the engine request (spec)."""
     constructs = {c["name"]: c for c in request["constructs"]}

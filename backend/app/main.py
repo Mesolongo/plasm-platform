@@ -21,9 +21,9 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import ai
-from .assess import assess
+from .assess import assess, assess_mga
 from .audit import run_audit, variable_dictionary
-from .engine import EngineError, run_engine
+from .engine import MGA_SCRIPT, EngineError, run_engine
 from .report import build_report
 from .storage import ROOT, analysis_dir, dataset_dir, new_id, read_json, write_json
 
@@ -218,14 +218,53 @@ def get_assessment(analysis_id: str):
     return assess(results, request)
 
 
+class MGARequest(BaseModel):
+    """Two-group comparison; MICOM invariance testing always runs first."""
+    group_variable: str
+    value_a: str
+    value_b: str
+    npermutations: int = Field(default=1000, ge=100, le=5000)
+    seed: int = 123
+
+
+@app.post("/api/analyses/{analysis_id}/mga")
+def create_mga(analysis_id: str, req: MGARequest):
+    """Multi-group analysis: MICOM (Henseler et al. 2016) gates the permutation
+    test on path differences (Chin & Dibbern 2010) — no invariance, no comparison."""
+    a_dir, _, request, _ = _load_analysis(analysis_id)
+    engine_request = {
+        **request,
+        "group": {"variable": req.group_variable,
+                  "value_a": req.value_a, "value_b": req.value_b},
+        "options": {"npermutations": req.npermutations, "seed": req.seed},
+    }
+    write_json(a_dir / "mga_request.json", engine_request)
+    try:
+        mga = run_engine(a_dir / "mga_request.json", a_dir / "mga.json", script=MGA_SCRIPT)
+    except EngineError as exc:
+        raise HTTPException(422, {"stage": exc.stage, "message": exc.message})
+    return assess_mga(mga)
+
+
+@app.get("/api/analyses/{analysis_id}/mga")
+def get_mga(analysis_id: str):
+    a_dir = analysis_dir(analysis_id)
+    p = a_dir / "mga.json"
+    if not p.exists():
+        raise HTTPException(404, "no multi-group analysis run yet")
+    return assess_mga(read_json(p))
+
+
 @app.get("/api/analyses/{analysis_id}/report.docx")
 def get_report(analysis_id: str):
     a_dir, meta, request, results = _load_analysis(analysis_id)
     dataset_meta = read_json(dataset_dir(meta["dataset_id"]) / "meta.json")
     interp_path = a_dir / "interpretation.json"
     interpretation = read_json(interp_path) if interp_path.exists() else None
+    mga_path = a_dir / "mga.json"
+    mga = assess_mga(read_json(mga_path)) if mga_path.exists() else None
     doc = build_report(dataset_meta, request, results, assess(results, request),
-                       interpretation=interpretation)
+                       interpretation=interpretation, mga=mga)
     out = a_dir / "report.docx"
     doc.save(out)
     return FileResponse(out, filename=f"plsem_report_{analysis_id}.docx",

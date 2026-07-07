@@ -31,7 +31,7 @@ def _fmt(v):
 
 
 def build_report(dataset_meta: dict, request: dict, results: dict, assessment: dict,
-                 interpretation: dict | None = None) -> Document:
+                 interpretation: dict | None = None, mga: dict | None = None) -> Document:
     doc = Document()
     style = doc.styles["Normal"]
     style.font.name = "Calibri"
@@ -261,6 +261,48 @@ def build_report(dataset_meta: dict, request: dict, results: dict, assessment: d
             )
             _table(doc, ["Construct", "Importance (total effect)", "Performance (0–100)"],
                    [[p, _fmt(i), f"{perf:.1f}"] for p, i, perf in rows])
+
+    # --- Multi-group analysis ----------------------------------------------------
+    if mga:
+        add_section("Multi-Group Analysis (MGA)")
+        m = mga["meta"]
+        micom = mga["micom"]
+        doc.add_paragraph(
+            f"Groups compared on {m['group_variable']}: group A = {m['value_a']} "
+            f"(n = {m['n_a']}), group B = {m['value_b']} (n = {m['n_b']}); "
+            f"{m['effective_permutations']:,} permutations, fixed seed {m['seed']}. "
+            f"Measurement invariance was tested with the MICOM procedure before any "
+            f"group comparison (Henseler et al., 2016). Step 1 (configural): "
+            f"{micom['step1']}."
+        )
+        doc.add_paragraph("Step 2 — compositional invariance (permutation test on c):")
+        _table(doc, ["Construct", "c", "5% quantile", "Verdict"],
+               [[s["construct"], f"{s['value']:.4f}",
+                 s["threshold"].split("(")[1].rstrip(")"),
+                 s["verdict"].upper()] for s in micom["step2"]])
+        doc.add_paragraph()
+        doc.add_paragraph("Step 3 — equality of construct means and variances (95% permutation CIs):")
+        _table(doc, ["Construct", "Δ mean", "95% CI", "Equal", "Δ log variance", "95% CI", "Equal"],
+               [[s["construct"], _fmt(s["mean_diff"]),
+                 f"[{s['mean_ci_95'][0]:.3f}; {s['mean_ci_95'][1]:.3f}]",
+                 "yes" if s["mean_equal"] else "no",
+                 _fmt(s["logvar_diff"]),
+                 f"[{s['var_ci_95'][0]:.3f}; {s['var_ci_95'][1]:.3f}]",
+                 "yes" if s["var_equal"] else "no"] for s in micom["step3"]])
+        doc.add_paragraph()
+        doc.add_paragraph(
+            f"MICOM verdict: {micom['invariance']} measurement invariance."
+            + ("" if micom["comparison_permissible"] else f" {micom['note']}.")
+        )
+        if micom["comparison_permissible"]:
+            doc.add_paragraph(
+                "Path-coefficient differences (two-sided permutation test; "
+                "Chin & Dibbern, 2010):"
+            )
+            _table(doc, ["Path", "β (A)", "β (B)", "Δ", "p", "Verdict"],
+                   [[p["path"], _fmt(p["estimate_a"]), _fmt(p["estimate_b"]),
+                     _fmt(p["difference"]), _fmt(p["p_value"]),
+                     p["verdict"]] for p in mga["paths"]])
 
     # --- Summary ---------------------------------------------------------------
     add_section("Summary")

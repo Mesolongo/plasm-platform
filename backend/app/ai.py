@@ -29,6 +29,26 @@ def is_configured() -> bool:
     return cred_dir.is_dir() and any(cred_dir.glob("*.json"))
 
 
+def _structured(response) -> dict:
+    """Unwrap a messages.parse() response as a plain dict.
+
+    parsed_output is None when the reply couldn't be validated against the
+    schema — usually the output hit the max_tokens cap mid-JSON (adaptive
+    thinking counts toward the cap), or the model refused. Raise something
+    actionable instead of the bare AttributeError a None would produce.
+    """
+    if response.parsed_output is not None:
+        return json.loads(response.parsed_output.model_dump_json())
+    if response.stop_reason == "max_tokens":
+        raise RuntimeError("the response was cut off at the output-token limit before "
+                           "the JSON was complete — run it again (a shorter study "
+                           "description also helps)")
+    if response.stop_reason == "refusal":
+        raise RuntimeError("the model declined to generate this content")
+    raise RuntimeError(f"the model reply could not be parsed "
+                       f"(stop_reason={response.stop_reason})")
+
+
 def interpret(request: dict, assessment: dict, study_description: str) -> dict:
     """Report writer: assessment (all numbers + verdicts) -> narrative sections.
 
@@ -69,7 +89,7 @@ def interpret(request: dict, assessment: dict, study_description: str) -> dict:
         messages=[{"role": "user", "content": json.dumps(payload, indent=2)}],
         output_format=Interpretation,
     )
-    return json.loads(response.parsed_output.model_dump_json())
+    return _structured(response)
 
 
 def chat(request: dict, assessment: dict, history: list[dict], message: str,
@@ -142,15 +162,19 @@ def draft_manuscript(request: dict, assessment: dict, reviewer_concerns: list[di
     }
 
     client = anthropic.Anthropic()
-    response = client.messages.parse(
+    # The manuscript is the longest structured output in the app (front matter +
+    # one response per reviewer concern) and thinking counts toward max_tokens,
+    # so give it double headroom; the explicit timeout lifts the SDK's
+    # non-streaming guard for large max_tokens.
+    response = client.with_options(timeout=600.0).messages.parse(
         model="claude-opus-4-8",
-        max_tokens=16000,
+        max_tokens=32000,
         thinking={"type": "adaptive"},
         system=PUBLISHER_PROMPT.read_text(),
         messages=[{"role": "user", "content": json.dumps(payload, indent=2)}],
         output_format=Manuscript,
     )
-    return json.loads(response.parsed_output.model_dump_json())
+    return _structured(response)
 
 
 def propose_model(variables: list[dict], study_description: str) -> dict:
@@ -175,4 +199,4 @@ def propose_model(variables: list[dict], study_description: str) -> dict:
         }],
         output_format=ModelSpec,
     )
-    return json.loads(response.parsed_output.model_dump_json())
+    return _structured(response)

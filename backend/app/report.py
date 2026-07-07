@@ -166,6 +166,18 @@ def build_report(dataset_meta: dict, request: dict, results: dict, assessment: d
              f"[{h['ci_95'][0]:.3f}; {h['ci_95'][1]:.3f}]" if h["ci_95"] else "",
              h["verdict"]] for h in assessment["hypotheses"]])
 
+    mediation = assessment.get("mediation") or []
+    if mediation:
+        doc.add_paragraph()
+        doc.add_paragraph(
+            "Mediation — specific indirect effects with 95% bootstrap percentile CIs; "
+            "classification follows Zhao, Lynch & Chen (2010) / Hair et al. (2022):"
+        )
+        _table(doc, ["Indirect path", "β (indirect)", "95% CI", "β (direct)", "Classification"],
+               [[m["path"].replace("->", "→"), _fmt(m["indirect_effect"]),
+                 f"[{m['ci_95'][0]:.3f}; {m['ci_95'][1]:.3f}]" if m["ci_95"] else "",
+                 _fmt(m["direct_effect"]), m["classification"]] for m in mediation])
+
     f2 = [s for s in assessment["structural_model"] if s["family"] == "effect_size"]
     if f2:
         doc.add_paragraph()
@@ -217,6 +229,39 @@ def build_report(dataset_meta: dict, request: dict, results: dict, assessment: d
                 f"power (Shmueli et al., 2019)."
             )
 
+    # --- IPMA -------------------------------------------------------------------
+    ipma = results.get("ipma") or {}
+    performance = {r["row"]: r["performance"] for r in ipma.get("performance") or []}
+    total_unstd = {r["row"]: r for r in ipma.get("total_effects_unstd") or []}
+    outgoing = {p["from_construct"] for p in request["paths"]}
+    endogenous = {p["to_construct"] for p in request["paths"]}
+    targets = [c for c in performance if c in endogenous and c not in outgoing]
+    if performance and targets:
+        add_section("Importance–Performance Map Analysis (IPMA)")
+        doc.add_paragraph(
+            "Importance is the unstandardized total effect on the target construct; "
+            "performance is the construct score rescaled to 0–100 (Ringle & Sarstedt, 2016). "
+            "Constructs combining high importance with low performance are the first "
+            "candidates for managerial action."
+        )
+        for target in targets:
+            rows = []
+            for pred in performance:
+                if pred == target:
+                    continue
+                imp = total_unstd.get(pred, {}).get(target)
+                if not isinstance(imp, (int, float)) or abs(imp) < 1e-9:
+                    continue
+                rows.append([pred, imp, performance[pred]])
+            if not rows:
+                continue
+            rows.sort(key=lambda r: -r[1])
+            doc.add_paragraph(
+                f"Target: {target} (performance {_fmt(performance[target])})."
+            )
+            _table(doc, ["Construct", "Importance (total effect)", "Performance (0–100)"],
+                   [[p, _fmt(i), f"{perf:.1f}"] for p, i, perf in rows])
+
     # --- Summary ---------------------------------------------------------------
     add_section("Summary")
     summ = assessment["summary"]
@@ -224,6 +269,9 @@ def build_report(dataset_meta: dict, request: dict, results: dict, assessment: d
         f"{summ['hypotheses_supported']} of {summ['hypotheses_total']} hypothesized paths are "
         f"supported. Measurement/structural checks: {summ['pass']} pass, {summ['review']} to "
         f"review, {summ['fail']} fail."
+        + (f" {summ['indirect_effects_significant']} of {summ['indirect_effects_total']} "
+           f"specific indirect effects are significant (mediation table above)."
+           if summ.get("indirect_effects_total") else "")
     )
     # --- AI narrative sections (grounded in the assessment) --------------------
     if interpretation:

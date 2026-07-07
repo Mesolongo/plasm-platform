@@ -6,7 +6,8 @@ Every verdict cites its criterion. This module is deterministic — the AI inter
 Thresholds: Hair, Hult, Ringle & Sarstedt (2022), A Primer on PLS-SEM, 3rd ed.;
 Henseler, Ringle & Sarstedt (2015) for HTMT; Cohen (1988) for f² classes;
 Henseler et al. (2014) / Hu & Bentler (1999) for SRMR; Shmueli et al. (2019)
-for PLSpredict; Kenny (2018) for interaction-term f² classes.
+for PLSpredict; Kenny (2018) for interaction-term f² classes; Zhao, Lynch &
+Chen (2010) for the mediation typology.
 """
 import re
 
@@ -274,10 +275,13 @@ def assess(results: dict, request: dict) -> dict:
 
     # --- Hypotheses: bootstrap percentile CI excludes zero -------------------
     hnum = 0
+    direct_effects = {}  # (from, to) -> (estimate, ci_lo, ci_hi) for mediation typing
     for rec in _rows(results.get("boot_paths")):
         parts = [p.strip() for p in rec["row"].split("->")]
         if len(parts) != 2:
             continue
+        direct_effects[(parts[0], parts[1])] = (
+            _col(rec, "Original Est."), _col(rec, "2.5% CI"), _col(rec, "97.5% CI"))
         hnum += 1
         est = _col(rec, "Original Est.")
         t = _col(rec, "T Stat.")
@@ -295,6 +299,47 @@ def assess(results: dict, request: dict) -> dict:
             "criterion": "95% percentile bootstrap CI excludes zero",
         })
 
+    # --- Mediation: specific indirect effects, typed per Zhao et al. (2010) --
+    # The engine tests every simple indirect chain with bootstrap percentile CIs;
+    # the typology also needs the direct from->to effect (when it is modeled).
+    mediation = []
+    for rec in _rows(results.get("specific_indirect")):
+        parts = [p.strip() for p in rec["row"].split("->")]
+        if len(parts) < 3:
+            continue
+        est = _col(rec, "Original Est.")
+        lo, hi = _col(rec, "2.5% CI"), _col(rec, "97.5% CI")
+        indirect_sig = lo is not None and hi is not None and (lo > 0 or hi < 0)
+        direct = direct_effects.get((parts[0], parts[-1]))
+        if direct is None:
+            d_est = None
+            cls = ("indirect-only (no direct path modeled)" if indirect_sig
+                   else "no effect (indirect n.s.; no direct path modeled)")
+        else:
+            d_est, d_lo, d_hi = direct
+            direct_sig = d_lo is not None and d_hi is not None and (d_lo > 0 or d_hi < 0)
+            if indirect_sig and direct_sig:
+                cls = ("complementary (partial mediation)"
+                       if (est or 0) * (d_est or 0) > 0
+                       else "competitive (partial mediation)")
+            elif indirect_sig:
+                cls = "indirect-only (full mediation)"
+            elif direct_sig:
+                cls = "direct-only (no mediation)"
+            else:
+                cls = "no effect (neither path significant)"
+        mediation.append({
+            "path": " -> ".join(parts),
+            "mediators": parts[1:-1],
+            "indirect_effect": round(est, 3) if est is not None else None,
+            "ci_95": [round(lo, 3), round(hi, 3)] if lo is not None and hi is not None else None,
+            "significant": indirect_sig,
+            "direct_effect": round(d_est, 3) if d_est is not None else None,
+            "classification": cls,
+            "criterion": "95% percentile bootstrap CI excludes zero",
+            "citation": "Zhao et al. (2010); Hair et al. (2022)",
+        })
+
     counts = {"pass": 0, "review": 0, "fail": 0}
     for item in measurement + structural:
         if item["verdict"] in counts:
@@ -304,9 +349,12 @@ def assess(results: dict, request: dict) -> dict:
         "measurement_model": measurement,
         "structural_model": structural,
         "hypotheses": hypotheses,
+        "mediation": mediation,
         "summary": {
             **counts,
             "hypotheses_supported": sum(1 for h in hypotheses if h["verdict"] == "supported"),
             "hypotheses_total": len(hypotheses),
+            "indirect_effects_significant": sum(1 for m in mediation if m["significant"]),
+            "indirect_effects_total": len(mediation),
         },
     }

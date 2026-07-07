@@ -2,13 +2,16 @@
 
 AI-powered PLS-SEM analysis platform — from raw survey data to a publication-ready
 structural equation modeling report. Blueprint: see the project artifact
-(architecture, user flow, roadmap). Status: **Phase 0 (engine parity, 70/70) and
-Phase 1 (web app + AI layer) complete** — see
-[docs/phase0_parity_report.md](docs/phase0_parity_report.md). **Phase 2 in
-progress**: moderation (two-stage interaction terms), higher-order constructs
-(two-stage), SRMR model fit, PLSpredict (Q²predict + LM benchmark), and SPSS
-`.sav` import are done; the moderation engine output reproduces the published
-two-stage example from Hair et al. (2022), ch. 7 (interaction β = −0.071).
+(architecture, user flow, roadmap). Status: **Phase 0 (engine parity, 70/70),
+Phase 1 (web app + AI layer), and Phase 2 (advanced analyses) complete** — see
+[docs/phase0_parity_report.md](docs/phase0_parity_report.md). Phase 2 covers
+moderation (two-stage interaction terms), higher-order constructs (two-stage),
+SRMR model fit, PLSpredict (Q²predict + LM benchmark), SPSS `.sav` import,
+mediation (bootstrap specific indirect effects with the Zhao et al. 2010
+typology), and IPMA (importance–performance map; Ringle & Sarstedt 2016).
+Engine outputs reproduce the published Hair et al. (2022) ch. 7 examples:
+two-stage interaction β = −0.071; indirect effects COMP→CUSA→CUSL = 0.074
+(indirect-only mediation) and LIKE→CUSA→CUSL = 0.220 (complementary).
 
 ## Layout
 
@@ -42,12 +45,13 @@ docs/references/                 # published SmartPLS case-study PDFs + extracte
 The web UI (served at `/`) walks the full flow: upload CSV/Excel/SPSS `.sav` →
 data audit → model builder with live path diagram (manual, example, or
 AI-proposed; supports moderation via two-stage interaction terms and
-higher-order constructs) → run → results dashboard with threshold verdicts →
-download the Word report. API docs: `/docs`. Assessment thresholds are
-rule-based with citations (Hair et al. 2022; Henseler et al. 2015; Cohen 1988;
-Henseler et al. 2014 / Hu & Bentler 1999 for SRMR; Shmueli et al. 2019 for
-PLSpredict; Kenny 2018 for interaction f²); hypothesis verdicts use 95%
-percentile bootstrap CIs. AI endpoints (`/api/ai/status`,
+higher-order constructs) → run → results dashboard with threshold verdicts,
+mediation classification, and IPMA → download the Word report. API docs:
+`/docs`. Assessment thresholds are rule-based with citations (Hair et al. 2022;
+Henseler et al. 2015; Cohen 1988; Henseler et al. 2014 / Hu & Bentler 1999 for
+SRMR; Shmueli et al. 2019 for PLSpredict; Kenny 2018 for interaction f²; Zhao
+et al. 2010 for mediation typing; Ringle & Sarstedt 2016 for IPMA); hypothesis
+verdicts use 95% percentile bootstrap CIs. AI endpoints (`/api/ai/status`,
 `/api/datasets/{id}/propose-model`) are wired but return 503 until
 `ANTHROPIC_API_KEY` is set.
 

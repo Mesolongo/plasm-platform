@@ -340,7 +340,8 @@ $("#btn-run").addEventListener("click", async () => {
       body: JSON.stringify(payload),
     });
     const assessment = await api(`/api/analyses/${analysis.id}/assessment`);
-    state.analysis = { ...analysis, assessment };
+    const results = await api(`/api/analyses/${analysis.id}/results`);
+    state.analysis = { ...analysis, assessment, results };
     setStatus("#run-status", "");
     renderResults();
     goStep(3);
@@ -424,4 +425,53 @@ function renderResults() {
     a.structural_model.map((m) => `<tr><td>${m.family.replaceAll("_", " ")}</td>
       <td>${m.construct}</td><td>${m.metric}</td><td>${fmt(m.value)}</td>
       <td>${m.threshold}</td><td>${verdictBadge(m.verdict)}</td></tr>`).join("");
+
+  renderMediation(a.mediation || []);
+  renderIpma(state.analysis.results);
+}
+
+function renderMediation(mediation) {
+  $("#mediation-block").classList.toggle("hidden", !mediation.length);
+  if (!mediation.length) return;
+  $("#med-table").innerHTML =
+    `<tr><th>Indirect path</th><th>β (indirect)</th><th>95% CI</th>
+      <th>β (direct)</th><th>Classification</th></tr>` +
+    mediation.map((m) => `<tr><td>${m.path.replaceAll("->", "→")}</td>
+      <td>${fmt(m.indirect_effect)}</td>
+      <td>${m.ci_95 ? `[${fmt(m.ci_95[0])}; ${fmt(m.ci_95[1])}]` : ""}</td>
+      <td>${fmt(m.direct_effect)}</td>
+      <td>${badge(m.classification, m.significant ? "supported" : "neutral")}</td></tr>`).join("");
+}
+
+/* IPMA table for the final outcome construct(s): importance = unstandardized
+   total effect on the target, performance = construct score rescaled 0-100. */
+function renderIpma(results) {
+  const ipma = results && results.ipma;
+  const perf = {};
+  (ipma && ipma.performance || []).forEach((r) => { perf[r.row] = r.performance; });
+  const te = {};
+  (ipma && ipma.total_effects_unstd || []).forEach((r) => { te[r.row] = r; });
+  const outgoing = new Set(state.paths.map((p) => p.from_construct));
+  const endogenous = new Set(state.paths.map((p) => p.to_construct));
+  const targets = Object.keys(perf).filter((c) => endogenous.has(c) && !outgoing.has(c));
+  const rows = [];
+  targets.forEach((target) => {
+    Object.keys(perf).forEach((pred) => {
+      const imp = te[pred] && te[pred][target];
+      if (pred === target || typeof imp !== "number" || Math.abs(imp) < 1e-9) return;
+      rows.push([target, pred, imp, perf[pred]]);
+    });
+  });
+  $("#ipma-block").classList.toggle("hidden", !rows.length);
+  if (!rows.length) return;
+  rows.sort((x, y) => x[0].localeCompare(y[0]) || y[2] - x[2]);
+  $("#ipma-note").textContent =
+    `Target${targets.length > 1 ? "s" : ""}: ` +
+    targets.map((t) => `${t} (performance ${perf[t].toFixed(1)})`).join(", ") +
+    ". High importance + low performance = priority for action.";
+  $("#ipma-table").innerHTML =
+    `<tr><th>Target</th><th>Construct</th><th>Importance (total effect)</th>
+      <th>Performance (0–100)</th></tr>` +
+    rows.map(([t, p, imp, pf]) => `<tr><td>${t}</td><td><b>${p}</b></td>
+      <td>${fmt(imp)}</td><td>${pf.toFixed(1)}</td></tr>`).join("");
 }

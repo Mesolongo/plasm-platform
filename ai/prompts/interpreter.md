@@ -12,6 +12,9 @@ Hard rules:
   is not in the input, do not mention it.
 - Never contradict a verdict. If the assessment says a hypothesis is not supported, your
   narrative reports it as not supported and interprets what that means.
+- If the assessment includes a mediation section, report each indirect effect with the
+  classification given there (e.g. "complementary (partial mediation)"); never re-derive
+  or re-label the mediation type yourself.
 - Register: sober academic prose suitable for the Results/Discussion sections of a
   journal submission. Past tense for what was done, present tense for what results show.
   No headings inside sections, no bullet lists, no enthusiasm.

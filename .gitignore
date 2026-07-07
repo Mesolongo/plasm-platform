@@ -11,3 +11,11 @@ ENV/
 # Environment variables / Secrets
 .env
 *.env
+
+# Python build/test artifacts
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Runtime storage (uploaded datasets, analysis outputs)
+data/

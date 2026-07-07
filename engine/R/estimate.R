@@ -200,6 +200,81 @@ mat_records <- function(m) {
 }
 maybe <- function(expr) tryCatch(expr, error = function(e) NULL)
 
+# --- Mediation: specific indirect effects (Hair et al. 2022, ch. 7) -----------
+# Every simple directed chain of length >= 2 in the structural model is a
+# candidate indirect effect; seminr multiplies the bootstrap path distributions
+# segment-wise, so CIs come from the same resamples as the direct paths.
+enumerate_chains <- function(paths) {
+  adj <- list()
+  for (p in paths) adj[[p$from_construct]] <- c(adj[[p$from_construct]], p$to_construct)
+  chains <- list()
+  walk <- function(chain) {
+    for (nxt in adj[[chain[length(chain)]]]) {
+      if (nxt %in% chain) next
+      extended <- c(chain, nxt)
+      if (length(extended) >= 3) chains[[length(chains) + 1]] <<- extended
+      walk(extended)
+    }
+  }
+  for (start in names(adj)) walk(start)
+  chains
+}
+specific_indirect <- maybe({
+  rows <- Filter(Negate(is.null), lapply(enumerate_chains(req$paths), function(ch) {
+    maybe(specific_effect_significance(boot, from = ch[[1]], to = ch[[length(ch)]],
+                                       through = ch[2:(length(ch) - 1)]))
+  }))
+  if (length(rows) > 0) do.call(rbind, rows) else NULL
+})
+
+# --- IPMA (Ringle & Sarstedt 2016) ---------------------------------------------
+# Performance: construct scores rebuilt from indicators rescaled to 0-100 with
+# unstandardized, sum-normalized outer weights. Importance: unstandardized total
+# effects, re-estimated by OLS over the performance-scale scores. Interaction
+# terms are excluded (their synthetic scores have no performance scale).
+compute_ipma <- function() {
+  W <- model$outer_weights
+  keep <- colnames(W)[colnames(W) %in% colnames(model$construct_scores) &
+                        !grepl("*", colnames(W), fixed = TRUE)]
+  if (length(keep) < 2) return(NULL)
+  X <- as.matrix(model$data)
+  perf <- matrix(NA_real_, nrow(X), length(keep), dimnames = list(NULL, keep))
+  for (cn in keep) {
+    w <- W[, cn]
+    items <- rownames(W)[abs(w) > 1e-12]
+    sds <- apply(X[, items, drop = FALSE], 2, sd)
+    rng <- apply(X[, items, drop = FALSE], 2, range)
+    if (any(sds < 1e-12) || any(rng[2, ] - rng[1, ] < 1e-12)) return(NULL)
+    X01 <- sweep(sweep(X[, items, drop = FALSE], 2, rng[1, ]), 2,
+                 rng[2, ] - rng[1, ], "/") * 100
+    wu <- w[items] / sds
+    if (abs(sum(wu)) < 1e-8) return(NULL)  # weights cancel out; scores undefined
+    perf[, cn] <- X01 %*% (wu / sum(wu))
+  }
+  Bu <- matrix(0, length(keep), length(keep), dimnames = list(keep, keep))
+  for (to in unique(vapply(req$paths, function(p) p$to_construct, character(1)))) {
+    if (!(to %in% keep)) next
+    preds <- vapply(Filter(function(p) identical(p$to_construct, to), req$paths),
+                    function(p) p$from_construct, character(1))
+    preds <- intersect(preds, keep)
+    if (length(preds) == 0) next
+    beta <- coef(lm(perf[, to] ~ perf[, preds, drop = FALSE]))[-1]
+    beta[is.na(beta)] <- 0
+    Bu[preds, to] <- beta
+  }
+  total <- Bu; step <- Bu
+  for (k in seq_len(length(keep) - 1)) {
+    step <- step %*% Bu
+    total <- total + step
+  }
+  list(
+    performance = data.frame(row = keep, performance = colMeans(perf)),
+    total_effects_unstd = mat_records(total),
+    excluded = if (length(interaction_names) > 0) as.list(interaction_names) else NULL
+  )
+}
+ipma <- maybe(compute_ipma())
+
 out <- list(
   meta = list(
     schema_version = 2,
@@ -232,6 +307,8 @@ out <- list(
   f_square        = mat_records(maybe(s$fSquare)),
   total_effects   = mat_records(maybe(s$total_effects)),
   total_indirect  = mat_records(maybe(s$total_indirect_effects)),
+  specific_indirect = mat_records(specific_indirect),
+  ipma            = ipma,
   boot_paths      = mat_records(bs$bootstrapped_paths),
   boot_loadings   = mat_records(bs$bootstrapped_loadings),
   boot_weights    = mat_records(maybe(bs$bootstrapped_weights)),

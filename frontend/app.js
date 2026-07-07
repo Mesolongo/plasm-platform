@@ -17,10 +17,11 @@ async function api(path, opts = {}) {
   }
   return body;
 }
-function setStatus(sel, msg, isError = false) {
+function setStatus(sel, msg, isError = false, busy = false) {
   const el = $(sel);
-  el.textContent = msg;
   el.classList.toggle("error", isError);
+  el.innerHTML = (busy ? '<span class="spinner" aria-hidden="true"></span>' : "")
+    + (msg ? escapeHtml(msg) : "");
 }
 function badge(text, cls) {
   return `<span class="badge ${cls}">${text}</span>`;
@@ -278,7 +279,7 @@ $("#btn-example").addEventListener("click", async () => {
 
 $("#btn-propose").addEventListener("click", async () => {
   if (!state.dataset) return;
-  setStatus("#propose-status", "Asking the AI architect…");
+  setStatus("#propose-status", "Asking the AI architect…", false, true);
   try {
     const spec = await api(`/api/datasets/${state.dataset.id}/propose-model`, {
       method: "POST",
@@ -317,30 +318,70 @@ function drawDiagram() {
   };
   names.forEach((n) => compute(n));
 
-  const W = svg.clientWidth || 560, H = 420;
-  const maxLayer = Math.max(...names.map((n) => layer[n]));
+  // Wrap a label into at most two lines, packing words greedily; a single word
+  // longer than the line budget is truncated with an ellipsis so it never spills.
+  // Wrap a label onto at most two lines. Words are packed greedily; if they spill
+  // past two lines the remainder collapses onto line two and is ellipsized — no word
+  // is ever silently dropped, and the full name is available on hover (a <title>).
+  const MAX_CHARS = 16;
+  const wrapLabel = (name) => {
+    const words = String(name).split(/\s+/);
+    const packed = [];
+    for (const w of words) {
+      const last = packed[packed.length - 1];
+      if (last && (last + " " + w).length <= MAX_CHARS) packed[packed.length - 1] = last + " " + w;
+      else packed.push(w);
+    }
+    const lines = packed.length > 2 ? [packed[0], packed.slice(1).join(" ")] : packed;
+    return lines.map((l) => (l.length > MAX_CHARS + 4 ? l.slice(0, MAX_CHARS + 2) + "…" : l));
+  };
+  // Ellipse half-width tracks the widest line (~3.6px per char at 12px bold) + padding.
+  const geom = {};
+  names.forEach((n) => {
+    const lines = wrapLabel(n);
+    const widest = Math.max(...lines.map((l) => l.length));
+    geom[n] = {
+      lines,
+      rx: Math.min(120, Math.max(52, widest * 3.6 + 18)),
+      ry: lines.length > 1 ? 30 : 24,
+    };
+  });
+
   const cols = {};
   names.forEach((n) => (cols[layer[n]] = cols[layer[n]] || []).push(n));
+  const maxLayer = Math.max(...names.map((n) => layer[n]));
+  const maxRows = Math.max(...Object.values(cols).map((ns) => ns.length));
+  const rowGap = 88;
+  const H = Math.max(300, maxRows * rowGap + 40);
+  const W = svg.clientWidth || 640;
+  svg.setAttribute("height", H);
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+
+  const pad = 110;
   const pos = {};
   Object.entries(cols).forEach(([l, ns]) => {
     ns.forEach((n, i) => {
       pos[n] = {
-        x: 90 + (maxLayer ? (l * (W - 180)) / maxLayer : 0),
+        x: pad + (maxLayer ? (l * (W - 2 * pad)) / maxLayer : (W - 2 * pad) / 2),
         y: ((i + 1) * H) / (ns.length + 1),
       };
     });
   });
 
   const NS = "http://www.w3.org/2000/svg";
+  // Distance from a node centre to its ellipse boundary along a unit direction.
+  const edgeReach = (g, ux, uy) =>
+    1 / Math.hypot(ux / g.rx, uy / g.ry);
   state.paths.forEach((p) => {
     const a = pos[p.from_construct], b = pos[p.to_construct];
-    if (!a || !b) return;
-    const line = document.createElementNS(NS, "path");
+    if (!a || !b || p.from_construct === p.to_construct) return;
     const dx = b.x - a.x, dy = b.y - a.y;
     const len = Math.hypot(dx, dy) || 1;
-    const sx = a.x + (dx / len) * 62, sy = a.y + (dy / len) * 30;
-    const ex = b.x - (dx / len) * 62, ey = b.y - (dy / len) * 30;
-    line.setAttribute("d", `M ${sx} ${sy} L ${ex} ${ey}`);
+    const ux = dx / len, uy = dy / len;
+    const ra = edgeReach(geom[p.from_construct], ux, uy) + 3;
+    const rb = edgeReach(geom[p.to_construct], ux, uy) + 5;  // room for the arrowhead
+    const line = document.createElementNS(NS, "path");
+    line.setAttribute("d", `M ${a.x + ux * ra} ${a.y + uy * ra} L ${b.x - ux * rb} ${b.y - uy * rb}`);
     line.setAttribute("class", "edge");
     line.setAttribute("stroke-width", "1.4");
     svg.appendChild(line);
@@ -350,21 +391,30 @@ function drawDiagram() {
     const g = document.createElementNS(NS, "g");
     g.setAttribute("class", `node ${c.measurement}`);
     const { x, y } = pos[c.name];
+    const { rx, ry, lines } = geom[c.name];
     const el = document.createElementNS(NS, "ellipse");
     el.setAttribute("cx", x); el.setAttribute("cy", y);
-    el.setAttribute("rx", 58); el.setAttribute("ry", 26);
+    el.setAttribute("rx", rx); el.setAttribute("ry", ry);
     const t = document.createElementNS(NS, "text");
-    t.setAttribute("x", x); t.setAttribute("y", y + 4);
-    t.setAttribute("text-anchor", "middle");
-    t.textContent = c.name;
-    g.appendChild(el); g.appendChild(t);
+    t.setAttribute("x", x); t.setAttribute("text-anchor", "middle");
+    const y0 = y + 4 - (lines.length - 1) * 7;
+    lines.forEach((ln, i) => {
+      const span = document.createElementNS(NS, "tspan");
+      span.setAttribute("x", x); span.setAttribute("y", y0 + i * 14);
+      span.textContent = ln;
+      t.appendChild(span);
+    });
+    const title = document.createElementNS(NS, "title");
+    title.textContent = c.name;  // full name on hover, even when truncated
+    g.appendChild(el); g.appendChild(t); g.appendChild(title);
     svg.appendChild(g);
   });
 }
 
 /* ------------------------------ Run ------------------------------ */
+let running = false;  // estimation is synchronous server-side; block concurrent runs
 $("#btn-run").addEventListener("click", async () => {
-  if (!state.dataset) return;
+  if (!state.dataset || running) return;
   const payload = {
     dataset_id: state.dataset.id,
     constructs: state.constructs.filter((c) =>
@@ -378,7 +428,17 @@ $("#btn-run").addEventListener("click", async () => {
     setStatus("#run-status", "Define at least two constructs and one path.", true);
     return;
   }
-  setStatus("#run-status", `Estimating (${payload.nboot.toLocaleString()} bootstrap resamples)…`);
+  const n = state.dataset.n_observations || 0;
+  const heavy = payload.nboot * Math.max(n, 1) > 5e6;  // big data × many resamples
+  running = true;
+  const btn = $("#btn-run");
+  btn.disabled = true;
+  const label = btn.textContent;
+  btn.textContent = "Estimating…";
+  setStatus("#run-status", `Estimating (${payload.nboot.toLocaleString()} bootstrap resamples`
+    + `${n ? `, ${n.toLocaleString()} rows` : ""})…`
+    + (heavy ? " This can take a few minutes — the run continues even if it looks idle." : ""),
+    false, true);
   try {
     const analysis = await api("/api/analyses", {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -392,13 +452,17 @@ $("#btn-run").addEventListener("click", async () => {
     goStep(3);
   } catch (err) {
     setStatus("#run-status", err.message, true);
+  } finally {
+    running = false;
+    btn.disabled = false;
+    btn.textContent = label;
   }
 });
 
 /* ------------------------------ Interpretation ------------------------------ */
 $("#btn-interpret").addEventListener("click", async () => {
   if (!state.analysis) return;
-  setStatus("#interpret-status", "The AI writer is drafting the narrative (30–90 s)…");
+  setStatus("#interpret-status", "The AI writer is drafting the narrative (30–90 s)…", false, true);
   try {
     const interp = await api(`/api/analyses/${state.analysis.id}/interpretation`, {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -564,7 +628,7 @@ $("#chat-form").addEventListener("submit", async (e) => {
   const log = $("#chat-log");
   log.innerHTML += `<div class="chat-msg user">${message}</div>`;
   input.value = "";
-  setStatus("#chat-status", "Thinking…");
+  setStatus("#chat-status", "Thinking…", false, true);
   try {
     const { reply } = await api(`/api/analyses/${state.analysis.id}/chat`, {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -625,7 +689,7 @@ function renderCitations(payload) {
 }
 $("#btn-citations").addEventListener("click", async () => {
   if (!state.analysis) return;
-  setStatus("#citations-status", "Searching Crossref…");
+  setStatus("#citations-status", "Searching Crossref…", false, true);
   try {
     const payload = await api(`/api/analyses/${state.analysis.id}/citations`, { method: "POST" });
     renderCitations(payload);
@@ -662,7 +726,7 @@ function renderReviewerChecks(payload) {
 
 $("#btn-reviewer").addEventListener("click", async () => {
   if (!state.analysis) return;
-  setStatus("#reviewer-status", "Scanning the assessment…");
+  setStatus("#reviewer-status", "Scanning the assessment…", false, true);
   try {
     const payload = await api(`/api/analyses/${state.analysis.id}/reviewer-check`);
     renderReviewerChecks(payload);
@@ -696,7 +760,7 @@ function renderManuscript(payload) {
 
 $("#btn-manuscript").addEventListener("click", async () => {
   if (!state.analysis) return;
-  setStatus("#manuscript-status", "Drafting…");
+  setStatus("#manuscript-status", "Drafting…", false, true);
   try {
     const payload = await api(`/api/analyses/${state.analysis.id}/manuscript`, {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -892,8 +956,19 @@ function renderIpma(results) {
    means. High importance + low performance (bottom right) = act first. */
 function drawIpmaMap(rows, target) {
   const svg = $("#ipma-map");
+  const card = svg.closest(".chart-card");
   svg.innerHTML = "";
-  if (rows.length < 2) return;
+  // A scatter needs at least two constructs to compare; with one, the quadrant
+  // means collapse onto the single point. Hide the empty canvas and explain,
+  // rather than leaving a blank box — the value is still in the table below.
+  if (rows.length < 2) {
+    if (card) card.classList.add("hidden");
+    $("#ipma-note").textContent +=
+      " The priority map needs at least two predictor constructs; with one, see the "
+      + "importance–performance value in the table below.";
+    return;
+  }
+  if (card) card.classList.remove("hidden");
   const NS = "http://www.w3.org/2000/svg";
   const W = svg.clientWidth || 640, H = 380;
   const M = { top: 18, right: 96, bottom: 42, left: 52 };

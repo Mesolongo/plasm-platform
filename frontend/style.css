@@ -91,6 +91,12 @@ button:hover, .button:hover { border-color: var(--accent); }
 .actions { margin-top: 1.2rem; }
 .status { margin: 0.6rem 0; font-size: 0.9rem; color: var(--ink-soft); min-height: 1.2em; }
 .status.error { color: var(--fail); }
+.spinner { display: inline-block; width: 0.85em; height: 0.85em; margin-right: 0.5em;
+  vertical-align: -0.1em; border: 2px solid var(--accent-soft); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+/* Also pulse the primary button while an action is in flight. */
+button.primary:disabled { opacity: 0.7; cursor: progress; }
 
 .cards { display: flex; gap: 0.8rem; flex-wrap: wrap; margin: 1rem 0; }
 .stat {

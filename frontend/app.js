@@ -439,6 +439,9 @@ function renderResults() {
   state.chatHistory = [];
   $("#chat-log").innerHTML = "";
   $("#chat-block").classList.toggle("hidden", !aiConfigured);
+  $("#citations-list").innerHTML = "";
+  setStatus("#citations-status", "");
+  refreshShares();
 
   const fit = a.structural_model.find((m) => m.family === "model_fit");
   $("#result-cards").innerHTML = `
@@ -587,6 +590,94 @@ $("#btn-pdf").addEventListener("click", async () => {
   a.click();
   URL.revokeObjectURL(a.href);
   setStatus("#interpret-status", "");
+});
+
+/* ------------------------------ Literature citations ------------------------------ */
+function refShort(r) {
+  const who = [r.authors, r.year].filter(Boolean).join(", ");
+  const cited = r.cited_by != null ? ` · cited by ${r.cited_by}` : "";
+  const link = r.url ? `<a href="${r.url}" target="_blank" rel="noopener">${r.doi}</a>` : "";
+  return `<div class="ref">
+    <div class="ref-title">${escapeHtml(r.title || "(untitled)")}</div>
+    <div class="hint">${escapeHtml(who)}${r.venue ? ` — ${escapeHtml(r.venue)}` : ""}${cited} ${link}</div>
+  </div>`;
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+function renderCitations(payload) {
+  $("#citations-list").innerHTML = payload.hypotheses.map((h) => `
+    <div class="citation-group">
+      <h4>${escapeHtml(h.hypothesis || "")} · ${escapeHtml(h.path)}</h4>
+      ${h.error ? `<div class="status error">lookup failed: ${escapeHtml(h.error)}</div>`
+        : h.references.length ? h.references.map(refShort).join("")
+        : `<div class="hint">No candidate references found.</div>`}
+    </div>`).join("")
+    + `<p class="hint">Suggestions for a literature review — not automatic support claims. Verify relevance before citing.</p>`;
+}
+$("#btn-citations").addEventListener("click", async () => {
+  if (!state.analysis) return;
+  setStatus("#citations-status", "Searching Crossref…");
+  try {
+    const payload = await api(`/api/analyses/${state.analysis.id}/citations`, { method: "POST" });
+    renderCitations(payload);
+    setStatus("#citations-status", "");
+  } catch (err) {
+    setStatus("#citations-status", err.message, true);
+  }
+});
+
+/* ------------------------------ Share & collaborate ------------------------------ */
+async function refreshShares() {
+  $("#share-list").innerHTML = "";
+  if (!state.analysis) return;
+  try {
+    const { shares } = await api(`/api/analyses/${state.analysis.id}/shares`);
+    renderShares(shares);
+  } catch { /* no shares yet is fine */ }
+}
+function renderShares(shares) {
+  if (!shares.length) { $("#share-list").innerHTML = ""; return; }
+  $("#share-list").innerHTML = `<table class="share-table">
+    <tr><th>Link</th><th>Access</th><th>Label</th><th></th></tr>` +
+    shares.map((s) => {
+      const full = `${location.origin}${s.url}`;
+      return `<tr>
+        <td><a href="${s.url}" target="_blank" rel="noopener">${s.token}</a></td>
+        <td>${s.scope === "comment" ? "view + comment" : "view only"}</td>
+        <td>${escapeHtml(s.label || "")}</td>
+        <td>
+          <button class="copy-share" data-url="${full}">Copy</button>
+          <button class="revoke-share" data-token="${s.token}">Revoke</button>
+        </td></tr>`;
+    }).join("") + `</table>`;
+  $("#share-list").querySelectorAll(".copy-share").forEach((b) =>
+    b.addEventListener("click", () => {
+      navigator.clipboard?.writeText(b.dataset.url);
+      b.textContent = "Copied!";
+      setTimeout(() => (b.textContent = "Copy"), 1200);
+    }));
+  $("#share-list").querySelectorAll(".revoke-share").forEach((b) =>
+    b.addEventListener("click", async () => {
+      await api(`/api/analyses/${state.analysis.id}/shares/${b.dataset.token}`, { method: "DELETE" });
+      refreshShares();
+    }));
+}
+$("#btn-share").addEventListener("click", async () => {
+  if (!state.analysis) return;
+  setStatus("#share-status", "Creating link…");
+  try {
+    await api(`/api/analyses/${state.analysis.id}/shares`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scope: $("#share-scope").value, label: $("#share-label").value.trim() }),
+    });
+    $("#share-label").value = "";
+    setStatus("#share-status", "");
+    refreshShares();
+  } catch (err) {
+    setStatus("#share-status", err.message, true);
+  }
 });
 
 /* ------------------------------ MGA (MICOM-gated) ------------------------------ */

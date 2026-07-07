@@ -25,7 +25,7 @@ from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import ai
+from . import ai, citations, collab
 from .assess import assess, assess_mga
 from .audit import run_audit, variable_dictionary
 from .engine import MGA_SCRIPT, EngineError, run_engine
@@ -540,6 +540,128 @@ def get_interpretation(analysis_id: str):
     p = a_dir / "interpretation.json"
     if not p.exists():
         raise HTTPException(404, "no interpretation generated yet")
+    return read_json(p)
+
+
+# --------------------------------------------------------------------------- #
+# Collaboration (Phase 3): token-based share links + comment threads. Sharing is
+# read-only; a link may additionally grant commenting. No accounts — see collab.py.
+# --------------------------------------------------------------------------- #
+
+class ShareRequest(BaseModel):
+    scope: Literal["view", "comment"] = "view"
+    label: str = ""
+
+
+def _require_analysis(analysis_id: str):
+    if not (analysis_dir(analysis_id) / "meta.json").exists():
+        raise HTTPException(404, "analysis not found")
+
+
+@app.post("/api/analyses/{analysis_id}/shares")
+def create_share(analysis_id: str, req: ShareRequest):
+    """Mint a read-only (optionally commentable) share link for an analysis."""
+    _require_analysis(analysis_id)
+    share = collab.create_share(analysis_id, req.scope, req.label)
+    return {**share, "url": f"/app/shared.html?token={share['token']}"}
+
+
+@app.get("/api/analyses/{analysis_id}/shares")
+def list_shares(analysis_id: str):
+    _require_analysis(analysis_id)
+    return {"shares": [{**s, "url": f"/app/shared.html?token={s['token']}"}
+                       for s in collab.list_shares(analysis_id)]}
+
+
+@app.delete("/api/analyses/{analysis_id}/shares/{token}")
+def revoke_share(analysis_id: str, token: str):
+    _require_analysis(analysis_id)
+    if not collab.revoke_share(analysis_id, token):
+        raise HTTPException(404, "share link not found")
+    return {"revoked": token}
+
+
+@app.get("/api/analyses/{analysis_id}/comments")
+def owner_comments(analysis_id: str):
+    """Owner-side view of the comment thread (no token needed)."""
+    _require_analysis(analysis_id)
+    return {"comments": collab.list_comments(analysis_id)}
+
+
+def _shared_bundle(token: str) -> tuple[dict, dict]:
+    """Resolve a share token to (share, read-only payload). 404 if the link is dead."""
+    share = collab.resolve_token(token)
+    if not share:
+        raise HTTPException(404, "share link is invalid or has been revoked")
+    a_dir, meta, request, results = _load_analysis(share["analysis_id"])
+    ds_meta = read_json(dataset_dir(meta["dataset_id"]) / "meta.json")
+    payload = {
+        "scope": share["scope"],
+        "label": share["label"],
+        "created_at": meta.get("created_at"),
+        "dataset": {"name": ds_meta.get("filename"),
+                    "n_observations": ds_meta.get("n_observations")},
+        "model": {
+            "constructs": [{"name": c["name"], "measurement": c["measurement"]}
+                           for c in request["constructs"]],
+            "paths": [f"{p['from_construct']} -> {p['to_construct']}"
+                      for p in request["paths"]],
+        },
+        "assessment": assess(results, request),
+        "mga": _mga_if_any(a_dir),
+        "comments": collab.list_comments(share["analysis_id"]),
+    }
+    return share, payload
+
+
+@app.get("/api/shared/{token}")
+def shared_view(token: str):
+    """Read-only bundle behind a share link: findings, assessment, comments."""
+    _, payload = _shared_bundle(token)
+    return payload
+
+
+class CommentRequest(BaseModel):
+    author: str = ""
+    body: str
+
+
+@app.post("/api/shared/{token}/comments")
+def shared_comment(token: str, req: CommentRequest):
+    """Leave a comment via a share link (only if the link grants commenting)."""
+    share = collab.resolve_token(token)
+    if not share:
+        raise HTTPException(404, "share link is invalid or has been revoked")
+    if share["scope"] != "comment":
+        raise HTTPException(403, "this share link is view-only")
+    try:
+        return collab.add_comment(share["analysis_id"], req.author, req.body)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc))
+
+
+# --------------------------------------------------------------------------- #
+# Literature citations (Phase 3): candidate references grounding each hypothesis,
+# from Crossref. Suggestions for a literature review, not automatic support claims.
+# --------------------------------------------------------------------------- #
+
+@app.post("/api/analyses/{analysis_id}/citations")
+def create_citations(analysis_id: str):
+    """Find candidate grounding references for each hypothesized direct path."""
+    a_dir, _, request, results = _load_analysis(analysis_id)
+    hypotheses = assess(results, request)["hypotheses"]
+    suggestions = citations.suggest_for_hypotheses(hypotheses)
+    payload = {"generated_at": datetime.datetime.now().isoformat(timespec="seconds"),
+               "source": "Crossref", "hypotheses": suggestions}
+    write_json(a_dir / "citations.json", payload)
+    return payload
+
+
+@app.get("/api/analyses/{analysis_id}/citations")
+def get_citations(analysis_id: str):
+    p = analysis_dir(analysis_id) / "citations.json"
+    if not p.exists():
+        raise HTTPException(404, "no citations generated yet")
     return read_json(p)
 
 

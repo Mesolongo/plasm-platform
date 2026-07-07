@@ -16,7 +16,9 @@ withheld unless at least partial invariance holds. Also: blindfolding Q²
 simple-slopes plots for moderation, assumption-checking gates before every run
 (10-times rule, >5% missing, straight-lining; override is recorded), Excel and
 PowerPoint export, PDF report export (needs LibreOffice), a grounded
-research-assistant chat, and SQL / Google Sheets data connectors. Engine
+research-assistant chat, SQL / Google Sheets data connectors, token-based
+share links with a read-only viewer and comment threads, and
+literature-grounded hypothesis citations (Crossref). Engine
 outputs reproduce the published Hair et al. examples: two-stage interaction
 β = −0.071; indirect effects COMP→CUSA→CUSL = 0.074 (indirect-only mediation)
 and LIKE→CUSA→CUSL = 0.220 (complementary); blindfolding Q² CUSA = 0.279 /
@@ -63,7 +65,9 @@ The web UI (served at `/`) walks the full flow: bring in data (upload CSV/Excel/
 data audit → model builder with live path diagram (manual, example, or
 AI-proposed; supports moderation via two-stage interaction terms and
 higher-order constructs) → run → results dashboard with threshold verdicts,
-mediation classification, and IPMA → download the Word report. API docs:
+mediation classification, and IPMA → find grounding literature per hypothesis
+(Crossref) → mint a read-only share link (optionally comment-enabled;
+recipients open `/app/shared.html?token=…`) → download the Word report. API docs:
 `/docs`. Assessment thresholds are rule-based with citations (Hair et al. 2022;
 Henseler et al. 2015; Cohen 1988; Henseler et al. 2014 / Hu & Bentler 1999 for
 SRMR; Shmueli et al. 2019 for PLSpredict; Kenny 2018 for interaction f²; Zhao

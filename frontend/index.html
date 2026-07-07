@@ -183,6 +183,31 @@
       </form>
       <div id="chat-status" class="status"></div>
     </div>
+
+    <h2>Literature <span class="hint">candidate references per hypothesis (Crossref)</span></h2>
+    <div class="card">
+      <div class="form-row">
+        <button id="btn-citations">🔎 Find supporting literature</button>
+        <div id="citations-status" class="status"></div>
+      </div>
+      <div id="citations-list"></div>
+    </div>
+
+    <h2>Share &amp; collaborate</h2>
+    <div class="card">
+      <div class="form-row">
+        <label>Access
+          <select id="share-scope">
+            <option value="view">View only</option>
+            <option value="comment">View &amp; comment</option>
+          </select>
+        </label>
+        <label>Label <input type="text" id="share-label" placeholder="e.g. thesis committee" size="20"></label>
+        <button id="btn-share" class="primary">Create share link</button>
+        <div id="share-status" class="status"></div>
+      </div>
+      <div id="share-list"></div>
+    </div>
   </section>
 </main>
 <script src="app.js"></script>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shared analysis — plsem-platform</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">plsem<span>-platform</span></div>
+  <div class="shared-tag">Shared analysis · read-only</div>
+</header>
+
+<main>
+  <section class="panel">
+    <div id="shared-status" class="status">Loading…</div>
+
+    <div id="shared-body" class="hidden">
+      <h1>Analysis results</h1>
+      <p class="lead" id="shared-meta"></p>
+
+      <div class="cards" id="shared-cards"></div>
+
+      <h2>Hypotheses</h2>
+      <div class="tablewrap"><table id="shared-hyp"></table></div>
+
+      <div id="shared-med-block" class="hidden">
+        <h2>Mediation — specific indirect effects</h2>
+        <div class="tablewrap"><table id="shared-med"></table></div>
+      </div>
+
+      <h2>Structural model</h2>
+      <div class="tablewrap"><table id="shared-struct"></table></div>
+
+      <h2>Discussion <span class="hint">comments are visible to everyone with this link</span></h2>
+      <div id="comment-log" class="card chat-log"></div>
+      <form id="comment-form" class="form-col hidden">
+        <div class="form-row">
+          <input type="text" id="comment-author" placeholder="Your name" size="20">
+        </div>
+        <textarea id="comment-body" rows="3" placeholder="Add a comment…"></textarea>
+        <div class="form-row">
+          <button type="submit" class="primary">Post comment</button>
+          <div id="comment-status" class="status"></div>
+        </div>
+      </form>
+      <p id="viewonly-note" class="hint hidden">This link is view-only — commenting is disabled.</p>
+    </div>
+  </section>
+</main>
+<script src="shared.js"></script>
+</body>
+</html>

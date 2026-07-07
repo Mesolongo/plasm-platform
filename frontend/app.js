@@ -441,6 +441,13 @@ function renderResults() {
   $("#chat-block").classList.toggle("hidden", !aiConfigured);
   $("#citations-list").innerHTML = "";
   setStatus("#citations-status", "");
+  $("#reviewer-summary").classList.add("hidden");
+  $("#reviewer-list").innerHTML = "";
+  setStatus("#reviewer-status", "");
+  $("#manuscript").classList.add("hidden");
+  $("#manuscript").innerHTML = "";
+  setStatus("#manuscript-status", "");
+  $("#publish-draft").classList.toggle("hidden", !aiConfigured);
   refreshShares();
 
   const fit = a.structural_model.find((m) => m.family === "model_fit");
@@ -625,6 +632,84 @@ $("#btn-citations").addEventListener("click", async () => {
     setStatus("#citations-status", "");
   } catch (err) {
     setStatus("#citations-status", err.message, true);
+  }
+});
+
+/* ------------------------------ Publishing assistant ------------------------------ */
+const SEVERITY_LABEL = { high: "High", medium: "Medium", low: "Low", info: "Standard" };
+
+function renderReviewerChecks(payload) {
+  const s = payload.summary;
+  $("#reviewer-summary").classList.remove("hidden");
+  $("#reviewer-summary").innerHTML = `<div class="cards">
+    <div class="stat ${s.high ? "bad" : "good"}"><div class="v">${s.high}</div><div class="l">high</div></div>
+    <div class="stat ${s.medium ? "warn" : ""}"><div class="v">${s.medium}</div><div class="l">medium</div></div>
+    <div class="stat"><div class="v">${s.low}</div><div class="l">low</div></div>
+    <div class="stat"><div class="v">${s.info}</div><div class="l">standard</div></div>
+  </div>`;
+  $("#reviewer-list").innerHTML = payload.concerns.map((c) => `
+    <div class="concern concern-${c.severity}">
+      <div class="concern-head">
+        <span class="sev-badge sev-${c.severity}">${SEVERITY_LABEL[c.severity] || c.severity}</span>
+        <span class="concern-area">${escapeHtml(c.area.replaceAll("_", " "))}</span>
+      </div>
+      <p class="concern-text">${escapeHtml(c.concern)}</p>
+      <p class="hint"><strong>Why:</strong> ${escapeHtml(c.evidence)}</p>
+      <p class="concern-fix"><strong>Pre-empt it:</strong> ${escapeHtml(c.recommendation)}
+        <span class="hint">${escapeHtml(c.citation)}</span></p>
+    </div>`).join("");
+}
+
+$("#btn-reviewer").addEventListener("click", async () => {
+  if (!state.analysis) return;
+  setStatus("#reviewer-status", "Scanning the assessment…");
+  try {
+    const payload = await api(`/api/analyses/${state.analysis.id}/reviewer-check`);
+    renderReviewerChecks(payload);
+    setStatus("#reviewer-status", "");
+  } catch (err) {
+    setStatus("#reviewer-status", err.message, true);
+  }
+});
+
+function renderManuscript(payload) {
+  const d = payload.draft;
+  const block = $("#manuscript");
+  block.classList.remove("hidden");
+  block.innerHTML = `
+    <h4>Title options</h4>
+    <ul>${d.title_options.map((t) => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
+    <h4>Abstract <span class="hint">${escapeHtml(payload.mode)}${payload.target_journal ? ` · ${escapeHtml(payload.target_journal)}` : ""}</span></h4>
+    <p>${escapeHtml(d.abstract)}</p>
+    <h4>Keywords</h4>
+    <p>${d.keywords.map(escapeHtml).join(" · ")}</p>
+    <h4>Highlights</h4>
+    <ul>${d.highlights.map((h) => `<li>${escapeHtml(h)}</li>`).join("")}</ul>
+    <h4>Contribution statement</h4>
+    <p>${escapeHtml(d.contribution_statement)}</p>
+    <h4>Pre-emptive reviewer responses</h4>
+    ${d.reviewer_responses.map((r) => `<div class="concern">
+      <p class="concern-text"><strong>${escapeHtml(r.concern)}</strong></p>
+      <p>${escapeHtml(r.response)}</p></div>`).join("")}
+    <p class="hint">AI-drafted from the computed assessment. Verify every claim before submission.</p>`;
+}
+
+$("#btn-manuscript").addEventListener("click", async () => {
+  if (!state.analysis) return;
+  setStatus("#manuscript-status", "Drafting…");
+  try {
+    const payload = await api(`/api/analyses/${state.analysis.id}/manuscript`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        study_description: $("#pub-study").value.trim(),
+        target_journal: $("#pub-journal").value.trim(),
+        mode: $("#pub-mode").value,
+      }),
+    });
+    renderManuscript(payload);
+    setStatus("#manuscript-status", "");
+  } catch (err) {
+    setStatus("#manuscript-status", err.message, true);
   }
 });
 

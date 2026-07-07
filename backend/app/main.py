@@ -25,7 +25,7 @@ from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import ai, citations, collab
+from . import ai, citations, collab, publish
 from .assess import assess, assess_mga
 from .audit import run_audit, variable_dictionary
 from .engine import MGA_SCRIPT, EngineError, run_engine
@@ -662,6 +662,66 @@ def get_citations(analysis_id: str):
     p = analysis_dir(analysis_id) / "citations.json"
     if not p.exists():
         raise HTTPException(404, "no citations generated yet")
+    return read_json(p)
+
+
+# --------------------------------------------------------------------------- #
+# Publishing assistant (Phase 4): reviewer-anticipation checks (deterministic)
+# and AI-drafted submission front matter in a journal or thesis register.
+# --------------------------------------------------------------------------- #
+
+def _reviewer_concerns(analysis_id: str) -> tuple[Path, dict, list[dict]]:
+    """Compute the deterministic reviewer concerns for an analysis.
+
+    Returns (analysis_dir, assessment, concerns) so the manuscript drafter can
+    reuse the assessment without recomputing it.
+    """
+    a_dir, meta, request, results = _load_analysis(analysis_id)
+    assessment = assess(results, request)
+    ds_meta = read_json(dataset_dir(meta["dataset_id"]) / "meta.json")
+    concerns = publish.reviewer_checks(assessment, request, dataset_meta=ds_meta,
+                                       analysis_meta=meta, mga=_mga_if_any(a_dir))
+    return a_dir, assessment, concerns
+
+
+@app.get("/api/analyses/{analysis_id}/reviewer-check")
+def reviewer_check(analysis_id: str):
+    """Anticipate peer-reviewer concerns from the rule-based assessment (no AI)."""
+    _, _, concerns = _reviewer_concerns(analysis_id)
+    return {"concerns": concerns, "summary": publish.summarize(concerns)}
+
+
+class ManuscriptRequest(BaseModel):
+    study_description: str = ""
+    target_journal: str = ""
+    mode: Literal["journal", "thesis"] = "journal"
+
+
+@app.post("/api/analyses/{analysis_id}/manuscript")
+def create_manuscript(analysis_id: str, req: ManuscriptRequest):
+    """AI publishing assistant: draft submission front matter + reviewer responses,
+    grounded in the assessment and the deterministic reviewer concerns."""
+    if not ai.is_configured():
+        raise HTTPException(503, ai.NOT_CONFIGURED)
+    a_dir, assessment, concerns = _reviewer_concerns(analysis_id)
+    _, _, request, _ = _load_analysis(analysis_id)
+    try:
+        draft = ai.draft_manuscript(request, assessment, concerns, req.study_description,
+                                    req.target_journal, req.mode)
+    except Exception as exc:
+        raise HTTPException(502, f"AI manuscript drafting failed: {exc}")
+    payload = {"generated_at": datetime.datetime.now().isoformat(timespec="seconds"),
+               "mode": req.mode, "target_journal": req.target_journal,
+               "reviewer_concerns": concerns, "draft": draft}
+    write_json(a_dir / "manuscript.json", payload)
+    return payload
+
+
+@app.get("/api/analyses/{analysis_id}/manuscript")
+def get_manuscript(analysis_id: str):
+    p = analysis_dir(analysis_id) / "manuscript.json"
+    if not p.exists():
+        raise HTTPException(404, "no manuscript drafted yet")
     return read_json(p)
 
 

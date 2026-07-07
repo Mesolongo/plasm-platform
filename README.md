@@ -17,8 +17,15 @@ simple-slopes plots for moderation, assumption-checking gates before every run
 (10-times rule, >5% missing, straight-lining; override is recorded), Excel and
 PowerPoint export, PDF report export (needs LibreOffice), a grounded
 research-assistant chat, SQL / Google Sheets data connectors, token-based
-share links with a read-only viewer and comment threads, and
-literature-grounded hypothesis citations (Crossref). Engine
+share links with a read-only viewer and comment threads,
+literature-grounded hypothesis citations (Crossref), and a **publishing
+assistant**: deterministic reviewer-anticipation checks that read the assessment
+and surface the concerns a peer reviewer will raise (marginal discriminant
+validity, missing PLSpredict, unsupported hypotheses, common method bias,
+endogeneity, unobserved heterogeneity…) each with a pre-emptive fix and citation,
+plus an AI drafter that turns them into submission front matter (title options,
+abstract, keywords, highlights, contribution statement, and point-by-point
+reviewer responses) in a journal or thesis register. Engine
 outputs reproduce the published Hair et al. examples: two-stage interaction
 β = −0.071; indirect effects COMP→CUSA→CUSL = 0.074 (indirect-only mediation)
 and LIKE→CUSA→CUSL = 0.220 (complementary); blindfolding Q² CUSA = 0.279 /

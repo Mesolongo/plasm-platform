@@ -176,6 +176,25 @@ td { font-variant-numeric: tabular-nums; }
 .ref { padding: 0.35rem 0; border-top: 1px solid var(--line); }
 .ref-title { font-size: 0.9rem; }
 
+/* Publishing assistant */
+#reviewer-summary { margin: 0.6rem 0; }
+.concern { border: 1px solid var(--line); border-left-width: 3px; border-radius: 6px;
+  padding: 0.6rem 0.75rem; margin: 0.5rem 0; background: var(--surface); }
+.concern-high { border-left-color: var(--fail); }
+.concern-medium { border-left-color: var(--review); }
+.concern-low, .concern-info { border-left-color: var(--line); }
+.concern-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
+.concern-area { font-size: 0.8rem; color: var(--ink-soft); text-transform: capitalize; }
+.concern-text { margin: 0.2rem 0; }
+.concern-fix { margin: 0.3rem 0 0; font-size: 0.9rem; }
+.sev-badge { font-size: 0.72rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 999px; }
+.sev-high { background: var(--fail-soft); color: var(--fail); }
+.sev-medium { background: var(--review-soft); color: var(--review); }
+.sev-low, .sev-info { background: var(--accent-soft); color: var(--accent); }
+#publish-draft { margin-top: 0.9rem; border-top: 1px solid var(--line); padding-top: 0.9rem; }
+#manuscript h4 { margin: 0.9rem 0 0.3rem; font-size: 0.92rem; color: var(--ink-soft); }
+#manuscript ul { margin: 0.2rem 0; padding-left: 1.2rem; }
+
 /* Share & collaborate */
 .share-table { width: 100%; margin-top: 0.6rem; font-size: 0.88rem; }
 .share-table td a { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }

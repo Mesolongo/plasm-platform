@@ -193,6 +193,35 @@
       <div id="citations-list"></div>
     </div>
 
+    <h2>Publishing assistant <span class="hint">reviewer-anticipation checks &amp; a submission draft</span></h2>
+    <div class="card">
+      <div class="form-row">
+        <button id="btn-reviewer">🛡 Anticipate reviewer concerns</button>
+        <div id="reviewer-status" class="status"></div>
+      </div>
+      <div id="reviewer-summary" class="hidden"></div>
+      <div id="reviewer-list"></div>
+      <div id="publish-draft" class="hidden">
+        <div class="form-col">
+          <label>Study description <span class="hint">optional — sharpens the abstract</span>
+            <textarea id="pub-study" rows="2" placeholder="One or two sentences on the study, sample, and aim"></textarea>
+          </label>
+          <div class="form-row">
+            <label>Target outlet <input type="text" id="pub-journal" placeholder="e.g. Journal of Business Research" size="26"></label>
+            <label>Mode
+              <select id="pub-mode">
+                <option value="journal">Journal article</option>
+                <option value="thesis">Thesis / dissertation</option>
+              </select>
+            </label>
+            <button id="btn-manuscript" class="primary">✨ Draft submission front matter</button>
+            <div id="manuscript-status" class="status"></div>
+          </div>
+        </div>
+        <div id="manuscript" class="hidden"></div>
+      </div>
+    </div>
+
     <h2>Share &amp; collaborate</h2>
     <div class="card">
       <div class="form-row">

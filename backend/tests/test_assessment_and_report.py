@@ -7,6 +7,8 @@ from fastapi.testclient import TestClient
 
 from backend.app.main import app
 
+from .helpers import create_analysis
+
 ROOT = Path(__file__).resolve().parents[2]
 CSV = Path(__file__).parent / "fixtures_corp_rep.csv"
 SPEC = ROOT / "ai" / "fixtures" / "model_spec_reference.json"
@@ -21,7 +23,7 @@ def analysis():
                          files={"file": ("corp_rep.csv", f, "text/csv")},
                          data={"missing_value": "-99"}).json()
     spec = json.loads(SPEC.read_text())
-    resp = client.post("/api/analyses", json={
+    return create_analysis(client, {
         "dataset_id": ds["id"],
         "constructs": [{"name": c["name"], "indicators": c["indicators"],
                         "measurement": c["measurement"]} for c in spec["constructs"]],
@@ -29,8 +31,6 @@ def analysis():
                   for p in spec["paths"]],
         "nboot": 1000,
     })
-    assert resp.status_code == 200, resp.text
-    return resp.json()
 
 
 def test_assessment_verdicts(analysis):

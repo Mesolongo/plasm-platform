@@ -36,7 +36,11 @@ def analysis_dir(analysis_id: str, create: bool = False) -> Path:
 
 
 def write_json(path: Path, obj) -> None:
-    path.write_text(json.dumps(obj, indent=2, default=str))
+    # Atomic (write + rename) so a poller never reads a half-written file — job
+    # and analysis metas are updated from worker threads while requests read them.
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(json.dumps(obj, indent=2, default=str))
+    tmp.replace(path)
 
 
 def read_json(path: Path):

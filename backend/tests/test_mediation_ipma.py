@@ -18,6 +18,8 @@ from fastapi.testclient import TestClient
 from backend.app.main import app
 from backend.app.storage import ROOT
 
+from .helpers import create_analysis
+
 CSV = Path(__file__).parent / "fixtures_corp_rep.csv"
 
 client = TestClient(app)
@@ -35,15 +37,13 @@ def analysis():
     dataset = resp.json()
 
     spec = json.loads((ROOT / "ai" / "fixtures" / "model_spec_reference.json").read_text())
-    resp = client.post("/api/analyses", json={
+    analysis_id = create_analysis(client, {
         "dataset_id": dataset["id"], "nboot": 200, "prediction": False,
         "constructs": [{"name": c["name"], "indicators": c.get("indicators", []),
                         "measurement": c["measurement"]} for c in spec["constructs"]],
         "paths": [{"from_construct": p["from_construct"], "to_construct": p["to_construct"]}
                   for p in spec["paths"]],
-    })
-    assert resp.status_code == 200, resp.text
-    analysis_id = resp.json()["id"]
+    })["id"]
     return {
         "id": analysis_id,
         "results": client.get(f"/api/analyses/{analysis_id}/results").json(),

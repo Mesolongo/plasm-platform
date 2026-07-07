@@ -15,6 +15,8 @@ from backend.app import main as main_module
 from backend.app.main import app
 from backend.app.storage import ROOT
 
+from .helpers import create_analysis
+
 CSV = Path(__file__).parent / "fixtures_corp_rep.csv"
 
 client = TestClient(app)
@@ -35,15 +37,13 @@ def dataset():
 @pytest.fixture(scope="module")
 def analysis(dataset):
     spec = json.loads((ROOT / "ai" / "fixtures" / "model_spec_reference.json").read_text())
-    resp = client.post("/api/analyses", json={
+    analysis_id = create_analysis(client, {
         "dataset_id": dataset["id"], "nboot": 100, "prediction": False,
         "constructs": [{"name": c["name"], "indicators": c.get("indicators", []),
                         "measurement": c["measurement"]} for c in spec["constructs"]],
         "paths": [{"from_construct": p["from_construct"], "to_construct": p["to_construct"]}
                   for p in spec["paths"]],
-    })
-    assert resp.status_code == 200, resp.text
-    analysis_id = resp.json()["id"]
+    })["id"]
     return {
         "id": analysis_id,
         "results": client.get(f"/api/analyses/{analysis_id}/results").json(),
@@ -127,9 +127,7 @@ def test_assumption_gates(dataset):
     assert detail["stage"] == "assumption_gates"
     assert any(v["gate"] == "sample_size_10x" for v in detail["violations"])
 
-    resp = client.post("/api/analyses", json={**spec, "override_gates": True})
-    assert resp.status_code == 200, resp.text
-    meta = client.get(f"/api/analyses/{resp.json()['id']}").json()
+    meta = create_analysis(client, {**spec, "override_gates": True})
     assert meta["assumption_gates"]["overridden"] is True
     assert meta["assumption_gates"]["violations"]
 

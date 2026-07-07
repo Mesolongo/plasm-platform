@@ -15,6 +15,8 @@ from fastapi.testclient import TestClient
 
 from backend.app.main import app
 
+from .helpers import create_analysis
+
 CSV = Path(__file__).parent / "fixtures_corp_rep.csv"
 
 client = TestClient(app)
@@ -62,11 +64,10 @@ def _cell(records, row, col):
 
 
 def test_moderation_matches_published_values(dataset):
-    resp = client.post("/api/analyses", json={
+    analysis = create_analysis(client, {
         "dataset_id": dataset["id"], "nboot": 200, **MODERATION_SPEC,
     })
-    assert resp.status_code == 200, resp.text
-    results = client.get(resp.json()["results_url"]).json()
+    results = client.get(analysis["results_url"]).json()
 
     # Two-stage interaction effect and R2 from the primer's moderation example
     assert abs(_cell(results["paths_and_r2"], "CUSA*SC", "CUSL") - (-0.071)) < 0.005
@@ -81,7 +82,7 @@ def test_moderation_matches_published_values(dataset):
     assert {"cusa", "cusl_1", "cusl_2", "cusl_3"} <= set(pred)
     assert all(r["q2_predict"] is not None for r in pred.values())
 
-    a = client.get(f"/api/analyses/{resp.json()['id']}/assessment").json()
+    a = client.get(f"/api/analyses/{analysis['id']}/assessment").json()
     mod = {h["path"]: h for h in a["hypotheses"] if h["type"] == "moderation"}
     assert set(mod) == {"CUSA*SC -> CUSL"}
 
@@ -98,7 +99,7 @@ def test_moderation_matches_published_values(dataset):
 
 
 def test_higher_order_construct(dataset):
-    resp = client.post("/api/analyses", json={
+    analysis = create_analysis(client, {
         "dataset_id": dataset["id"], "nboot": 200, "prediction": False,
         "constructs": [
             {"name": "QUAL", "indicators": [f"qual_{i}" for i in range(1, 9)],
@@ -117,14 +118,13 @@ def test_higher_order_construct(dataset):
             {"from_construct": "CUSA", "to_construct": "CUSL"},
         ],
     })
-    assert resp.status_code == 200, resp.text
-    results = client.get(resp.json()["results_url"]).json()
+    results = client.get(analysis["results_url"]).json()
     assert results["meta"]["higher_order"] == "DRIVERS"
     assert not results.get("prediction")  # explicitly disabled
     assert 0.0 < results["srmr"] < 0.15
     assert _cell(results["paths_and_r2"], "DRIVERS", "CUSA") is not None
 
-    a = client.get(f"/api/analyses/{resp.json()['id']}/assessment").json()
+    a = client.get(f"/api/analyses/{analysis['id']}/assessment").json()
     # Dimension weights on the HOC are assessed like formative indicators
     fiv = [m for m in a["measurement_model"] if m["family"] == "formative_indicator_validity"]
     assert {"QUAL", "PERF"} <= {m["item"] for m in fiv if m["construct"] == "DRIVERS"}
@@ -132,7 +132,7 @@ def test_higher_order_construct(dataset):
     assert hyp["DRIVERS -> CUSA"] == "supported"
 
     # The Word report renders with the new sections
-    report = client.get(f"/api/analyses/{resp.json()['id']}/report.docx")
+    report = client.get(f"/api/analyses/{analysis['id']}/report.docx")
     assert report.status_code == 200
     from docx import Document
     doc = Document(io.BytesIO(report.content))
@@ -167,8 +167,9 @@ def test_invalid_phase2_specs(dataset):
     })
     assert resp.status_code == 422
 
-    # Interaction referencing an unknown construct (caught by the engine)
-    resp = client.post("/api/analyses", json={
+    # Interaction referencing an unknown construct (caught by the engine, so the
+    # queued job fails and the error lands on the analysis meta)
+    meta = create_analysis(client, {
         **base,
         "constructs": [
             {"name": "A", "indicators": ["comp_1", "comp_2"], "measurement": "reflective"},
@@ -176,6 +177,5 @@ def test_invalid_phase2_specs(dataset):
         ],
         "interactions": [{"iv": "A", "moderator": "NOPE"}],
         "paths": [{"from_construct": "A", "to_construct": "B"}],
-    })
-    assert resp.status_code == 422
-    assert "NOPE" in str(resp.json())
+    }, expect="failed")
+    assert "NOPE" in str(meta["error"])

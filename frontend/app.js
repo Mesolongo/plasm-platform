@@ -17,6 +17,26 @@ async function api(path, opts = {}) {
   }
   return body;
 }
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const jobError = (e) => new Error(e && e.message ? `[${e.stage}] ${e.message}` : "the job failed");
+/* Long-running work (estimation, MGA, citations) is queued server-side; the POST
+   answers 202 with something pollable. */
+async function waitJob(jobId, intervalMs = 1500) {
+  for (;;) {
+    const job = await api(`/api/jobs/${jobId}`);
+    if (job.status === "completed") return job;
+    if (job.status === "failed") throw jobError(job.error);
+    await sleep(intervalMs);
+  }
+}
+async function waitAnalysis(id, intervalMs = 1500) {
+  for (;;) {
+    const meta = await api(`/api/analyses/${id}`);
+    if (meta.status === "completed") return meta;
+    if (meta.status === "failed") throw jobError(meta.error);
+    await sleep(intervalMs);
+  }
+}
 function setStatus(sel, msg, isError = false, busy = false) {
   const el = $(sel);
   el.classList.toggle("error", isError);
@@ -444,6 +464,7 @@ $("#btn-run").addEventListener("click", async () => {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+    await waitAnalysis(analysis.id);
     const assessment = await api(`/api/analyses/${analysis.id}/assessment`);
     const results = await api(`/api/analyses/${analysis.id}/results`);
     state.analysis = { ...analysis, assessment, results };
@@ -689,9 +710,11 @@ function renderCitations(payload) {
 }
 $("#btn-citations").addEventListener("click", async () => {
   if (!state.analysis) return;
-  setStatus("#citations-status", "Searching Crossref…", false, true);
+  setStatus("#citations-status", "Searching Crossref (a few seconds per hypothesis)…", false, true);
   try {
-    const payload = await api(`/api/analyses/${state.analysis.id}/citations`, { method: "POST" });
+    const job = await api(`/api/analyses/${state.analysis.id}/citations`, { method: "POST" });
+    await waitJob(job.id);
+    const payload = await api(`/api/analyses/${state.analysis.id}/citations`);
     renderCitations(payload);
     setStatus("#citations-status", "");
   } catch (err) {
@@ -859,9 +882,9 @@ function setupMga() {
 $("#btn-mga").addEventListener("click", async () => {
   if (!state.analysis) return;
   const nperm = +$("#mga-nperm").value;
-  setStatus("#mga-status", `Testing invariance and comparing groups (${nperm.toLocaleString()} permutations)…`);
+  setStatus("#mga-status", `Testing invariance and comparing groups (${nperm.toLocaleString()} permutations)…`, false, true);
   try {
-    const mga = await api(`/api/analyses/${state.analysis.id}/mga`, {
+    const job = await api(`/api/analyses/${state.analysis.id}/mga`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         group_variable: $("#mga-var").value,
@@ -870,6 +893,8 @@ $("#btn-mga").addEventListener("click", async () => {
         npermutations: nperm,
       }),
     });
+    await waitJob(job.id);
+    const mga = await api(`/api/analyses/${state.analysis.id}/mga`);
     renderMga(mga);
     setStatus("#mga-status", "Done — the Word report now includes the MGA section.");
   } catch (err) {

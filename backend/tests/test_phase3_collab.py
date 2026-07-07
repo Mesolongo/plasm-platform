@@ -12,6 +12,8 @@ from fastapi.testclient import TestClient
 from backend.app.main import app
 from backend.app.storage import ROOT
 
+from .helpers import create_analysis
+
 CSV = Path(__file__).parent / "fixtures_corp_rep.csv"
 client = TestClient(app)
 
@@ -22,15 +24,13 @@ def analysis_id():
         ds = client.post("/api/datasets", files={"file": ("corp_rep.csv", f, "text/csv")},
                          data={"missing_value": "-99"}).json()
     spec = json.loads((ROOT / "ai" / "fixtures" / "model_spec_reference.json").read_text())
-    resp = client.post("/api/analyses", json={
+    return create_analysis(client, {
         "dataset_id": ds["id"], "nboot": 100, "prediction": False,
         "constructs": [{"name": c["name"], "indicators": c.get("indicators", []),
                         "measurement": c["measurement"]} for c in spec["constructs"]],
         "paths": [{"from_construct": p["from_construct"], "to_construct": p["to_construct"]}
                   for p in spec["paths"]],
-    })
-    assert resp.status_code == 200, resp.text
-    return resp.json()["id"]
+    })["id"]
 
 
 def test_view_share_resolves_readonly_bundle(analysis_id):

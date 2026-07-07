@@ -1,8 +1,7 @@
 """Wrapper around the R PLS-SEM engine (engine/R/estimate.R).
 
-Synchronous subprocess call for the MVP; the interface (request dict in, results
-dict out, EngineError on failure) is what a Celery task will wrap later, so callers
-won't change.
+Synchronous subprocess call (request dict in, results dict out, EngineError on
+failure); API endpoints run it through the jobs.py queue so requests don't block.
 """
 import json
 import subprocess

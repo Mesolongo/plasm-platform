@@ -11,6 +11,8 @@ from fastapi.testclient import TestClient
 
 from backend.app.main import app
 
+from .helpers import create_analysis
+
 ROOT = Path(__file__).resolve().parents[2]
 CSV = Path(__file__).parent / "fixtures_corp_rep.csv"
 SPEC = ROOT / "ai" / "fixtures" / "model_spec_reference.json"
@@ -40,19 +42,18 @@ def test_upload_builds_dictionary_and_audit(dataset):
 
 
 def test_rejects_bad_spec(dataset):
-    resp = client.post("/api/analyses", json={
+    meta = create_analysis(client, {
         "dataset_id": dataset["id"],
         "constructs": [{"name": "X", "indicators": ["no_such_col"], "measurement": "reflective"}],
         "paths": [],
         "nboot": 100,
-    })
-    assert resp.status_code == 422
-    assert "no_such_col" in json.dumps(resp.json())
+    }, expect="failed")
+    assert "no_such_col" in json.dumps(meta["error"])
 
 
 def test_full_analysis_matches_published_values(dataset):
     spec = json.loads(SPEC.read_text())
-    resp = client.post("/api/analyses", json={
+    analysis = create_analysis(client, {
         "dataset_id": dataset["id"],
         "constructs": [
             {"name": c["name"], "indicators": c["indicators"], "measurement": c["measurement"]}
@@ -64,10 +65,9 @@ def test_full_analysis_matches_published_values(dataset):
         ],
         "nboot": 1000,
     })
-    assert resp.status_code == 200, resp.text
-    assert resp.json()["status"] == "completed"
+    assert analysis["status"] == "completed"
 
-    results = client.get(resp.json()["results_url"]).json()
+    results = client.get(analysis["results_url"]).json()
 
     def cell(records, row, col):
         for rec in records:

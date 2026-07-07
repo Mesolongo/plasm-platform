@@ -14,6 +14,8 @@ from fastapi.testclient import TestClient
 from backend.app.assess import assess_mga
 from backend.app.main import app
 
+from .helpers import create_analysis, wait_job
+
 CSV = Path(__file__).parent / "fixtures_corp_rep.csv"
 
 client = TestClient(app)
@@ -49,11 +51,9 @@ def analysis():
     servicetype = next(v for v in dataset["variables"] if v["name"] == "servicetype")
     assert servicetype["values"] == {"1": 125, "2": 219}
 
-    resp = client.post("/api/analyses", json={
+    return create_analysis(client, {
         "dataset_id": dataset["id"], "nboot": 100, "prediction": False, **SIMPLE_SPEC,
-    })
-    assert resp.status_code == 200, resp.text
-    return resp.json()["id"]
+    })["id"]
 
 
 def test_mga_micom_and_paths(analysis):
@@ -61,8 +61,10 @@ def test_mga_micom_and_paths(analysis):
         "group_variable": "servicetype", "value_a": "1", "value_b": "2",
         "npermutations": 100,
     })
-    assert resp.status_code == 200, resp.text
-    mga = resp.json()
+    assert resp.status_code == 202, resp.text
+    job = wait_job(client, resp.json()["id"])
+    assert job["status"] == "completed", job["error"]
+    mga = client.get(f"/api/analyses/{analysis}/mga").json()
 
     assert mga["meta"]["n_a"] == 125 and mga["meta"]["n_b"] == 219
     # Published result: compositional invariance holds for every construct
@@ -107,18 +109,20 @@ def test_mga_gating_withholds_paths_without_invariance():
 
 
 def test_mga_invalid_requests(analysis):
+    def failed_job(body):
+        resp = client.post(f"/api/analyses/{analysis}/mga", json=body)
+        assert resp.status_code == 202, resp.text
+        job = wait_job(client, resp.json()["id"])
+        assert job["status"] == "failed", job
+        return job
+
     # Unknown grouping variable
-    resp = client.post(f"/api/analyses/{analysis}/mga", json={
-        "group_variable": "nope", "value_a": "1", "value_b": "2", "npermutations": 100,
-    })
-    assert resp.status_code == 422 and "nope" in str(resp.json())
+    job = failed_job({"group_variable": "nope", "value_a": "1", "value_b": "2",
+                      "npermutations": 100})
+    assert "nope" in str(job["error"])
     # Group value with no observations
-    resp = client.post(f"/api/analyses/{analysis}/mga", json={
-        "group_variable": "servicetype", "value_a": "1", "value_b": "9", "npermutations": 100,
-    })
-    assert resp.status_code == 422
+    failed_job({"group_variable": "servicetype", "value_a": "1", "value_b": "9",
+                "npermutations": 100})
     # Same value twice
-    resp = client.post(f"/api/analyses/{analysis}/mga", json={
-        "group_variable": "servicetype", "value_a": "1", "value_b": "1", "npermutations": 100,
-    })
-    assert resp.status_code == 422
+    failed_job({"group_variable": "servicetype", "value_a": "1", "value_b": "1",
+                "npermutations": 100})

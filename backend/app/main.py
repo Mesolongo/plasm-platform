@@ -1,13 +1,14 @@
-"""plsem-platform backend — Phase 1 vertical slice.
+"""plsem-platform backend.
 
-Flow: upload dataset -> variable dictionary + audit -> submit model spec -> engine
-estimates -> results JSON. Estimation runs synchronously in the MVP (a corp-rep-sized
-job with 1k bootstraps takes seconds; 10k takes ~1 min). Celery + Redis replace the
-sync call in a later increment without changing the API.
+Flow: upload dataset -> variable dictionary + audit -> submit model spec -> the
+job queue runs the engine -> poll status -> results JSON. Long-running work
+(estimation, MGA, citation lookups) goes through the in-process queue in jobs.py:
+the POST answers 202 with a pollable job, so requests never block on the engine.
 
 Run:  .venv/bin/uvicorn backend.app.main:app --reload  (from the project root)
 Docs: http://127.0.0.1:8000/docs
 """
+import contextlib
 import datetime
 import io
 import re
@@ -25,15 +26,22 @@ from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import ai, citations, collab, publish
+from . import ai, citations, collab, jobs, publish
 from .assess import assess, assess_mga
 from .audit import run_audit, variable_dictionary
-from .engine import MGA_SCRIPT, EngineError, run_engine
+from .engine import MGA_SCRIPT, run_engine
 from .export import write_pptx, write_xlsx
 from .report import build_report
 from .storage import ROOT, analysis_dir, dataset_dir, new_id, read_json, write_json
 
-app = FastAPI(title="plsem-platform", version="0.2.0")
+
+@contextlib.asynccontextmanager
+async def _lifespan(app: FastAPI):
+    jobs.recover_interrupted()  # fail jobs orphaned by a previous server death
+    yield
+
+
+app = FastAPI(title="plsem-platform", version="0.3.0", lifespan=_lifespan)
 
 
 # --------------------------------------------------------------------------- #
@@ -295,8 +303,10 @@ def assumption_gates(ds_meta: dict, req: AnalysisRequest) -> list[dict]:
     return violations
 
 
-@app.post("/api/analyses")
+@app.post("/api/analyses", status_code=202)
 def create_analysis(req: AnalysisRequest):
+    """Validate the spec and queue the estimation; poll GET /api/analyses/{id}
+    until status is completed (results ready) or failed (error in the meta)."""
     ds_dir = dataset_dir(req.dataset_id)
     if not (ds_dir / "meta.json").exists():
         raise HTTPException(404, "dataset not found")
@@ -326,32 +336,42 @@ def create_analysis(req: AnalysisRequest):
     }
     write_json(a_dir / "request.json", engine_request)
 
+    # The job id goes into the meta before the worker can touch it, so the two
+    # files never race; the worker mirrors the final status back via on_done.
+    job_id = new_id("job")
     meta = {
         "id": analysis_id,
         "dataset_id": req.dataset_id,
         "created_at": datetime.datetime.now().isoformat(timespec="seconds"),
-        "status": "running",
+        "status": "queued",
+        "job_id": job_id,
         "assumption_gates": {"violations": violations,
                              "overridden": bool(violations)},
     }
     write_json(a_dir / "meta.json", meta)
 
-    try:
+    def estimate():
+        record("running", None)  # mirror the job's start so polling shows progress
         run_engine(a_dir / "request.json", a_dir / "results.json")
-        meta["status"] = "completed"
-    except EngineError as exc:
-        meta["status"] = "failed"
-        meta["error"] = {"stage": exc.stage, "message": exc.message}
-        write_json(a_dir / "meta.json", meta)
-        raise HTTPException(422, meta["error"])
-    except Exception as exc:  # crash path — keep the record, surface a 500
-        meta["status"] = "failed"
-        meta["error"] = {"stage": "internal", "message": str(exc)}
-        write_json(a_dir / "meta.json", meta)
-        raise HTTPException(500, meta["error"])
 
-    write_json(a_dir / "meta.json", meta)
+    def record(status, error):
+        m = read_json(a_dir / "meta.json")
+        m["status"] = status
+        if error:
+            m["error"] = error
+        write_json(a_dir / "meta.json", m)
+
+    jobs.submit("estimate", analysis_id, estimate, on_done=record, job_id=job_id)
     return {**meta, "results_url": f"/api/analyses/{analysis_id}/results"}
+
+
+@app.get("/api/jobs/{job_id}")
+def get_job(job_id: str):
+    """Poll a queued job (estimation, MGA, citations); error is set when failed."""
+    job = jobs.get(job_id)
+    if not job:
+        raise HTTPException(404, "job not found")
+    return job
 
 
 @app.get("/api/analyses/{analysis_id}")
@@ -396,10 +416,11 @@ class MGARequest(BaseModel):
     seed: int = 123
 
 
-@app.post("/api/analyses/{analysis_id}/mga")
+@app.post("/api/analyses/{analysis_id}/mga", status_code=202)
 def create_mga(analysis_id: str, req: MGARequest):
     """Multi-group analysis: MICOM (Henseler et al. 2016) gates the permutation
-    test on path differences (Chin & Dibbern 2010) — no invariance, no comparison."""
+    test on path differences (Chin & Dibbern 2010) — no invariance, no comparison.
+    Queues the permutation run; poll the returned job, then GET .../mga."""
     a_dir, _, request, _ = _load_analysis(analysis_id)
     engine_request = {
         **request,
@@ -408,11 +429,11 @@ def create_mga(analysis_id: str, req: MGARequest):
         "options": {"npermutations": req.npermutations, "seed": req.seed},
     }
     write_json(a_dir / "mga_request.json", engine_request)
-    try:
-        mga = run_engine(a_dir / "mga_request.json", a_dir / "mga.json", script=MGA_SCRIPT)
-    except EngineError as exc:
-        raise HTTPException(422, {"stage": exc.stage, "message": exc.message})
-    return assess_mga(mga)
+
+    def run():
+        run_engine(a_dir / "mga_request.json", a_dir / "mga.json", script=MGA_SCRIPT)
+
+    return jobs.submit("mga", analysis_id, run)
 
 
 @app.get("/api/analyses/{analysis_id}/mga")
@@ -645,16 +666,21 @@ def shared_comment(token: str, req: CommentRequest):
 # from Crossref. Suggestions for a literature review, not automatic support claims.
 # --------------------------------------------------------------------------- #
 
-@app.post("/api/analyses/{analysis_id}/citations")
+@app.post("/api/analyses/{analysis_id}/citations", status_code=202)
 def create_citations(analysis_id: str):
-    """Find candidate grounding references for each hypothesized direct path."""
+    """Find candidate grounding references for each hypothesized direct path.
+    Crossref lookups take seconds per hypothesis, so the search is queued;
+    poll the returned job, then GET .../citations."""
     a_dir, _, request, results = _load_analysis(analysis_id)
     hypotheses = assess(results, request)["hypotheses"]
-    suggestions = citations.suggest_for_hypotheses(hypotheses)
-    payload = {"generated_at": datetime.datetime.now().isoformat(timespec="seconds"),
-               "source": "Crossref", "hypotheses": suggestions}
-    write_json(a_dir / "citations.json", payload)
-    return payload
+
+    def run():
+        suggestions = citations.suggest_for_hypotheses(hypotheses)
+        write_json(a_dir / "citations.json", {
+            "generated_at": datetime.datetime.now().isoformat(timespec="seconds"),
+            "source": "Crossref", "hypotheses": suggestions})
+
+    return jobs.submit("citations", analysis_id, run)
 
 
 @app.get("/api/analyses/{analysis_id}/citations")

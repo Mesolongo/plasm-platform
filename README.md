@@ -25,7 +25,12 @@ validity, missing PLSpredict, unsupported hypotheses, common method bias,
 endogeneity, unobserved heterogeneity…) each with a pre-emptive fix and citation,
 plus an AI drafter that turns them into submission front matter (title options,
 abstract, keywords, highlights, contribution statement, and point-by-point
-reviewer responses) in a journal or thesis register. Engine
+reviewer responses) in a journal or thesis register. Long-running work
+(estimation, MGA, citation lookups) runs on an in-process **async job queue**
+(file-backed, `backend/app/jobs.py`): the POST answers `202` with a job that is
+pollable at `/api/jobs/{id}`, jobs orphaned by a server restart are failed on
+startup, and the polling contract is Celery-shaped so a broker can replace the
+thread pool without an API change. Engine
 outputs reproduce the published Hair et al. examples: two-stage interaction
 β = −0.071; indirect effects COMP→CUSA→CUSL = 0.074 (indirect-only mediation)
 and LIKE→CUSA→CUSL = 0.220 (complementary); blindfolding Q² CUSA = 0.279 /

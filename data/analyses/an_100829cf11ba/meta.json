@@ -1,0 +1,10 @@
+{
+  "id": "an_100829cf11ba",
+  "dataset_id": "ds_14c24e10c240",
+  "created_at": "2026-07-07T02:27:37",
+  "status": "failed",
+  "error": {
+    "stage": "validate_spec",
+    "message": "interaction references unknown construct: A x NOPE"
+  }
+}

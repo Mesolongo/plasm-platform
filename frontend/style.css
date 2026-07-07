@@ -1,0 +1,141 @@
+:root {
+  --ground: #f7f8fa;
+  --surface: #ffffff;
+  --ink: #1c2534;
+  --ink-soft: #55617a;
+  --line: #dde2ec;
+  --accent: #0e6e8e;
+  --accent-soft: #e3eef2;
+  --pass: #2e7d4f;
+  --pass-soft: #e2f2e9;
+  --review: #9a6a0b;
+  --review-soft: #f6eedc;
+  --fail: #b3373c;
+  --fail-soft: #f9e5e6;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--ground);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.55;
+}
+header.top {
+  display: flex; align-items: center; gap: 2rem;
+  padding: 0.7rem 1.5rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 10;
+}
+.brand { font-weight: 700; font-size: 1.1rem; color: var(--accent); }
+.brand span { color: var(--ink-soft); font-weight: 400; }
+.stepper { display: flex; gap: 0.5rem; flex: 1; }
+.step {
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft);
+  border-radius: 999px; padding: 0.35rem 0.9rem; cursor: pointer; font-size: 0.9rem;
+}
+.step span {
+  display: inline-block; width: 1.3rem; height: 1.3rem; border-radius: 50%;
+  background: var(--line); color: var(--ink); text-align: center; line-height: 1.3rem;
+  font-size: 0.8rem; margin-right: 0.3rem;
+}
+.step.active { border-color: var(--accent); color: var(--accent); }
+.step.active span { background: var(--accent); color: #fff; }
+.step:disabled { opacity: 0.45; cursor: default; }
+.ai-badge { font-size: 0.8rem; padding: 0.25rem 0.7rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.ai-badge.off { background: var(--review-soft); color: var(--review); }
+
+main { max-width: 68rem; margin: 0 auto; padding: 1.5rem; }
+.panel h1 { font-size: 1.5rem; margin: 0.5rem 0; }
+.panel h2 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+.panel h3 { font-size: 0.95rem; margin: 1rem 0 0.4rem; color: var(--ink-soft); }
+.lead { color: var(--ink-soft); margin-top: 0; }
+.hidden { display: none !important; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 8px; padding: 1rem;
+}
+.form-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.form-row label { color: var(--ink-soft); font-size: 0.9rem; }
+input[type="text"], select {
+  border: 1px solid var(--line); border-radius: 6px; padding: 0.35rem 0.5rem;
+  font: inherit; background: var(--surface);
+}
+button, .button {
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  border-radius: 6px; padding: 0.45rem 0.95rem; font: inherit; cursor: pointer;
+  text-decoration: none; display: inline-block;
+}
+button:hover, .button:hover { border-color: var(--accent); }
+.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.primary:hover { filter: brightness(1.08); }
+.toolbar { display: flex; gap: 0.6rem; margin: 0.8rem 0; flex-wrap: wrap; }
+.actions { margin-top: 1.2rem; }
+.status { margin: 0.6rem 0; font-size: 0.9rem; color: var(--ink-soft); min-height: 1.2em; }
+.status.error { color: var(--fail); }
+
+.cards { display: flex; gap: 0.8rem; flex-wrap: wrap; margin: 1rem 0; }
+.stat {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 0.7rem 1.1rem; min-width: 8.5rem;
+}
+.stat .v { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat .l { font-size: 0.78rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; }
+.stat.good .v { color: var(--pass); }
+.stat.warn .v { color: var(--review); }
+.stat.bad .v { color: var(--fail); }
+
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+th, td { text-align: left; padding: 0.45rem 0.8rem; border-bottom: 1px solid var(--line); white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-soft); background: var(--ground); }
+td { font-variant-numeric: tabular-nums; }
+
+.badge {
+  display: inline-block; padding: 0.1rem 0.55rem; border-radius: 999px;
+  font-size: 0.75rem; font-weight: 600;
+}
+.badge.pass, .badge.supported, .badge.ok { background: var(--pass-soft); color: var(--pass); }
+.badge.review, .badge.warning { background: var(--review-soft); color: var(--review); }
+.badge.fail, .badge.not-supported { background: var(--fail-soft); color: var(--fail); }
+.badge.info, .badge.neutral { background: var(--accent-soft); color: var(--accent); }
+
+.audit-item {
+  background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0; padding: 0.55rem 0.9rem; margin: 0.4rem 0; font-size: 0.9rem;
+}
+.audit-item.warning { border-left-color: var(--review); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1.1fr; gap: 1.5rem; }
+@media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+.construct-row, .path-row {
+  display: flex; gap: 0.5rem; align-items: flex-start; flex-wrap: wrap;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 0.6rem; margin: 0.45rem 0;
+}
+.construct-row input[type="text"] { width: 6.5rem; font-weight: 600; }
+.construct-row select.items { min-width: 12rem; min-height: 4.5rem; }
+.path-row select { min-width: 7rem; }
+.rm { border: none; background: none; color: var(--fail); cursor: pointer; font-size: 1rem; padding: 0.2rem 0.4rem; }
+
+.hint { font-size: 0.75rem; font-weight: 400; color: var(--ink-soft); margin-left: 0.4rem; }
+
+.interp-card { margin: 0.6rem 0; }
+.interp-card h3 { margin: 0 0 0.4rem; color: var(--accent); }
+.interp-card p { margin: 0.4rem 0; max-width: 60rem; }
+
+.diagram-card { padding: 0.4rem; }
+.run-card { margin-top: 1rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+#diagram .node ellipse { fill: var(--accent-soft); stroke: var(--accent); }
+#diagram .node.formative ellipse,
+#diagram .node.higher_order_formative ellipse { fill: #fff; stroke-dasharray: 4 3; }
+#diagram .node.higher_order_reflective ellipse,
+#diagram .node.higher_order_formative ellipse { stroke-width: 2.5; }
+#diagram .node.interaction ellipse { fill: #fdf3e3; stroke: #c98a2b; stroke-dasharray: 2 3; }
+#diagram .node text { font-size: 12px; font-weight: 600; fill: var(--ink); }
+#diagram .edge { stroke: var(--ink-soft); fill: none; marker-end: url(#arrow); }

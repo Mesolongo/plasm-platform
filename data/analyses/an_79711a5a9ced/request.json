@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "data_csv": "/Users/meschacolongo/plsem-platform/data/datasets/ds_ed665e200c96/raw.csv",
+  "missing_value": null,
+  "options": {
+    "nboot": 5000,
+    "seed": 123
+  },
+  "constructs": [
+    {
+      "name": "RMSD",
+      "indicators": [
+        "RMSD"
+      ],
+      "measurement": "reflective"
+    },
+    {
+      "name": "F1",
+      "indicators": [
+        "F1"
+      ],
+      "measurement": "reflective"
+    }
+  ],
+  "paths": [
+    {
+      "from_construct": "RMSD",
+      "to_construct": "F1"
+    }
+  ]
+}

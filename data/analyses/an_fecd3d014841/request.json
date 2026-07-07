@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "data_csv": "/Users/meschacolongo/plsem-platform/data/datasets/ds_3d41e1c7091b/raw.csv",
+  "missing_value": "-99",
+  "options": {
+    "nboot": 1000,
+    "seed": 123
+  },
+  "constructs": [
+    {
+      "name": "QUAL",
+      "indicators": [
+        "qual_1",
+        "qual_2",
+        "qual_3",
+        "qual_4",
+        "qual_5",
+        "qual_6",
+        "qual_7",
+        "qual_8"
+      ],
+      "measurement": "formative"
+    },
+    {
+      "name": "PERF",
+      "indicators": [
+        "perf_1",
+        "perf_2",
+        "perf_3",
+        "perf_4",
+        "perf_5"
+      ],
+      "measurement": "formative"
+    },
+    {
+      "name": "CSOR",
+      "indicators": [
+        "csor_1",
+        "csor_2",
+        "csor_3",
+        "csor_4",
+        "csor_5"
+      ],
+      "measurement": "formative"
+    },
+    {
+      "name": "ATTR",
+      "indicators": [
+        "attr_1",
+        "attr_2",
+        "attr_3"
+      ],
+      "measurement": "formative"
+    },
+    {
+      "name": "COMP",
+      "indicators": [
+        "comp_1",
+        "comp_2",
+        "comp_3"
+      ],
+      "measurement": "reflective"
+    },
+    {
+      "name": "LIKE",
+      "indicators": [
+        "like_1",
+        "like_2",
+        "like_3"
+      ],
+      "measurement": "reflective"
+    },
+    {
+      "name": "CUSA",
+      "indicators": [
+        "cusa"
+      ],
+      "measurement": "single_item"
+    },
+    {
+      "name": "CUSL",
+      "indicators": [
+        "cusl_1",
+        "cusl_2",
+        "cusl_3"
+      ],
+      "measurement": "reflective"
+    }
+  ],
+  "paths": [
+    {
+      "from_construct": "QUAL",
+      "to_construct": "COMP"
+    },
+    {
+      "from_construct": "QUAL",
+      "to_construct": "LIKE"
+    },
+    {
+      "from_construct": "PERF",
+      "to_construct": "COMP"
+    },
+    {
+      "from_construct": "PERF",
+      "to_construct": "LIKE"
+    },
+    {
+      "from_construct": "CSOR",
+      "to_construct": "COMP"
+    },
+    {
+      "from_construct": "CSOR",
+      "to_construct": "LIKE"
+    },
+    {
+      "from_construct": "ATTR",
+      "to_construct": "COMP"
+    },
+    {
+      "from_construct": "ATTR",
+      "to_construct": "LIKE"
+    },
+    {
+      "from_construct": "COMP",
+      "to_construct": "CUSA"
+    },
+    {
+      "from_construct": "LIKE",
+      "to_construct": "CUSA"
+    },
+    {
+      "from_construct": "COMP",
+      "to_construct": "CUSL"
+    },
+    {
+      "from_construct": "LIKE",
+      "to_construct": "CUSL"
+    },
+    {
+      "from_construct": "CUSA",
+      "to_construct": "CUSL"
+    }
+  ]
+}

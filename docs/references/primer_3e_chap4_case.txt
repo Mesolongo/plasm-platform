@@ -1,0 +1,229 @@
+4
+ASSESSING PLS-SEM
+RESULTS PART I
+Evaluation of Reflective Measurement
+Models
+CASE STUDY ILLUSTRATION—EVALUATION
+OF REFLECTIVE MEASUREMENT MODELS
+Running the PLS-SEM Algorithm
+We continue working with our PLS-SEM example on corporate reputa-
+tion. In Chapter 3, we explained how to estimate the PLS path model and
+how to obtain the results by opening the default report in the SmartPLS 4
+software (Ringle, Wende, & Becker, 2022). Recall that to do so, you must
+first load the simple corporate reputation model and then run the model by
+clicking on the wheel symbol with the label Calculate in the toolbar or by us-
+ing the pull-down menu by going to Calculate → PLS-SEM algorithm.A f t e r
+running the PLS -SEM algorithm, if you had previously ticked Open report on
+the dialog box, the SmartPLS results report automatically opens; if not, click
+on the Open Report button in the Modeling window. You can save the results
+of this report by clicking on the Save button in the toolbar.
+Before analyzing the results, you need to quickly check if the algorithm
+converged (i.e., the stop criterion of the algorithm was reached and not the
+maximum number of iterations). T o do so, go to Algorithm → Stop criterion
+changes in the results report. You will then see the table shown in Exhibit
+A4.1, which shows the number of iterat ions of the PLS-SEM algorithm. This
+number should be lower than the maxi mum number of iterations (i.e.,
+3,000). At the bottom left side of the table, you will see that the algorithm
+converged after Iteration 5. If the PLS-SEM algorithm does not converge in
+fewer than 3,000 iterations (the default setting in the software), the algorithm
+could not find a stable solution. This kind of situation almost never occurs.
+But if it does occur, there are problems with the data and they need to be
+checked carefully. For example, data problems may occur if the sample size is
+too small or if an indicator has many identical values (i.e., the same data
+points, which results in insufficient variability).
+Exhibit A4.1 ■ Stop Criterion Table in SmartPLS
+When your PLS path model estimation converges, which it practically al-
+ways does, you need to examine the following PLS-SEM calculation results
+tables from the results report for ref lective measurement model assessment:
+Outer loadings , Composite reliability (rho_a) , Composite reliability (rho_c) ,
+Cronbach’s alpha, Average variance extracted (A VE),a n d Discriminant validity.
+We examine other elements of the report in Chapters 5 and 6, when we ex-
+tend the simple path model by including formative measures and also consid-
+er the structural model results.
+Reflective Measurement Model Evaluation
+The simple corporate reputation model has three latent variables with re-
+flective measurement models (i.e., COMP , CUSL,and LIKE)a sw e l la sas i n -
+gle-item construct ( CUSA). For the reflective measurement models, we need
+the estimates for the relationships betwe en the reflective constructs and their
+indicators (i.e., outer loa dings). Exhibit A4.2 displa ys the results table for the
+outer loadings, which can be found under Final results → Outer loadings.B y
+default, the outer loadings are also displayed in the Graphical output of the
+PLS results report after running the PLS-SEM algorithm. All outer loadings
+o ft h er e f l e c t i v ec o n s t r u c t sCOMP , CUSL, and LIKE are well above the
+threshold value of 0.708, which suggests suf ficient levels of indicator reliability.
+A Primer on Partial Least Squares Stru ctural Equation Modeling (PLS-SEM)2
+Exhibit A4.2 ■ Outer Loadings
+The indicator comp_2 (outer loading: 0.798) has the smallest indicator reli-
+ability with a value of 0.637 (0.798 2), while the indicator cusl_2 (outer load-
+ing: 0.917) has the highest indicator reliability, with a value of 0.841 (0.917 2).
+Next, go to Quality criteria → Construct reliability and validity to evaluate
+the construct measures’ internal consist ency reliability and convergent validi-
+ty. Here, you have the option of displaying the composite reliability values us-
+ing a bar chart or in a matrix format. Exhibit A4.3 shows the internal consis-
+tency reliability values in matrix format. With
+ρA values of 0.832 ( COMP),
+0.839 ( CUSL), and 0.836 ( LIKE), all three reflective constructs have high
+levels of internal consistency reliability. Clicking on Composite reliability
+(rho_a)—Bar chart shows the bar chart of the constructs’ reliability values
+(Exhibit A4.4). If a ρA value is above the threshold value, the corresponding
+bar is colored green. If a ρA is lower than 0.70, the bar is colored red. As indi-
+cated above, all ρA values exceed the threshold. Note that the ρA value of the
+single-item variable CUSA is 1.00, but this cannot be interpreted as evidence
+the construct measurement is perfectly reliable and should not be reported
+with other measures of reliability.
+Exhibit A4.3 ■ Construct Reliability and Validity
+Chapter 4 ■ Assessing PLS-SEM Results Part I 3
+Exhibit A4.4 ■ Reliability ρ A
+Analogous to ρA, you can also examine the bar charts of Cronbach’s alpha
+and composite reliability ρC. All bars in the charts appear in green, indicating
+that all construct measures are above the 0.70 threshold. The specific values
+of Cronbach’ s alpha (0.776 forCOMP,0 . 8 3 1f o rCUSL, and 0.831 for LIKE)
+and the composite reliability
+ρC (0.865 for COMP, 0.899 for CUSL,a n d
+0.899 for LIKE) can be accessed by going to Quality criteria → Construct reli-
+ability and validity → Overview.A g a i n ,a sCUSA is measured using a single
+item, interpreting this construct’s Cron bach’s alpha or composite reliability
+values is not meaningful.
+Convergent validity assessment is b ased on the A VE values, which can be
+accessed by navigating to Quality criteria → Construct reliability and validity
+in the Results report . As with the internal consistency reliability measures,
+SmartPLS offers the option of displaying the results using bar charts (Exhibit
+A4.5) or in a matrix format. In this example, the A VE values of COMP
+(0.681), CUSL (0.748), and LIKE (0.747) are well above the required mini-
+A Primer on Partial Least Squares Stru ctural Equation Modeling (PLS-SEM)4
+Exhibit A4.5 ■ Average Variance Extracted (AVE)
+mum level of 0.50. Thus, the measures of the three reflective constructs have
+high levels of convergent validity.
+Finally, in the Quality criteria → Discriminant validity, SmartPLS offers sev-
+eral approaches to assess whether the co nstruct measures empirically demon-
+strate discriminant validity. The primar y criterion for discriminant validity as-
+sessment is the Heterotrait-monotrait ratio (HTMT) , which can be accessed via
+the Quality criteria → Discriminant validity → Heterotrait-monotrait ratio
+(HTMT)—Matrix section of the results report. Exhibit A4.6 shows the HTMT
+values for all pairs of constructs in a matrix format. Note that SmartPLS com-
+putes the HTMT values on the grounds of absolute correlations to avoid ad-
+verse results due to a combination of positive and negative indicator correlations
+(Ringle, Sarstedt, Sinkovics, & Sinkovics, 2023). The Results report also shows
+these HTMT values in a list format and in bar charts, using 0.85 as the relevant
+threshold level. As can be seen, all HTMT values are clearly lower than the
+more conservative threshold value of 0.85, even for COMP and LIKE as well as
+CUSA and CUSL, which are very similar from a conceptual viewpoint. Recall
+that the threshold value for conceptually similar constructs is 0.90.
+Chapter 4 ■ Assessing PLS-SEM Results Part I 5
+According to the Fornell-Larcker c riterion, the square root of the A VE of
+each construct should be higher than the construct’s highest correlation with
+any other construct in the model (this notion is identical to comparing the
+A VE with the squared correlations bet ween the constructs). Exhibit A4.7
+shows the results of the Fornell-Larcker criterion assessment with the square
+root of the reflective constructs’ A VE on the diagonal and the correlations be-
+tween the constructs in the off-diagonal position. For example, the reflective
+construct COMP has a value of 0.825 for the square root of its A VE, which
+needs to be compared with all correlation values in the column of COMP .
+Note that for CUSL, you need to consider the correlations in both the row
+and column and for LIKE only those in the row. Overall, the square roots of
+t h eA V E sf o rt h er e f l e c t i v ec o n s t r u c t sCOMP (0.825), CUSL (0.865), and
+LIKE (0.864) are all higher than the correlations of these constructs with oth-
+er latent variables in the path model, thus indicating all constructs are valid
+measures of unique concepts.
+Note that while frequently used in past applied research, the Fornell-Lar-
+cker criterion does not reliably detect di scriminant validity issues. That is, the
+criterion is not well-suited for disclosi ng existing discriminant validity prob-
+lems. Nevertheless, any violation of th e Fornell-Larcker criterion should be
+taken as strong evidence for a severe discriminant validity problem.
+In addition to examining the HTMT ratios, you should test whether
+the HTMT values are significantly different from the threshold value.
+Exhibit A4.6 ■ HTMT
+Exhibit A4.7 ■ Fornell-Larcker Criterion
+A Primer on Partial Least Squares Stru ctural Equation Modeling (PLS-SEM)6
+Specifically, we assume a 0.85 threshold for all pairs of constructs except for
+COMP and LIKE as well as CUSA and CUSL, for which we assume a higher
+threshold (0.90) because of their conce ptual similarity. T o run this test, we
+need to compute bootstrap confidence intervals using bootstrapping. T o run
+the bootstrapping procedure, go back to the Modeling window by clicking on
+Edit in the Results window. Next, left-click on Calculate → Bootstrapping in
+the pull-down menu. In the dialog box t hat opens, choose the bootstrapping
+options as displayed in Exhibit A4.8 (Chapter 5 includes a more detailed in-
+troduction to the bootstrapping procedure and the parameter settings). Make
+sure to select 10,000 Subsamples and the Complete (slower) option, which in-
+cludes the results for HTMT (unlike the Most important (faster) option). Se-
+lect Percentile bootstrap as the Confidence interval method , One tailed as Te s t
+type,a n da0 . 0 5 Significance level (note that you can also select Tw o t a i l e das
+Te s t t y p eand a 0.10 Significance level ). Note that Fixed seed next to Random
+number generator should be selected to facilitate the reproducibility of results.
+F i n a l l y ,m a k es u r et oc h e c kt h eb o xn e x tOpen report and click on Start calcu-
+lation.
+Exhibit A4.8 ■ Bootstrapping Options in SmartPLS
+Chapter 4 ■ Assessing PLS-SEM Results Part I 7
+After running bootstrapping, the resul ts report opens automatically. Go to
+Quality criteria → Heterotrait-monotrait ratio (HTMT) and navigate to Confi-
+dence intervals bias corrected . The table that opens (Exhibit A4.9) shows the
+original HTMT values (column Original sample (O)) for each combination of
+constructs in the model, along with the average HTMT values computed
+from the 10,000 bootstrap samples, as shown in column Sample mean (M) .
+Note that you should have the same results, provided that you selected the
+Fixed seed option in the bootstrapping settings. However, if you chose Ran-
+dom seed , your results will differ from thos e presented here and will change
+slightly each time you rerun the bootstrapping procedure. The reason is that
+bootstrapping builds on randomly draw n bootstrap samples, which will differ
+every time the procedure is run. The diffe rences in the overall bootstrapping
+results are marginal, however, provide d that a sufficiently large number of
+bootstrap samples have been drawn (e.g., 10,000). By selecting the Fixed seed
+option, the bootstrapping algorithm’s random number generator uses fixed
+settings, which facilitates reproducing the results in later model estimations.
+Exhibit A4.9 ■ Percentile Confidence Intervals (with Bias Correction)
+for HTMT
+The columns labeled 5% and 95% show the lower and upper bounds of
+the 95% one-sided bootstrap confide nce interval (or the 90% two-sided
+bootstrap confidence interval, respectively). The statistical test focuses on the
+right tail of the bootstrap distribution to show that HTMT value is signifi-
+cantly lower than the corresponding th reshold values (0.85 and 0.90) with a
+5% probability of error. As can be seen all values in the 95% column are low-
+er than these threshold values, suggesting that all HTMT values are signifi-
+cantly lower than 0.85 and 0.90, respectively. More importantly, even assum-
+ing a more conservative threshold of 0.8 5 for all construct combinations (i.e.,
+including CUSA and CUSL as well as COMP and LIKE), we find that all
+HTMT values are significantly lower tha n this value (i.e., the confidence in-
+tervals’ upper bound is smaller than 0.85). For example, the lower and upper
+bounds of the HTMT’s 95% confidence interval for CUSA and COMP are
+A Primer on Partial Least Squares Stru ctural Equation Modeling (PLS-SEM)8
+Exhibit 4.10 ■ Results Summary for Reflective Measurement Models
+Latent
+Variable Indicators
+Convergent Validity Internal Consistency Reliability
+Discriminant
+Validity
+Loadings
+Indicator
+Reliability AVE
+Cronbach’s
+Alpha Reliability
+ρA
+Composite
+Reliability
+ρ C HTMT
+>0.70 >0.50 >0.50 0.60–0.90 0.60–0.90 0.60–0.90
+Significantly
+lower than
+0.85 (0.90)?
+COMP
+comp_1 0.858 0.736 0.681 0.776 0.832 0.865 Yes
+comp_2 0.798 0.637
+comp_3 0.818 0.669
+CUSL
+cusl_1 0.833 0.694 0.748 0.831 0.839 0.899 Yes
+cusl_2 0.917 0.841
+cusl_3 0.843 0.711
+LIKE
+like_1 0.879 0.773 0.747 0.831 0.836 0.899 Yes
+like_2 0.870 0.757
+like_3 0.843 0.711
+Chapter 4 ■ Assessing PLS-SEM Results Part I 9
+0.369 and 0.556, respectively. Since the upper bound of 0.556 is lower than
+0.85, the HTMT value of 0.465 for CUSA and COMP is significantly lower
+t h a nt h em o r ec o n s e r v a t i v et h r e s h o l dvalue of 0.85. T o summarize, the boot-
+strap confidence interval results of th e HTMT criterion also clearly demon-
+strate the discriminant validity of the constructs.
+Exhibit A4.10 summarizes the results o f the reflective measurement model
+assessment. As can be seen, all model evaluation criteria have been met, pro-
+viding support for the measures’ reliability and validity.
+A Primer on Partial Least Squares Stru ctural Equation Modeling (PLS-SEM)10

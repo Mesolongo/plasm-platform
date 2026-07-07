@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>plsem-platform</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">plsem<span>-platform</span></div>
+  <nav class="stepper">
+    <button class="step active" data-step="1"><span>1</span> Data</button>
+    <button class="step" data-step="2" disabled><span>2</span> Model</button>
+    <button class="step" data-step="3" disabled><span>3</span> Results</button>
+  </nav>
+  <div id="ai-badge" class="ai-badge" title="">AI: checking…</div>
+</header>
+
+<main>
+  <!-- ============ Step 1: Data ============ -->
+  <section id="panel-1" class="panel">
+    <h1>Upload survey data</h1>
+    <p class="lead">CSV, Excel, or SPSS (.sav). Each row is a respondent; columns are indicators.</p>
+    <form id="upload-form" class="card form-row">
+      <input type="file" id="file-input" accept=".csv,.xlsx,.xls,.sav" required>
+      <label>Missing-value code <input type="text" id="missing-code" placeholder="e.g. -99" size="6"></label>
+      <button type="submit" class="primary">Upload &amp; audit</button>
+    </form>
+    <div id="upload-status" class="status"></div>
+    <div id="data-summary" class="hidden">
+      <div class="cards" id="data-cards"></div>
+      <h2>Data audit</h2>
+      <div id="audit-list"></div>
+      <h2>Variable dictionary</h2>
+      <div class="tablewrap"><table id="var-table"></table></div>
+      <div class="actions"><button class="primary" id="to-model">Continue to model →</button></div>
+    </div>
+  </section>
+
+  <!-- ============ Step 2: Model ============ -->
+  <section id="panel-2" class="panel hidden">
+    <h1>Specify the model</h1>
+    <div class="toolbar">
+      <button id="btn-propose" class="primary">✨ Propose model with AI</button>
+      <button id="btn-example">Load example (corporate reputation)</button>
+      <button id="btn-clear">Clear</button>
+    </div>
+    <div id="propose-status" class="status"></div>
+    <div class="two-col">
+      <div>
+        <h2>Constructs</h2>
+        <div id="construct-list"></div>
+        <button id="add-construct">+ Add construct</button>
+        <h2>Structural paths</h2>
+        <div id="path-list"></div>
+        <button id="add-path">+ Add path</button>
+        <h2>Moderation <span class="hint">two-stage interaction terms</span></h2>
+        <div id="interaction-list"></div>
+        <button id="add-interaction">+ Add interaction</button>
+      </div>
+      <div>
+        <h2>Path diagram</h2>
+        <div class="card diagram-card"><svg id="diagram" width="100%" height="420"></svg></div>
+        <div class="card run-card">
+          <label>Bootstrap resamples
+            <select id="nboot"><option>1000</option><option selected>5000</option><option>10000</option></select>
+          </label>
+          <button id="btn-run" class="primary">Run analysis</button>
+          <div id="run-status" class="status"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Step 3: Results ============ -->
+  <section id="panel-3" class="panel hidden">
+    <h1>Results</h1>
+    <div class="cards" id="result-cards"></div>
+    <div class="toolbar">
+      <a id="btn-report" class="button primary" href="#" download>⬇ Download report (.docx)</a>
+      <button id="btn-interpret">✨ Generate AI interpretation</button>
+      <a id="btn-json" class="button" href="#" target="_blank">Raw results JSON</a>
+    </div>
+    <div id="interpret-status" class="status"></div>
+    <div id="interpretation" class="hidden">
+      <h2>AI interpretation</h2>
+      <div id="interp-sections"></div>
+    </div>
+    <h2>Hypotheses</h2>
+    <div class="tablewrap"><table id="hyp-table"></table></div>
+    <h2>Measurement model</h2>
+    <div class="tablewrap"><table id="rel-table"></table></div>
+    <h3>Discriminant validity (HTMT)</h3>
+    <div class="tablewrap"><table id="htmt-table"></table></div>
+    <h2>Structural model</h2>
+    <div class="tablewrap"><table id="struct-table"></table></div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

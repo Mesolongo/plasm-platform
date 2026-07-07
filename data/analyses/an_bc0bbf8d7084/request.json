@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "data_csv": "/Users/meschacolongo/plsem-platform/data/datasets/ds_fd9863492b71/raw.csv",
+  "missing_value": "-99",
+  "options": {
+    "nboot": 100,
+    "seed": 123
+  },
+  "constructs": [
+    {
+      "name": "X",
+      "indicators": [
+        "no_such_col"
+      ],
+      "measurement": "reflective"
+    }
+  ],
+  "paths": []
+}

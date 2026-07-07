@@ -1,0 +1,75 @@
+{
+  "_provenance": "Reference fixture: model spec produced by Claude (Fable 5, interactive session 2026-07-04) acting as the model architect, from ai/corp_rep_variable_dictionary.json and the study description 'Drivers of corporate reputation and customer loyalty among mobile network operators'. Serves as expected output for testing ai/model_architect.py once API credentials are available.",
+  "constructs": [
+    {
+      "name": "QUAL",
+      "indicators": ["qual_1", "qual_2", "qual_3", "qual_4", "qual_5", "qual_6", "qual_7", "qual_8"],
+      "measurement": "formative",
+      "rationale": "The eight items name distinct, non-interchangeable components of perceived quality (product quality, innovativeness, value for money, service quality, customer orientation, reliability, trustworthiness, respect). Dropping one changes the meaning of the construct, so they compose quality rather than reflect it."
+    },
+    {
+      "name": "PERF",
+      "indicators": ["perf_1", "perf_2", "perf_3", "perf_4", "perf_5"],
+      "measurement": "formative",
+      "rationale": "Management quality, economic stability, business risk, growth potential, and vision are defining facets of perceived performance, not interchangeable manifestations of it."
+    },
+    {
+      "name": "CSOR",
+      "indicators": ["csor_1", "csor_2", "csor_3", "csor_4", "csor_5"],
+      "measurement": "formative",
+      "rationale": "Social consciousness, transparency, fairness to competitors, environmental concern, and non-profit orientation are distinct components of corporate social responsibility."
+    },
+    {
+      "name": "ATTR",
+      "indicators": ["attr_1", "attr_2", "attr_3"],
+      "measurement": "formative",
+      "rationale": "Employer attractiveness, personal willingness to work there, and overall appeal are separate facets composing attractiveness."
+    },
+    {
+      "name": "COMP",
+      "indicators": ["comp_1", "comp_2", "comp_3"],
+      "measurement": "reflective",
+      "rationale": "All three items are interchangeable expressions of perceived competence (cognitive dimension of reputation); they should covary and any one could be dropped without changing the construct's meaning."
+    },
+    {
+      "name": "LIKE",
+      "indicators": ["like_1", "like_2", "like_3"],
+      "measurement": "reflective",
+      "rationale": "Identification, regret at loss, and likeability are interchangeable manifestations of affective liking (affective dimension of reputation)."
+    },
+    {
+      "name": "CUSA",
+      "indicators": ["cusa"],
+      "measurement": "single_item",
+      "rationale": "Overall satisfaction is measured by a single global item."
+    },
+    {
+      "name": "CUSL",
+      "indicators": ["cusl_1", "cusl_2", "cusl_3"],
+      "measurement": "reflective",
+      "rationale": "Recommendation, repurchase intention, and retention are classic interchangeable indicators of customer loyalty."
+    }
+  ],
+  "paths": [
+    {"from_construct": "QUAL", "to_construct": "COMP", "rationale": "Perceived quality of products/services informs the cognitive judgment of competence (Eberl & Schwaiger reputation model)."},
+    {"from_construct": "QUAL", "to_construct": "LIKE", "rationale": "Quality experiences also shape affective liking of the company."},
+    {"from_construct": "PERF", "to_construct": "COMP", "rationale": "Perceived economic performance is a cognitive input to competence judgments."},
+    {"from_construct": "PERF", "to_construct": "LIKE", "rationale": "Performance perceptions can spill over into affect, though the affective route is expected to be weaker."},
+    {"from_construct": "CSOR", "to_construct": "COMP", "rationale": "Responsibility perceptions may inform competence judgments, though primarily an affective driver."},
+    {"from_construct": "CSOR", "to_construct": "LIKE", "rationale": "Social responsibility is an affect-laden signal that drives likeability."},
+    {"from_construct": "ATTR", "to_construct": "COMP", "rationale": "Attractiveness signals (e.g. attracting talent) feed cognitive reputation."},
+    {"from_construct": "ATTR", "to_construct": "LIKE", "rationale": "Appeal is inherently affective and should primarily drive liking."},
+    {"from_construct": "COMP", "to_construct": "CUSA", "rationale": "Reputation dimensions drive customer satisfaction (reputation-satisfaction-loyalty chain)."},
+    {"from_construct": "LIKE", "to_construct": "CUSA", "rationale": "Affective liking drives satisfaction; for intangible services the affective route is expected to dominate."},
+    {"from_construct": "COMP", "to_construct": "CUSL", "rationale": "Direct effect of competence on loyalty beyond satisfaction."},
+    {"from_construct": "LIKE", "to_construct": "CUSL", "rationale": "Direct effect of liking on loyalty beyond satisfaction."},
+    {"from_construct": "CUSA", "to_construct": "CUSL", "rationale": "Satisfaction is the proximal driver of loyalty (satisfaction-loyalty link)."}
+  ],
+  "mediators": ["COMP", "LIKE", "CUSA"],
+  "moderator": null,
+  "excluded_variables": [
+    {"variable": "serviceprovider", "reason": "Categorical identifier of the operator; not a latent-variable indicator. Candidate grouping variable for multigroup analysis (MGA)."},
+    {"variable": "servicetype", "reason": "Contract vs prepaid; not an indicator. Strong candidate for MGA or, if theorized, a moderator of the CUSA->CUSL link."}
+  ],
+  "summary": "A two-dimension corporate reputation model: four formatively measured exogenous drivers (QUAL, PERF, CSOR, ATTR) shape the cognitive (COMP) and affective (LIKE) dimensions of reputation, which influence customer loyalty (CUSL) directly and through customer satisfaction (CUSA). COMP, LIKE, and CUSA operate as mediators; no moderator is proposed absent a theoretical basis, but servicetype is flagged for multigroup analysis."
+}

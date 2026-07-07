@@ -1,0 +1,175 @@
+{
+  "constructs": [
+    {
+      "name": "Quality",
+      "indicators": [
+        "qual_1",
+        "qual_2",
+        "qual_3",
+        "qual_4",
+        "qual_5",
+        "qual_6",
+        "qual_7",
+        "qual_8"
+      ],
+      "measurement": "formative",
+      "rationale": "In the Hair et al. corporate reputation model, quality is a driver construct whose items (product quality, innovation, value for money, reliability, trustworthiness, respect) are distinct defining components that jointly compose perceived quality rather than interchangeable reflections; hence formative (mode B)."
+    },
+    {
+      "name": "Performance",
+      "indicators": [
+        "perf_1",
+        "perf_2",
+        "perf_3",
+        "perf_4",
+        "perf_5"
+      ],
+      "measurement": "formative",
+      "rationale": "Economic performance is captured by distinct facets (management quality, stability, risk, growth potential, vision) that together define the construct; dropping one changes the meaning, indicating a formative specification."
+    },
+    {
+      "name": "CSR",
+      "indicators": [
+        "csor_1",
+        "csor_2",
+        "csor_3",
+        "csor_4",
+        "csor_5"
+      ],
+      "measurement": "formative",
+      "rationale": "Corporate social responsibility is composed of separable dimensions (social consciousness, transparency, fairness, environmental concern, non-profit orientation) that are defining components rather than interchangeable manifestations, so it is modeled formatively."
+    },
+    {
+      "name": "Attractiveness",
+      "indicators": [
+        "attr_1",
+        "attr_2",
+        "attr_3"
+      ],
+      "measurement": "formative",
+      "rationale": "Attractiveness aggregates distinct aspects (attracting talent, employer appeal, overall appeal) that constitute the construct; treated as a formative driver in the corporate reputation model."
+    },
+    {
+      "name": "Competence",
+      "indicators": [
+        "comp_1",
+        "comp_2",
+        "comp_3"
+      ],
+      "measurement": "reflective",
+      "rationale": "The competence dimension of corporate reputation is measured with interchangeable items reflecting a common perception (top competitor, worldwide recognition, premium performance); reflective (mode A) is appropriate."
+    },
+    {
+      "name": "Likeability",
+      "indicators": [
+        "like_1",
+        "like_2",
+        "like_3"
+      ],
+      "measurement": "reflective",
+      "rationale": "The likeability dimension of corporate reputation is captured by interchangeable affective items (identification, regret if gone, likeable); reflective measurement fits."
+    },
+    {
+      "name": "Satisfaction",
+      "indicators": [
+        "cusa"
+      ],
+      "measurement": "single_item",
+      "rationale": "Overall customer satisfaction is measured by a single global item (cusa), so a single-item construct is used."
+    },
+    {
+      "name": "Loyalty",
+      "indicators": [
+        "cusl_1",
+        "cusl_2",
+        "cusl_3"
+      ],
+      "measurement": "reflective",
+      "rationale": "Customer loyalty is reflected by interchangeable behavioral-intention items (recommend, choose again, remain a customer); reflective (mode A) is appropriate."
+    }
+  ],
+  "paths": [
+    {
+      "from_construct": "Quality",
+      "to_construct": "Competence",
+      "rationale": "Quality is a key exogenous driver of the competence dimension of corporate reputation (Eberl/Hair corporate reputation model)."
+    },
+    {
+      "from_construct": "Quality",
+      "to_construct": "Likeability",
+      "rationale": "Perceived quality shapes the affective likeability dimension of reputation."
+    },
+    {
+      "from_construct": "Performance",
+      "to_construct": "Competence",
+      "rationale": "Economic performance signals capability and thus drives perceived competence."
+    },
+    {
+      "from_construct": "Performance",
+      "to_construct": "Likeability",
+      "rationale": "Performance contributes to overall favorable affect toward the firm."
+    },
+    {
+      "from_construct": "CSR",
+      "to_construct": "Competence",
+      "rationale": "Socially responsible conduct enhances perceptions of the firm's competence."
+    },
+    {
+      "from_construct": "CSR",
+      "to_construct": "Likeability",
+      "rationale": "CSR is a strong emotional/relational cue that drives likeability."
+    },
+    {
+      "from_construct": "Attractiveness",
+      "to_construct": "Competence",
+      "rationale": "Attractiveness as employer and overall appeal contributes to perceived competence."
+    },
+    {
+      "from_construct": "Attractiveness",
+      "to_construct": "Likeability",
+      "rationale": "Attractiveness feeds the affective likeability dimension of reputation."
+    },
+    {
+      "from_construct": "Competence",
+      "to_construct": "Satisfaction",
+      "rationale": "The cognitive competence dimension of reputation raises customer satisfaction."
+    },
+    {
+      "from_construct": "Likeability",
+      "to_construct": "Satisfaction",
+      "rationale": "The affective likeability dimension of reputation increases customer satisfaction."
+    },
+    {
+      "from_construct": "Competence",
+      "to_construct": "Loyalty",
+      "rationale": "Competence perceptions directly foster loyalty intentions."
+    },
+    {
+      "from_construct": "Likeability",
+      "to_construct": "Loyalty",
+      "rationale": "Likeability builds emotional attachment that drives loyalty."
+    },
+    {
+      "from_construct": "Satisfaction",
+      "to_construct": "Loyalty",
+      "rationale": "Satisfaction is the proximal antecedent of loyalty per satisfaction-loyalty theory."
+    }
+  ],
+  "mediators": [
+    "Competence",
+    "Likeability",
+    "Satisfaction"
+  ],
+  "moderator": null,
+  "excluded_variables": [
+    {
+      "variable": "serviceprovider",
+      "reason": "Categorical identifier of the operator used; a potential multigroup grouping variable but not called for in the study description, so excluded from the structural model."
+    },
+    {
+      "variable": "servicetype",
+      "reason": "Categorical contract-vs-prepaid classifier; screening/demographic variable not specified for use, so excluded."
+    }
+  ],
+  "summary": "This is the established two-dimensional corporate reputation model applied to mobile network operators. Four formative driver constructs (Quality, Performance, CSR, Attractiveness) explain the two reflective reputation dimensions, Competence and Likeability, which in turn drive Satisfaction and Loyalty, with Satisfaction as the proximal antecedent of Loyalty. Competence, Likeability, and Satisfaction act as mediators between the drivers and loyalty. Categorical operator and service-type variables are reserved as potential grouping variables and excluded from estimation."
+}

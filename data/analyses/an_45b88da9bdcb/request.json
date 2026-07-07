@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "data_csv": "/Users/meschacolongo/plsem-platform/data/datasets/ds_8984ade42e68/raw.csv",
+  "missing_value": "-99",
+  "options": {
+    "nboot": 200,
+    "seed": 123,
+    "prediction": true
+  },
+  "constructs": [
+    {
+      "name": "COMP",
+      "indicators": [
+        "comp_1",
+        "comp_2",
+        "comp_3"
+      ],
+      "dimensions": [],
+      "measurement": "reflective"
+    },
+    {
+      "name": "LIKE",
+      "indicators": [
+        "like_1",
+        "like_2",
+        "like_3"
+      ],
+      "dimensions": [],
+      "measurement": "reflective"
+    },
+    {
+      "name": "CUSA",
+      "indicators": [
+        "cusa"
+      ],
+      "dimensions": [],
+      "measurement": "single_item"
+    },
+    {
+      "name": "SC",
+      "indicators": [
+        "switch_1",
+        "switch_2",
+        "switch_3",
+        "switch_4"
+      ],
+      "dimensions": [],
+      "measurement": "reflective"
+    },
+    {
+      "name": "CUSL",
+      "indicators": [
+        "cusl_1",
+        "cusl_2",
+        "cusl_3"
+      ],
+      "dimensions": [],
+      "measurement": "reflective"
+    }
+  ],
+  "interactions": [
+    {
+      "iv": "CUSA",
+      "moderator": "SC"
+    }
+  ],
+  "paths": [
+    {
+      "from_construct": "COMP",
+      "to_construct": "CUSA"
+    },
+    {
+      "from_construct": "LIKE",
+      "to_construct": "CUSA"
+    },
+    {
+      "from_construct": "COMP",
+      "to_construct": "CUSL"
+    },
+    {
+      "from_construct": "LIKE",
+      "to_construct": "CUSL"
+    },
+    {
+      "from_construct": "CUSA",
+      "to_construct": "CUSL"
+    },
+    {
+      "from_construct": "SC",
+      "to_construct": "CUSL"
+    },
+    {
+      "from_construct": "CUSA*SC",
+      "to_construct": "CUSL"
+    }
+  ]
+}

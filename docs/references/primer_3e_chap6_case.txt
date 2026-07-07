@@ -1,0 +1,313 @@
+6
+ASSESSING PLS-SEM
+RESULTS PART III
+Evaluation of the Structural Model
+CASE STUDY ILLUSTRATION—HOW ARE
+PLS-SEM STRUCTURAL MODEL RESULTS
+REPORTED?
+We continue with the extended corporate reputation model as introduced
+in Chapter 5. If you do not have the PLS path model readily available in
+SmartPLS 4, download the file Corporate Reputation.zip from the https://
+www.pls-sem.net website and save i t on your hard drive. Then, run the
+SmartPLS software and click on Files → Import project from backup file in the
+menu. In the box that appears on the screen, locate and open the Corporate
+Reputation.zip file that you just downloaded. Thereafter, a new project ap-
+pears with the name Corporate Reputation in the SmartPLS Wor ks p ac ewin-
+dow on the left-hand side. This project contains several models (.splsm files)
+labeled Simple model, Extended model, Redundancy analysis ATTR, Redundan-
+cy analysis CSOR , and so forth, plus the data set Corporate reputation data.csv.
+Alternately, you see in the main screen of the Wo rk sp ac eview, under Sample
+projects,t h e Corporate reputation—PLS-SEM book (primer) example. After
+clicking on the link with the label Install next to this sample project, the Ex-
+ample—Corporate reputation (primer) project will appear in the Work s p ace.
+Next, double-click on Extended model, and the extended PLS path model for
+the corporate reputation example to open.
+The assessment of the structural model builds on the results from the stan-
+dard model estimation, the bootstrapping routine, and the PLS
+predict proce-
+dure. After running the PLS-SEM algo rithm using the same algorithm and
+missing values settings as in the previous chapters, SmartPLS shows the key
+results of the model estimation in the Modeling window (Exhibit A6.1). Per
+default, we see the path coefficients as well as the R
+2 values of the endogenous
+constructs (shown in the circles).
+For a more detailed assessment, we need to examine the SmartPLS results
+report. Following the structural model assessment procedure (Exhibit 6.1),
+we first need to check the structural model for collinearity issues by examin-
+ing the VIF values of all sets of predictor constructs in the structural model.
+To d o s o , g o t oQuality criteria → Collinearity statistics (VIF) and click on the
+Inner model tab. The results table that opens (Exhibit A6.2) shows the VIF
+values of all combinations of endogenou sc o n s t r u c t s( r e p r e s e n t e db yt h ec o l -
+umns) and corresponding exogenous (i.e. , predictor) constructs (represented
+by the rows). Specifically, we assess the following sets of (predictor) constructs
+for collinearity: (1) ATTR, CSOR, PERF ,and QUAL as predictors of COMP
+(and LIKE); (2) COMP and LIKE as predictors of CUSA; and (3) COMP ,
+LIKE, and CUSA as predictors of CUSL. As can be seen in Exhibit A6.2, all
+VIF values are clearly below the thresho ld of 5 and with two exceptions (i.e.,
+the QUAL predictor) below 3. Since the two exceptions are close to 3, we
+conclude that collinearity among the pre dictor constructs is not a critical is-
+sue in the structural model, and we can continue examining the results re-
+port.
+The second step of the structural model assessment procedure (Exhibit 6.1)
+involves assessing the significance and re levance of the structural model rela-
+tionships. Starting with the relevance assessment, go to Final results → Path
+coefficients, where we find the path coefficients as shown in the modeling
+window in three formats: matrix, list and bar charts. Looking at the relative
+importance of the driver constructs for the perceived competence ( COMP),
+one finds that the customers’ perception of the company’s quality of products
+and services (QUAL) is most important, followed by its performance ( PERF).
+In contrast, the perceived attractiveness ( ATTR)a n dd e g r e et ow h i c ht h e
+company acts in socially conscious ways ( CSOR) have very little bearing on
+COMP. These two drivers are, however, of in creased importance for establish-
+ing a company’ s likeability (LIKE). Moving on in the model, we also find that
+likeability is the primary driver for the customers’ satisfaction and loyalty, as
+illustrated by the increased path c oefficients compared with those of COMP.
+More interesting, though, is the examination of total effects. Specifically,
+we can evaluate how strongly each of the four formative driver constructs
+(ATTR, CSOR, PERF , and QUAL) ultimately influences the key target vari-
+able CUSL via the mediating constructs COMP , LIKE,and CUSA. To t a l e f -
+fects are shown under Final results → To t a l e f f e c t sin the results report. We
+read the table shown in Exhibit A6.3 column to row. That is, each column
+represents a target construct, whereas the rows represent predecessor con-
+structs. For example, with regard to loyalty, we can see that among the four
+A Primer on Partial Least Squares Stru ctural Equation Modeling (PLS-SEM)2
+Exhibit A6.1 ■ Results in Modeling Window
+Chapter 6 ■ Assessing PLS-SEM Results Part III 3
+Exhibit A6.2 ■ VIF Values in the Structural Model
+Exhibit A6.3 ■ Total effects
+exogenous driver constructs, quality has the strongest total effect on loyalty
+(0.248), followed by corporate social re sponsibility (0.105), attractiveness
+(0.101), and performance (0.089). There fore, it is advisable for companies to
+focus on marketing activities that positi vely influence the customers’ percep-
+tion of the quality of their products an d services. By also taking the con-
+struct’s indicator weights into consideration, we can even identify which spe-
+cific element of quality needs to be add ressed. Looking at the outer weights
+(Final results → Outer weights ) reveals that qual_6 has the highest outer
+weight (0.398). This item relates to the survey question “[the company] is a
+reliable partner for customers.” Thus, marketing managers should try to en-
+hance the customers’ perception of the reliability of their products and ser-
+vices by means of marketing activities.
+The analysis of the structural model relationships shows that several path
+coefficients (e.g., COMP → CUSL) have rather low values. T o assess whether
+t h e s er e l a t i o n s h i p sa r es i g n i f i c a n t( E x h i b i t6 . 1 ) ,w er u nt h eb o o t s t r a p p i n g
+procedure. The extraction of bootstra pping results for the structural model
+A Primer on Partial Least Squares Stru ctural Equation Modeling (PLS-SEM)4
+estimates is analogous to the descriptions in the context of formative mea-
+surement model assessment (Chapter 5 ). T o run the bootstrapping proce-
+dure, go to Calculate → Bootstrapping in the SmartPLS menu or go to the
+Modeling window and click on the Calculate icon, followed by Bootstrapping
+(note that you first may need to go back to the Modeling window before the
+Calculate icon appears). We retain all settings for missing value treatment and
+the PLS-SEM algorithm as in the init ial model estimation and select Do par-
+allel processing option, 10,000 bootstrap samples and select the Complete
+(slower) option. In the BT setup we choose Percentile Bootstrap as a Confidence
+interval method , Tw o t a i l e dtesting, a significance level of 0.05,a n ds e l e c t
+Fixed seed.N e x t ,w ec l i c kStart calculation.
+After running the procedure, SmartPLS shows the bootstrapping results
+for the measurement models and structural model in the Modeling window.
+Using the combo boxes available on the screen under the menu, you can
+choose whether SmartPLS should display t values or p values in the Modeling
+window. Exhibit A6.4 shows p values for the structural model relationships as
+resulting from the bootstrapping procedure.
+By going to the bootstrapping report, we get a more detailed overview of
+the results. The table under Final results → Path coefficients provides us with
+an overview of results, including standard errors, bootstrap mean values, t val-
+ues and p values. Clicking on the Confidence intervals tab in the bootstrap-
+ping results report shows the confidence interval as derived from the percen-
+tile method without and with bias corre ction. Exhibit A6.5 shows the latter
+result.
+Finally, clicking on the Samples tab in the bootstrapping results report
+shows the results of each bootstrap r un as shown in Exhibit A6.6. The dis-
+played table includes the estimates of all the path coefficients for all 10,000
+subsamples. These estimates are used to compute the bootstrapping mean
+values, standard errors, t values, and p values of all the path coefficients,
+s h o w ni nt h eMean, STDEV, Tv a l u e s,a n dPv a l u e stable of the bootstrapping
+results report.
+Exhibit A6.7 provides a summary of the path coefficient estimates, t val-
+ues, p values, and confidence intervals. Ag ain, researchers usually report ei-
+ther the t values (and their significance levels) or the p values or the confi-
+dence intervals. We find that all criteria come to the same outcome for the
+significance of path coefficients. Otherwise, we recommend relying on the
+bootstrap confidence intervals for significance testing (see Chapter 5 for de-
+tails). Exhibit A6.7 shows all resul ts only for illustrative purposes.
+Assuming a 5% significance level, we focus on the 95% bootstrap confidence
+interval obtained by the percentile approach with bias correction and find that all
+relationships in the structural model are significant, exceptPERF → LIKE, ATTR
+→ COMP , CSOR→ COMP , and COMP→ CUSL (Exhibit A6.7). These results
+suggest that companies should concentrate their marketing efforts on enhancing
+their LIKE (by strengthening QUAL) rather than their COMP to maximize CUSL.
+Chapter 6 ■ Assessing PLS-SEM Results Part III 5
+Exhibit A6.4 ■ Bootstrapping p values in the Modeling Window
+A Primer on Partial Least Squares Stru ctural Equation Modeling (PLS-SEM)6
+Exhibit A6.5 ■ Percentile Confidence Intervals (with Bias Correction)
+for the Path Coefficients
+Exhibit A6.6 ■ Bootstrap Samples
+Chapter 6 ■ Assessing PLS-SEM Results Part III 7
+Exhibit A6.7 ■ Significance Testing Results of the Structural Model
+Path Coefficients
+Path
+Coefficients
+t Values p Values 95% Confi-
+dence Intervals
+(With Bias
+Correction)
+Significancea
+(p < 0.05)?
+ATTR → COMP 0.086 1.579 0.114 [-0.016;0.195] No
+ATTR → LIKE 0.167 2.666 0.008 [0.044;0.292] Yes
+COMP → CUSA 0.146 2.173 0.030 [0.012;0.279] Yes
+COMP → CUSL 0.006 0.103 0.918 [-0.100;0.114] No
+CSOR → COMP 0.059 1.086 0.278 [-0.048;0.164] No
+CSOR → LIKE 0.178 3.200 0.001 [0.067;0.284] Yes
+CUSA → CUSL 0.505 11.960 0.000 [0.420;0.584] Yes
+LIKE → CUSA 0.436 7.381 0.000 [0.316;0.545] Yes
+LIKE → CUSL 0.344 6.207 0.000 [0.236;0.451] Yes
+PERF → COMP 0.295 4.457 0.000 [0.162;0.418] Yes
+PERF → LIKE 0.117 1.684 0.092 [-0.022;0.252] No
+QUAL → COMP 0.430 6.400 0.000 [0.299;0.558] Yes
+QUAL → LIKE 0.380 5.834 0.000 [0.246;0.500] Yes
+a We refer to the bootstrap confidence intervals for significance testing, as described in Chapter 5.
+This is not surprising, considering that customers rated mobile network oper-
+ators. As their services (provision of netw ork capabilities) are intangible, af-
+fective judgments play a much more important role than cognitive judgments
+for establishing customer loyalty. Furthermore, we learn that ATTR and
+CSOR only influence LIKE, which is also not surprising since these two driv-
+er constructs are also more affective in nature.
+T o examine the bootstrapping results for the total effects, go to Final re-
+sults → T otal effects. Exhibit A6.8 summarizes the results for the total effects
+of the exogenous constructs ATTR, CSOR, PERF, and QUAL on the target
+constructs CUSA and CUSL taken from the Mean, STDEV, Tv a l u e s, Pv a l u e s
+table of the bootstrapping results repo rt. As can be seen, all total effects are
+significant at a 5% level.
+Next, we turn our attention to the assessment of the model’ s explanatory
+power as called for in the third step of th e structural model assessment proce-
+dure (Exhibit 6.1). T o do so, we go back to the SmartPLS results report as
+produced after running the PLS-SEM algorithm (not bootstrapping).
+A Primer on Partial Least Squares Stru ctural Equation Modeling (PLS-SEM)8
+Exhibit A6.8 ■ Significance Testing Results of the Total Effects
+Total Effect t Values p Values 95% Confi-
+dence Intervals
+(With Bias
+Correction)
+Significancea
+(p < 0.05)?
+ATTR → CUSA 0.086 2.817 0.005 [0.029;0.149] Yes
+ATTR → CUSL 0.101 2.740 0.006 [0.030;0.176] Yes
+COMP → CUSL 0.074 2.117 0.034 [0.006;0.145] Yes
+CSOR → CUSA 0.086 3.142 0.002 [0.035;0.143] Yes
+CSOR → CUSL 0.105 3.107 0.002 [0.042;0.175] Yes
+LIKE → CUSL 0.220 6.282 0.000 [0.153;0.292] Yes
+PERF → CUSA 0.094 2.454 0.014 [0.016;0.168] Yes
+PERF → CUSL 0.089 2.034 0.042 [-0.001;0.174] Yes
+QUAL → CUSA 0.228 6.189 0.000 [0.155;0.301] Yes
+QUAL → CUSL 0.248 5.788 0.000 [0.160;0.331] Yes
+a We refer to the bootstrap confidence intervals for significance testing, as described in Chapter 5.
+T o start with, we examine the R2 values of the endogenous latent variables,
+which are available under Quality criteria → R-square (select the Overview tab
+for the matrix view). Following our rules of thumb, the R2 values of COMP
+(0.631), CUSL (0.562), and LIKE (0.558) can be considered moderate,
+whereas the R2 value of CUSA (0.292) is rather weak.
+T o obtain the effect sizes f 2 for all structural model relationships, go to
+Quality criteria → f-square (select the Matrix view). Exhibit A6.9 shows the
+f 2 values for all combinations of endogenous constructs (represented by the
+columns) and corresponding exogenous ( i.e., predictor) constructs (repre-
+sented by the rows). For example, LIKE has a medium effect size of 0.159 on
+CUSA and of 0.138 on CUSL. On the contrary, COMP has no effect on
+CUSA (0.018) or CUSL (0.000). Please note these results differ from a manu-
+al computation of the f 2 values by using the aforementioned equation with
+values for Rincluded
+2 and Rexcluded
+2 . This difference results because SmartPLS uses
+the latent variable scores of the model t hat includes all latent variables and
+then internally excludes latent variables to obtain the Rexcluded
+2 .O nt h ec o n -
+trary, when manually computing the f 2 values by estimating the model with
+and without a latent variable, the model changes and, thus, so do the latent
+variable scores. Hence, the difference of the manually computed f
+2 values re-
+sults from the changes in the latent va riable scores due to a model modifica-
+tion which is, however, incorrect.
+Chapter 6 ■ Assessing PLS-SEM Results Part III 9
+Exhibit A6.9 ■ f 2 Effect Sizes
+The fourth step of the structural model assessment procedure (Exhibit 6.1)
+requires assessing the model’s predictive power using PLS predict.T oi n i t i a t et h e
+procedure, go to Calculate → PLSpredict/CVPAT in the SmartPLS menu or
+go to the Modeling window and click on the Calculate icon, followed by
+PLSpredict/CVPAT. In the dialog box that opens, we retain the default set-
+tings. That is, we run PLS predict with 10 folds and 10 repetitions and select the
+Fixed seed option. T o initiate the analysis, click on Start calculation.
+Exhibit A6.10 ■ PLSpredict Results Report
+Exhibit A6.10 shows the PLS predict results report. T o access the PLS and
+LM benchmarks model’s results, go to Final results → MV prediction summary
+and select the Overview tab in the results report. We focus our analysis on the
+model’s key target construct CUSL and consider the RMSE as the default
+metric for interpreting the prediction error of the construct’s indicators. In an
+initial step, we interpret the Q
+predict
+2 values. The analysis shows that all three
+A Primer on Partial Least Squares Stru ctural Equation Modeling (PLS-SEM)10
+indicators (i.e., cusl_1, cusl_2,a n d cusl_3)h a v e Qpredict
+2 values larger than
+zero, suggesting that the PLS path model outperforms the most na¨ ıve bench-
+mark. The following analyses require comparing the RMSE values produced
+by the PLS-SEM analysis with those produced by the na¨ ıve LM benchmark
+model.
+Comparing the RMSE values, we find that the PLS-SEM analysis pro-
+duces smaller prediction errors (i.e ., smaller RMSE values) than the LM for
+all three CUSL indicators. Specifically, the a n a l y s i sp r o d u c e st h ef o l l o w i n g
+RMSE values (PLS-SEM vs. LM):
+) cusl_1: 1.300 vs. 1.310,
+) cusl_2:1 . 5 2 3v s .1 . 5 4 2 ,a n d
+) cusl_3: 1.531 vs. 1.569.
+These results suggest the model has h igh predictive power as the PLS-SEM
+analysis outperforms the na¨ıve LM benchmark model for all CUSL indica-
+tors. Note that the absolute size of the differences in RMSE values is of sec-
+ondary importance for two reasons. First, the size of the RMSE values largely
+depend on the measurement scale of the indicators. As the CUSL indicators
+are measured on 7-point Likert scales, the range of possible RMSE differences
+is quite limited. Second, the RMSE values generated by PLS
+predict are highly
+stable. Hence, even marginal differences in the RMSE values are typically sig-
+nificant.
+The results report after running PLSpredict/CVPAT in SmartPLS also in
+includes the CVPAT results under Final results → CVPAT.I nb o t hC V P A T
+results reports, PLS-SEM vs. Indicator average (IA) and PLS-SEM vs. Linear
+model (LM), we obtain a negative average loss value difference for the Overall
+model. This means that PLS-SEM has a lower average loss than the IA and
+LM prediction benchmarks. Moreover, since the pv a l u eis below 0.05, we
+conclude that PLS-SEM’s predictive capabilities are significantly better than
+those of these two prediction benchmarks. Hence, the CVPAT results sup-
+port high predictive power of the PLS-SEM results for the corporate reputa-
+tion model.
+In a final step, we compare different configurations of the reputation mod-
+el. Drawing on Danks, Sharma, and Sarstedt (2020) and Sharma et al.
+(2020), we compare the original model t hat serves as the basis for our prior
+analyses (Model 1), with two more complex variants in which the four driver
+constructs also relate to CUSA (Model 2) and CUSL (Model 3). Exhibit
+A6.11 shows the three models under consideration.
+T o compare the models, we estimate each model using the PLS-SEM algo-
+rithm and examine the BIC criterion, which can be accessed in the results re-
+port under Quality criteria → Model selection criteria . Exhibit A6.12 shows
+the BIC values for the five models under consideration.
+Chapter 6 ■ Assessing PLS-SEM Results Part III 11
+Exhibit A6.11. Model comparisons
+Exhibit A6.12 ■ BIC values
+Model 1 Model 2 Model 3
+BIC –261.602 –261.603 –245.038
+Akaike weights (relative model likelihoods) 49.98% 50.01% 0.01%
+Comparing the BIC values, we find that Model 2 yields the lowest BIC
+value, closely followed by Model 1 and, with a greater difference, Model 3.
+Considering the marginal difference in BIC values between Models 1 and 2,
+however, the evidence in favor of the more complex model, which relates all
+four driver constructs to CUSA is not very strong. T o further explore the dif-
+ference, we compute the BIC-based Akaike weights for the three models. T o
+do so, we first compute each delta score, which gives 0.001 for Model 1, 0 for
+Model 2, and 16.565 for Model 3. We then compute e
+(–0.5 ·delta) for each mod-
+el, which gives 0.9995 for Model 1, 1 for Model 2, and 0.0003 for Model 3.
+Dividing each value by (0.9995 + 1 + 0.0003) gives the Akaike weights
+shown in Exhibit A6.12. Comparing the weights, we find a marginally higher
+relative likelihood for Model 2 over M odel 1. However, considering that
+Model 1 is more parsimonious, we would opt for this model rather than the
+more complex variant Model 2.
+A Primer on Partial Least Squares Stru ctural Equation Modeling (PLS-SEM)12

@@ -1,0 +1,10 @@
+{
+  "id": "an_bc0bbf8d7084",
+  "dataset_id": "ds_fd9863492b71",
+  "created_at": "2026-07-06T13:02:02",
+  "status": "failed",
+  "error": {
+    "stage": "validate_spec",
+    "message": "indicators not found in dataset: no_such_col"
+  }
+}

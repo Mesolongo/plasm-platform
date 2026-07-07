@@ -1,0 +1,2700 @@
+{
+  "meta": {
+    "dataset": "corp_rep_data (seminr)",
+    "n": 344,
+    "engine": "seminr 2.5.0",
+    "r_version": "R version 4.6.1 (2026-06-24)",
+    "nboot": 10000,
+    "seed": 123,
+    "missing_treatment": "mean replacement, code -99",
+    "timestamp": "2026-07-04 09:16:31 EEST"
+  },
+  "simple": {
+    "loadings": [
+      {
+        "row": "comp_1",
+        "COMP": 0.857719,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "comp_1"
+      },
+      {
+        "row": "comp_2",
+        "COMP": 0.798453,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "comp_2"
+      },
+      {
+        "row": "comp_3",
+        "COMP": 0.817641,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "comp_3"
+      },
+      {
+        "row": "like_1",
+        "COMP": 0,
+        "LIKE": 0.879326,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "like_1"
+      },
+      {
+        "row": "like_2",
+        "COMP": 0,
+        "LIKE": 0.870239,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "like_2"
+      },
+      {
+        "row": "like_3",
+        "COMP": 0,
+        "LIKE": 0.843036,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "like_3"
+      },
+      {
+        "row": "cusa",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 1,
+        "CUSL": 0,
+        "_row": "cusa"
+      },
+      {
+        "row": "cusl_1",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.832827,
+        "_row": "cusl_1"
+      },
+      {
+        "row": "cusl_2",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.917273,
+        "_row": "cusl_2"
+      },
+      {
+        "row": "cusl_3",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.84277,
+        "_row": "cusl_3"
+      }
+    ],
+    "weights": [
+      {
+        "row": "comp_1",
+        "COMP": 0.536127,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "comp_1"
+      },
+      {
+        "row": "comp_2",
+        "COMP": 0.340387,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "comp_2"
+      },
+      {
+        "row": "comp_3",
+        "COMP": 0.328227,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "comp_3"
+      },
+      {
+        "row": "like_1",
+        "COMP": 0,
+        "LIKE": 0.418423,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "like_1"
+      },
+      {
+        "row": "like_2",
+        "COMP": 0,
+        "LIKE": 0.377858,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "like_2"
+      },
+      {
+        "row": "like_3",
+        "COMP": 0,
+        "LIKE": 0.359703,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "like_3"
+      },
+      {
+        "row": "cusa",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 1,
+        "CUSL": 0,
+        "_row": "cusa"
+      },
+      {
+        "row": "cusl_1",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.368667,
+        "_row": "cusl_1"
+      },
+      {
+        "row": "cusl_2",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.420211,
+        "_row": "cusl_2"
+      },
+      {
+        "row": "cusl_3",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.364887,
+        "_row": "cusl_3"
+      }
+    ],
+    "reliability": [
+      {
+        "row": "COMP",
+        "alpha": 0.776028,
+        "rhoA": 0.831879,
+        "rhoC": 0.864615,
+        "AVE": 0.680582,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "alpha": 0.830987,
+        "rhoA": 0.836057,
+        "rhoC": 0.898566,
+        "AVE": 0.747081,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "alpha": 1,
+        "rhoA": 1,
+        "rhoC": 1,
+        "AVE": 1,
+        "_row": "CUSA"
+      },
+      {
+        "row": "CUSL",
+        "alpha": 0.830988,
+        "rhoA": 0.839042,
+        "rhoC": 0.899067,
+        "AVE": 0.748417,
+        "_row": "CUSL"
+      }
+    ],
+    "htmt": [
+      {
+        "row": "COMP",
+        "COMP": null,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "COMP": 0.779757,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "COMP": 0.465471,
+        "LIKE": 0.576884,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "CUSA"
+      },
+      {
+        "row": "CUSL",
+        "COMP": 0.532491,
+        "LIKE": 0.736666,
+        "CUSA": 0.754614,
+        "CUSL": null,
+        "_row": "CUSL"
+      }
+    ],
+    "fornell_larcker": [
+      {
+        "row": "COMP",
+        "COMP": 0.824974,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "COMP": 0.645244,
+        "LIKE": 0.864338,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "COMP": 0.435551,
+        "LIKE": 0.528432,
+        "CUSA": 1,
+        "CUSL": null,
+        "_row": "CUSA"
+      },
+      {
+        "row": "CUSL",
+        "COMP": 0.449614,
+        "LIKE": 0.614566,
+        "CUSA": 0.689223,
+        "CUSL": 0.865111,
+        "_row": "CUSL"
+      }
+    ],
+    "vif_structural": {
+      "CUSA": {
+        "COMP": 1.713327,
+        "LIKE": 1.713327
+      },
+      "CUSL": {
+        "COMP": 1.750553,
+        "LIKE": 1.968015,
+        "CUSA": 1.417571
+      }
+    },
+    "paths_and_r2": [
+      {
+        "row": "R^2",
+        "CUSA": 0.294568,
+        "CUSL": 0.562039,
+        "_row": "R^2"
+      },
+      {
+        "row": "AdjR^2",
+        "CUSA": 0.29043,
+        "CUSL": 0.558174,
+        "_row": "AdjR^2"
+      },
+      {
+        "row": "COMP",
+        "CUSA": 0.162051,
+        "CUSL": 0.009175,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "CUSA": 0.42387,
+        "CUSL": 0.342069,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "CUSA": null,
+        "CUSL": 0.504466,
+        "_row": "CUSA"
+      }
+    ],
+    "f_square": [
+      {
+        "row": "COMP",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0.021728,
+        "CUSL": 0.000097,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0.148651,
+        "CUSL": 0.135417,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.40098,
+        "_row": "CUSA"
+      },
+      {
+        "row": "CUSL",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "CUSL"
+      }
+    ],
+    "total_effects": [
+      {
+        "row": "COMP",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0.162051,
+        "CUSL": 0.090924,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0.42387,
+        "CUSL": 0.555897,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.504466,
+        "_row": "CUSA"
+      },
+      {
+        "row": "CUSL",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "CUSL"
+      }
+    ],
+    "total_indirect": [
+      {
+        "row": "COMP",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.081749,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.213828,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "CUSA"
+      },
+      {
+        "row": "CUSL",
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "CUSL"
+      }
+    ],
+    "boot_paths": [
+      {
+        "row": "COMP  ->  CUSA",
+        "Original Est.": 0.162051,
+        "Bootstrap Mean": 0.164818,
+        "Bootstrap SD": 0.064883,
+        "T Stat.": 2.4976,
+        "2.5% CI": 0.037137,
+        "97.5% CI": 0.291004,
+        "Bootstrap P Val": 0.0122,
+        "_row": "COMP  ->  CUSA"
+      },
+      {
+        "row": "COMP  ->  CUSL",
+        "Original Est.": 0.009175,
+        "Bootstrap Mean": 0.011052,
+        "Bootstrap SD": 0.054867,
+        "T Stat.": 0.167214,
+        "2.5% CI": -0.095871,
+        "97.5% CI": 0.120163,
+        "Bootstrap P Val": 0.8372,
+        "_row": "COMP  ->  CUSL"
+      },
+      {
+        "row": "LIKE  ->  CUSA",
+        "Original Est.": 0.42387,
+        "Bootstrap Mean": 0.422849,
+        "Bootstrap SD": 0.059506,
+        "T Stat.": 7.123196,
+        "2.5% CI": 0.303788,
+        "97.5% CI": 0.537348,
+        "Bootstrap P Val": 0,
+        "_row": "LIKE  ->  CUSA"
+      },
+      {
+        "row": "LIKE  ->  CUSL",
+        "Original Est.": 0.342069,
+        "Bootstrap Mean": 0.341992,
+        "Bootstrap SD": 0.056016,
+        "T Stat.": 6.106651,
+        "2.5% CI": 0.230346,
+        "97.5% CI": 0.451291,
+        "Bootstrap P Val": 0,
+        "_row": "LIKE  ->  CUSL"
+      },
+      {
+        "row": "CUSA  ->  CUSL",
+        "Original Est.": 0.504466,
+        "Bootstrap Mean": 0.503454,
+        "Bootstrap SD": 0.042395,
+        "T Stat.": 11.899194,
+        "2.5% CI": 0.417636,
+        "97.5% CI": 0.58356,
+        "Bootstrap P Val": 0,
+        "_row": "CUSA  ->  CUSL"
+      }
+    ],
+    "boot_total": [
+      {
+        "row": "COMP  ->  CUSA",
+        "Original Est.": 0.162051,
+        "Bootstrap Mean": 0.164818,
+        "Bootstrap SD": 0.064883,
+        "T Stat.": 2.4976,
+        "2.5% CI": 0.037137,
+        "97.5% CI": 0.291004,
+        "Bootstrap P Val": 0.0122,
+        "_row": "COMP  ->  CUSA"
+      },
+      {
+        "row": "COMP  ->  CUSL",
+        "Original Est.": 0.090924,
+        "Bootstrap Mean": 0.094136,
+        "Bootstrap SD": 0.06609,
+        "T Stat.": 1.375761,
+        "2.5% CI": -0.035686,
+        "97.5% CI": 0.224179,
+        "Bootstrap P Val": 0.1596,
+        "_row": "COMP  ->  CUSL"
+      },
+      {
+        "row": "LIKE  ->  CUSA",
+        "Original Est.": 0.42387,
+        "Bootstrap Mean": 0.422849,
+        "Bootstrap SD": 0.059506,
+        "T Stat.": 7.123196,
+        "2.5% CI": 0.303788,
+        "97.5% CI": 0.537348,
+        "Bootstrap P Val": 0,
+        "_row": "LIKE  ->  CUSA"
+      },
+      {
+        "row": "LIKE  ->  CUSL",
+        "Original Est.": 0.555897,
+        "Bootstrap Mean": 0.55492,
+        "Bootstrap SD": 0.061091,
+        "T Stat.": 9.099468,
+        "2.5% CI": 0.434371,
+        "97.5% CI": 0.673717,
+        "Bootstrap P Val": 0,
+        "_row": "LIKE  ->  CUSL"
+      },
+      {
+        "row": "CUSA  ->  CUSL",
+        "Original Est.": 0.504466,
+        "Bootstrap Mean": 0.503454,
+        "Bootstrap SD": 0.042395,
+        "T Stat.": 11.899194,
+        "2.5% CI": 0.417636,
+        "97.5% CI": 0.58356,
+        "Bootstrap P Val": 0,
+        "_row": "CUSA  ->  CUSL"
+      }
+    ],
+    "boot_htmt": [
+      {
+        "row": "COMP  ->  LIKE",
+        "Original Est.": 0.779757,
+        "Bootstrap Mean": 0.780135,
+        "Bootstrap SD": 0.041279,
+        "T Stat.": 5.335533,
+        "2.5% CI": 0.695663,
+        "97.5% CI": 0.857925,
+        "Bootstrap P Val": 0,
+        "_row": "COMP  ->  LIKE"
+      },
+      {
+        "row": "COMP  ->  CUSA",
+        "Original Est.": 0.465471,
+        "Bootstrap Mean": 0.465677,
+        "Bootstrap SD": 0.05622,
+        "T Stat.": 9.507758,
+        "2.5% CI": 0.353052,
+        "97.5% CI": 0.57246,
+        "Bootstrap P Val": 0,
+        "_row": "COMP  ->  CUSA"
+      },
+      {
+        "row": "COMP  ->  CUSL",
+        "Original Est.": 0.532491,
+        "Bootstrap Mean": 0.53357,
+        "Bootstrap SD": 0.058321,
+        "T Stat.": 8.016119,
+        "2.5% CI": 0.41709,
+        "97.5% CI": 0.645597,
+        "Bootstrap P Val": 0,
+        "_row": "COMP  ->  CUSL"
+      },
+      {
+        "row": "LIKE  ->  CUSA",
+        "Original Est.": 0.576884,
+        "Bootstrap Mean": 0.576828,
+        "Bootstrap SD": 0.04279,
+        "T Stat.": 9.888286,
+        "2.5% CI": 0.489201,
+        "97.5% CI": 0.656464,
+        "Bootstrap P Val": 0,
+        "_row": "LIKE  ->  CUSA"
+      },
+      {
+        "row": "LIKE  ->  CUSL",
+        "Original Est.": 0.736666,
+        "Bootstrap Mean": 0.736845,
+        "Bootstrap SD": 0.040999,
+        "T Stat.": 6.422956,
+        "2.5% CI": 0.654207,
+        "97.5% CI": 0.813966,
+        "Bootstrap P Val": 0,
+        "_row": "LIKE  ->  CUSL"
+      },
+      {
+        "row": "CUSA  ->  CUSL",
+        "Original Est.": 0.754614,
+        "Bootstrap Mean": 0.754622,
+        "Bootstrap SD": 0.033456,
+        "T Stat.": 7.334599,
+        "2.5% CI": 0.686796,
+        "97.5% CI": 0.817065,
+        "Bootstrap P Val": 0,
+        "_row": "CUSA  ->  CUSL"
+      }
+    ],
+    "iterations": 4
+  },
+  "extended": {
+    "loadings": [
+      {
+        "row": "qual_1",
+        "QUAL": 0.740521,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_1"
+      },
+      {
+        "row": "qual_2",
+        "QUAL": 0.570126,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_2"
+      },
+      {
+        "row": "qual_3",
+        "QUAL": 0.749146,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_3"
+      },
+      {
+        "row": "qual_4",
+        "QUAL": 0.663813,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_4"
+      },
+      {
+        "row": "qual_5",
+        "QUAL": 0.786697,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_5"
+      },
+      {
+        "row": "qual_6",
+        "QUAL": 0.855583,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_6"
+      },
+      {
+        "row": "qual_7",
+        "QUAL": 0.721606,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_7"
+      },
+      {
+        "row": "qual_8",
+        "QUAL": 0.627234,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_8"
+      },
+      {
+        "row": "perf_1",
+        "QUAL": 0,
+        "PERF": 0.84603,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "perf_1"
+      },
+      {
+        "row": "perf_2",
+        "QUAL": 0,
+        "PERF": 0.690176,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "perf_2"
+      },
+      {
+        "row": "perf_3",
+        "QUAL": 0,
+        "PERF": 0.57282,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "perf_3"
+      },
+      {
+        "row": "perf_4",
+        "QUAL": 0,
+        "PERF": 0.717195,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "perf_4"
+      },
+      {
+        "row": "perf_5",
+        "QUAL": 0,
+        "PERF": 0.637957,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "perf_5"
+      },
+      {
+        "row": "csor_1",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0.771331,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "csor_1"
+      },
+      {
+        "row": "csor_2",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0.570503,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "csor_2"
+      },
+      {
+        "row": "csor_3",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0.83839,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "csor_3"
+      },
+      {
+        "row": "csor_4",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0.616732,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "csor_4"
+      },
+      {
+        "row": "csor_5",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0.84797,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "csor_5"
+      },
+      {
+        "row": "attr_1",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0.754499,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "attr_1"
+      },
+      {
+        "row": "attr_2",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0.505595,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "attr_2"
+      },
+      {
+        "row": "attr_3",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0.890921,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "attr_3"
+      },
+      {
+        "row": "comp_1",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.82418,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "comp_1"
+      },
+      {
+        "row": "comp_2",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.820578,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "comp_2"
+      },
+      {
+        "row": "comp_3",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.843514,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "comp_3"
+      },
+      {
+        "row": "like_1",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0.879581,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "like_1"
+      },
+      {
+        "row": "like_2",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0.868873,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "like_2"
+      },
+      {
+        "row": "like_3",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0.844163,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "like_3"
+      },
+      {
+        "row": "cusa",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 1,
+        "CUSL": 0,
+        "_row": "cusa"
+      },
+      {
+        "row": "cusl_1",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.83278,
+        "_row": "cusl_1"
+      },
+      {
+        "row": "cusl_2",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.917289,
+        "_row": "cusl_2"
+      },
+      {
+        "row": "cusl_3",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.842799,
+        "_row": "cusl_3"
+      }
+    ],
+    "weights": [
+      {
+        "row": "qual_1",
+        "QUAL": 0.202389,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_1"
+      },
+      {
+        "row": "qual_2",
+        "QUAL": 0.041137,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_2"
+      },
+      {
+        "row": "qual_3",
+        "QUAL": 0.105537,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_3"
+      },
+      {
+        "row": "qual_4",
+        "QUAL": -0.004536,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_4"
+      },
+      {
+        "row": "qual_5",
+        "QUAL": 0.15965,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_5"
+      },
+      {
+        "row": "qual_6",
+        "QUAL": 0.397982,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_6"
+      },
+      {
+        "row": "qual_7",
+        "QUAL": 0.229164,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_7"
+      },
+      {
+        "row": "qual_8",
+        "QUAL": 0.189966,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "qual_8"
+      },
+      {
+        "row": "perf_1",
+        "QUAL": 0,
+        "PERF": 0.467716,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "perf_1"
+      },
+      {
+        "row": "perf_2",
+        "QUAL": 0,
+        "PERF": 0.176937,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "perf_2"
+      },
+      {
+        "row": "perf_3",
+        "QUAL": 0,
+        "PERF": 0.19445,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "perf_3"
+      },
+      {
+        "row": "perf_4",
+        "QUAL": 0,
+        "PERF": 0.340431,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "perf_4"
+      },
+      {
+        "row": "perf_5",
+        "QUAL": 0,
+        "PERF": 0.19851,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "perf_5"
+      },
+      {
+        "row": "csor_1",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0.306418,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "csor_1"
+      },
+      {
+        "row": "csor_2",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0.037224,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "csor_2"
+      },
+      {
+        "row": "csor_3",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0.406057,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "csor_3"
+      },
+      {
+        "row": "csor_4",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0.080069,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "csor_4"
+      },
+      {
+        "row": "csor_5",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0.415814,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "csor_5"
+      },
+      {
+        "row": "attr_1",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0.414386,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "attr_1"
+      },
+      {
+        "row": "attr_2",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0.200771,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "attr_2"
+      },
+      {
+        "row": "attr_3",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0.657564,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "attr_3"
+      },
+      {
+        "row": "comp_1",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.469305,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "comp_1"
+      },
+      {
+        "row": "comp_2",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.365122,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "comp_2"
+      },
+      {
+        "row": "comp_3",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.371775,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "comp_3"
+      },
+      {
+        "row": "like_1",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0.419403,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "like_1"
+      },
+      {
+        "row": "like_2",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0.37411,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "like_2"
+      },
+      {
+        "row": "like_3",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0.362545,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "like_3"
+      },
+      {
+        "row": "cusa",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 1,
+        "CUSL": 0,
+        "_row": "cusa"
+      },
+      {
+        "row": "cusl_1",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.368558,
+        "_row": "cusl_1"
+      },
+      {
+        "row": "cusl_2",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.420268,
+        "_row": "cusl_2"
+      },
+      {
+        "row": "cusl_3",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.364933,
+        "_row": "cusl_3"
+      }
+    ],
+    "reliability": [
+      {
+        "row": "QUAL",
+        "alpha": 0.87838,
+        "rhoA": 1,
+        "rhoC": 0.894307,
+        "AVE": 0.517542,
+        "_row": "QUAL"
+      },
+      {
+        "row": "PERF",
+        "alpha": 0.746748,
+        "rhoA": 1,
+        "rhoC": 0.824272,
+        "AVE": 0.488318,
+        "_row": "PERF"
+      },
+      {
+        "row": "CSOR",
+        "alpha": 0.816254,
+        "rhoA": 1,
+        "rhoC": 0.853672,
+        "AVE": 0.544547,
+        "_row": "CSOR"
+      },
+      {
+        "row": "ATTR",
+        "alpha": 0.599881,
+        "rhoA": 1,
+        "rhoC": 0.770088,
+        "AVE": 0.539545,
+        "_row": "ATTR"
+      },
+      {
+        "row": "COMP",
+        "alpha": 0.776028,
+        "rhoA": 0.785576,
+        "rhoC": 0.868694,
+        "AVE": 0.688046,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "alpha": 0.830987,
+        "rhoA": 0.836037,
+        "rhoC": 0.898564,
+        "AVE": 0.747072,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "alpha": 1,
+        "rhoA": 1,
+        "rhoC": 1,
+        "AVE": 1,
+        "_row": "CUSA"
+      },
+      {
+        "row": "CUSL",
+        "alpha": 0.830988,
+        "rhoA": 0.839064,
+        "rhoC": 0.899067,
+        "AVE": 0.748417,
+        "_row": "CUSL"
+      }
+    ],
+    "htmt": [
+      {
+        "row": "QUAL",
+        "QUAL": null,
+        "PERF": null,
+        "CSOR": null,
+        "ATTR": null,
+        "COMP": null,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "QUAL"
+      },
+      {
+        "row": "PERF",
+        "QUAL": 0.918289,
+        "PERF": null,
+        "CSOR": null,
+        "ATTR": null,
+        "COMP": null,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "PERF"
+      },
+      {
+        "row": "CSOR",
+        "QUAL": 0.80896,
+        "PERF": 0.738467,
+        "CSOR": null,
+        "ATTR": null,
+        "COMP": null,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "CSOR"
+      },
+      {
+        "row": "ATTR",
+        "QUAL": 0.896178,
+        "PERF": 0.91071,
+        "CSOR": 0.8255,
+        "ATTR": null,
+        "COMP": null,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "ATTR"
+      },
+      {
+        "row": "COMP",
+        "QUAL": 0.863847,
+        "PERF": 0.946258,
+        "CSOR": 0.677792,
+        "ATTR": 0.847378,
+        "COMP": null,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "QUAL": 0.827502,
+        "PERF": 0.790401,
+        "CSOR": 0.741128,
+        "ATTR": 0.840288,
+        "COMP": 0.779757,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "QUAL": 0.564181,
+        "PERF": 0.478712,
+        "CSOR": 0.444412,
+        "ATTR": 0.548085,
+        "COMP": 0.465471,
+        "LIKE": 0.576884,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "CUSA"
+      },
+      {
+        "row": "CUSL",
+        "QUAL": 0.651663,
+        "PERF": 0.591215,
+        "CSOR": 0.460498,
+        "ATTR": 0.619763,
+        "COMP": 0.532491,
+        "LIKE": 0.736666,
+        "CUSA": 0.754614,
+        "CUSL": null,
+        "_row": "CUSL"
+      }
+    ],
+    "fornell_larcker": [
+      {
+        "row": "QUAL",
+        "QUAL": 0.719404,
+        "PERF": null,
+        "CSOR": null,
+        "ATTR": null,
+        "COMP": null,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "QUAL"
+      },
+      {
+        "row": "PERF",
+        "QUAL": 0.78786,
+        "PERF": 0.698797,
+        "CSOR": null,
+        "ATTR": null,
+        "COMP": null,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "PERF"
+      },
+      {
+        "row": "CSOR",
+        "QUAL": 0.700284,
+        "PERF": 0.625834,
+        "CSOR": 0.737934,
+        "ATTR": null,
+        "COMP": null,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "CSOR"
+      },
+      {
+        "row": "ATTR",
+        "QUAL": 0.689057,
+        "PERF": 0.664615,
+        "CSOR": 0.591962,
+        "ATTR": 0.734538,
+        "COMP": null,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "ATTR"
+      },
+      {
+        "row": "COMP",
+        "QUAL": 0.763023,
+        "PERF": 0.728065,
+        "CSOR": 0.595661,
+        "ATTR": 0.61341,
+        "COMP": 0.829485,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "QUAL": 0.71218,
+        "PERF": 0.639015,
+        "CSOR": 0.616604,
+        "ATTR": 0.612233,
+        "COMP": 0.6379,
+        "LIKE": 0.864333,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "QUAL": 0.489132,
+        "PERF": 0.425332,
+        "CSOR": 0.421968,
+        "ATTR": 0.416444,
+        "COMP": 0.42345,
+        "LIKE": 0.5285,
+        "CUSA": 1,
+        "CUSL": null,
+        "_row": "CUSA"
+      },
+      {
+        "row": "CUSL",
+        "QUAL": 0.531584,
+        "PERF": 0.479401,
+        "CSOR": 0.417073,
+        "ATTR": 0.438549,
+        "COMP": 0.438966,
+        "LIKE": 0.614538,
+        "CUSA": 0.689229,
+        "CUSL": 0.865111,
+        "_row": "CUSL"
+      }
+    ],
+    "vif_structural": {
+      "COMP": {
+        "QUAL": 3.487155,
+        "PERF": 2.888672,
+        "CSOR": 2.083182,
+        "ATTR": 2.121722
+      },
+      "LIKE": {
+        "QUAL": 3.487155,
+        "PERF": 2.888672,
+        "CSOR": 2.083182,
+        "ATTR": 2.121722
+      },
+      "CUSA": {
+        "COMP": 1.686104,
+        "LIKE": 1.686104
+      },
+      "CUSL": {
+        "COMP": 1.716018,
+        "LIKE": 1.954134,
+        "CUSA": 1.412182
+      }
+    },
+    "paths_and_r2": [
+      {
+        "row": "R^2",
+        "COMP": 0.630861,
+        "LIKE": 0.557643,
+        "CUSA": 0.291876,
+        "CUSL": 0.561972,
+        "_row": "R^2"
+      },
+      {
+        "row": "AdjR^2",
+        "COMP": 0.626505,
+        "LIKE": 0.552424,
+        "CUSA": 0.287723,
+        "CUSL": 0.558107,
+        "_row": "AdjR^2"
+      },
+      {
+        "row": "QUAL",
+        "COMP": 0.429659,
+        "LIKE": 0.379972,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "QUAL"
+      },
+      {
+        "row": "PERF",
+        "COMP": 0.295461,
+        "LIKE": 0.116953,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "PERF"
+      },
+      {
+        "row": "CSOR",
+        "COMP": 0.058886,
+        "LIKE": 0.178431,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "CSOR"
+      },
+      {
+        "row": "ATTR",
+        "COMP": 0.086125,
+        "LIKE": 0.167058,
+        "CUSA": null,
+        "CUSL": null,
+        "_row": "ATTR"
+      },
+      {
+        "row": "COMP",
+        "COMP": null,
+        "LIKE": null,
+        "CUSA": 0.145543,
+        "CUSL": 0.005665,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "COMP": null,
+        "LIKE": null,
+        "CUSA": 0.435659,
+        "CUSL": 0.344025,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "COMP": null,
+        "LIKE": null,
+        "CUSA": null,
+        "CUSL": 0.505012,
+        "_row": "CUSA"
+      }
+    ],
+    "f_square": [
+      {
+        "row": "QUAL",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.144178,
+        "LIKE": 0.093728,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "QUAL"
+      },
+      {
+        "row": "PERF",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.076105,
+        "LIKE": 0.010786,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "PERF"
+      },
+      {
+        "row": "CSOR",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.005029,
+        "LIKE": 0.034389,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "CSOR"
+      },
+      {
+        "row": "ATTR",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.009443,
+        "LIKE": 0.029726,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "ATTR"
+      },
+      {
+        "row": "COMP",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0.017746,
+        "CUSL": 0.000034,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0.158968,
+        "CUSL": 0.137866,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.403478,
+        "_row": "CUSA"
+      },
+      {
+        "row": "CUSL",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "CUSL"
+      }
+    ],
+    "total_effects": [
+      {
+        "row": "QUAL",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.429659,
+        "LIKE": 0.379972,
+        "CUSA": 0.228072,
+        "CUSL": 0.248333,
+        "_row": "QUAL"
+      },
+      {
+        "row": "PERF",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.295461,
+        "LIKE": 0.116953,
+        "CUSA": 0.093954,
+        "CUSL": 0.089356,
+        "_row": "PERF"
+      },
+      {
+        "row": "CSOR",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.058886,
+        "LIKE": 0.178431,
+        "CUSA": 0.086305,
+        "CUSL": 0.105303,
+        "_row": "CSOR"
+      },
+      {
+        "row": "ATTR",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0.086125,
+        "LIKE": 0.167058,
+        "CUSA": 0.085315,
+        "CUSL": 0.101045,
+        "_row": "ATTR"
+      },
+      {
+        "row": "COMP",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0.145543,
+        "CUSL": 0.079166,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0.435659,
+        "CUSL": 0.564038,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.505012,
+        "_row": "CUSA"
+      },
+      {
+        "row": "CUSL",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "CUSL"
+      }
+    ],
+    "total_indirect": [
+      {
+        "row": "QUAL",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0.228072,
+        "CUSL": 0.248333,
+        "_row": "QUAL"
+      },
+      {
+        "row": "PERF",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0.093954,
+        "CUSL": 0.089356,
+        "_row": "PERF"
+      },
+      {
+        "row": "CSOR",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0.086305,
+        "CUSL": 0.105303,
+        "_row": "CSOR"
+      },
+      {
+        "row": "ATTR",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0.085315,
+        "CUSL": 0.101045,
+        "_row": "ATTR"
+      },
+      {
+        "row": "COMP",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.073501,
+        "_row": "COMP"
+      },
+      {
+        "row": "LIKE",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0.220013,
+        "_row": "LIKE"
+      },
+      {
+        "row": "CUSA",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "CUSA"
+      },
+      {
+        "row": "CUSL",
+        "QUAL": 0,
+        "PERF": 0,
+        "CSOR": 0,
+        "ATTR": 0,
+        "COMP": 0,
+        "LIKE": 0,
+        "CUSA": 0,
+        "CUSL": 0,
+        "_row": "CUSL"
+      }
+    ],
+    "boot_paths": [
+      {
+        "row": "QUAL  ->  COMP",
+        "Original Est.": 0.429659,
+        "Bootstrap Mean": 0.430069,
+        "Bootstrap SD": 0.066472,
+        "T Stat.": 6.463744,
+        "2.5% CI": 0.29668,
+        "97.5% CI": 0.559341,
+        "Bootstrap P Val": 0,
+        "_row": "QUAL  ->  COMP"
+      },
+      {
+        "row": "QUAL  ->  LIKE",
+        "Original Est.": 0.379972,
+        "Bootstrap Mean": 0.385631,
+        "Bootstrap SD": 0.064639,
+        "T Stat.": 5.87834,
+        "2.5% CI": 0.259822,
+        "97.5% CI": 0.511568,
+        "Bootstrap P Val": 0,
+        "_row": "QUAL  ->  LIKE"
+      },
+      {
+        "row": "PERF  ->  COMP",
+        "Original Est.": 0.295461,
+        "Bootstrap Mean": 0.298435,
+        "Bootstrap SD": 0.065019,
+        "T Stat.": 4.544245,
+        "2.5% CI": 0.169773,
+        "97.5% CI": 0.424125,
+        "Bootstrap P Val": 0,
+        "_row": "PERF  ->  COMP"
+      },
+      {
+        "row": "PERF  ->  LIKE",
+        "Original Est.": 0.116953,
+        "Bootstrap Mean": 0.120865,
+        "Bootstrap SD": 0.070091,
+        "T Stat.": 1.668587,
+        "2.5% CI": -0.014354,
+        "97.5% CI": 0.259699,
+        "Bootstrap P Val": 0.0844,
+        "_row": "PERF  ->  LIKE"
+      },
+      {
+        "row": "CSOR  ->  COMP",
+        "Original Est.": 0.058886,
+        "Bootstrap Mean": 0.062034,
+        "Bootstrap SD": 0.05483,
+        "T Stat.": 1.07397,
+        "2.5% CI": -0.04597,
+        "97.5% CI": 0.170073,
+        "Bootstrap P Val": 0.2516,
+        "_row": "CSOR  ->  COMP"
+      },
+      {
+        "row": "CSOR  ->  LIKE",
+        "Original Est.": 0.178431,
+        "Bootstrap Mean": 0.178856,
+        "Bootstrap SD": 0.055804,
+        "T Stat.": 3.197467,
+        "2.5% CI": 0.066973,
+        "97.5% CI": 0.288434,
+        "Bootstrap P Val": 0.001,
+        "_row": "CSOR  ->  LIKE"
+      },
+      {
+        "row": "ATTR  ->  COMP",
+        "Original Est.": 0.086125,
+        "Bootstrap Mean": 0.085583,
+        "Bootstrap SD": 0.054116,
+        "T Stat.": 1.591503,
+        "2.5% CI": -0.015687,
+        "97.5% CI": 0.193209,
+        "Bootstrap P Val": 0.1032,
+        "_row": "ATTR  ->  COMP"
+      },
+      {
+        "row": "ATTR  ->  LIKE",
+        "Original Est.": 0.167058,
+        "Bootstrap Mean": 0.163069,
+        "Bootstrap SD": 0.064274,
+        "T Stat.": 2.599137,
+        "2.5% CI": 0.037289,
+        "97.5% CI": 0.287807,
+        "Bootstrap P Val": 0.0106,
+        "_row": "ATTR  ->  LIKE"
+      },
+      {
+        "row": "COMP  ->  CUSA",
+        "Original Est.": 0.145543,
+        "Bootstrap Mean": 0.14611,
+        "Bootstrap SD": 0.067073,
+        "T Stat.": 2.169917,
+        "2.5% CI": 0.013441,
+        "97.5% CI": 0.276363,
+        "Bootstrap P Val": 0.0298,
+        "_row": "COMP  ->  CUSA"
+      },
+      {
+        "row": "COMP  ->  CUSL",
+        "Original Est.": 0.005665,
+        "Bootstrap Mean": 0.006068,
+        "Bootstrap SD": 0.054191,
+        "T Stat.": 0.104531,
+        "2.5% CI": -0.099102,
+        "97.5% CI": 0.114095,
+        "Bootstrap P Val": 0.9096,
+        "_row": "COMP  ->  CUSL"
+      },
+      {
+        "row": "LIKE  ->  CUSA",
+        "Original Est.": 0.435659,
+        "Bootstrap Mean": 0.435521,
+        "Bootstrap SD": 0.059194,
+        "T Stat.": 7.359867,
+        "2.5% CI": 0.315063,
+        "97.5% CI": 0.550079,
+        "Bootstrap P Val": 0,
+        "_row": "LIKE  ->  CUSA"
+      },
+      {
+        "row": "LIKE  ->  CUSL",
+        "Original Est.": 0.344025,
+        "Bootstrap Mean": 0.344433,
+        "Bootstrap SD": 0.055458,
+        "T Stat.": 6.20332,
+        "2.5% CI": 0.234687,
+        "97.5% CI": 0.453435,
+        "Bootstrap P Val": 0,
+        "_row": "LIKE  ->  CUSL"
+      },
+      {
+        "row": "CUSA  ->  CUSL",
+        "Original Est.": 0.505012,
+        "Bootstrap Mean": 0.504516,
+        "Bootstrap SD": 0.042114,
+        "T Stat.": 11.991434,
+        "2.5% CI": 0.419594,
+        "97.5% CI": 0.584168,
+        "Bootstrap P Val": 0,
+        "_row": "CUSA  ->  CUSL"
+      }
+    ],
+    "boot_total": [
+      {
+        "row": "QUAL  ->  COMP",
+        "Original Est.": 0.429659,
+        "Bootstrap Mean": 0.430069,
+        "Bootstrap SD": 0.066472,
+        "T Stat.": 6.463744,
+        "2.5% CI": 0.29668,
+        "97.5% CI": 0.559341,
+        "Bootstrap P Val": 0,
+        "_row": "QUAL  ->  COMP"
+      },
+      {
+        "row": "QUAL  ->  LIKE",
+        "Original Est.": 0.379972,
+        "Bootstrap Mean": 0.385631,
+        "Bootstrap SD": 0.064639,
+        "T Stat.": 5.87834,
+        "2.5% CI": 0.259822,
+        "97.5% CI": 0.511568,
+        "Bootstrap P Val": 0,
+        "_row": "QUAL  ->  LIKE"
+      },
+      {
+        "row": "QUAL  ->  CUSA",
+        "Original Est.": 0.228072,
+        "Bootstrap Mean": 0.231148,
+        "Bootstrap SD": 0.037012,
+        "T Stat.": 6.162159,
+        "2.5% CI": 0.159907,
+        "97.5% CI": 0.305955,
+        "Bootstrap P Val": 0,
+        "_row": "QUAL  ->  CUSA"
+      },
+      {
+        "row": "QUAL  ->  CUSL",
+        "Original Est.": 0.248333,
+        "Bootstrap Mean": 0.252268,
+        "Bootstrap SD": 0.042317,
+        "T Stat.": 5.868351,
+        "2.5% CI": 0.171571,
+        "97.5% CI": 0.335982,
+        "Bootstrap P Val": 0,
+        "_row": "QUAL  ->  CUSL"
+      },
+      {
+        "row": "PERF  ->  COMP",
+        "Original Est.": 0.295461,
+        "Bootstrap Mean": 0.298435,
+        "Bootstrap SD": 0.065019,
+        "T Stat.": 4.544245,
+        "2.5% CI": 0.169773,
+        "97.5% CI": 0.424125,
+        "Bootstrap P Val": 0,
+        "_row": "PERF  ->  COMP"
+      },
+      {
+        "row": "PERF  ->  LIKE",
+        "Original Est.": 0.116953,
+        "Bootstrap Mean": 0.120865,
+        "Bootstrap SD": 0.070091,
+        "T Stat.": 1.668587,
+        "2.5% CI": -0.014354,
+        "97.5% CI": 0.259699,
+        "Bootstrap P Val": 0.0844,
+        "_row": "PERF  ->  LIKE"
+      },
+      {
+        "row": "PERF  ->  CUSA",
+        "Original Est.": 0.093954,
+        "Bootstrap Mean": 0.0962,
+        "Bootstrap SD": 0.038172,
+        "T Stat.": 2.461355,
+        "2.5% CI": 0.021911,
+        "97.5% CI": 0.17073,
+        "Bootstrap P Val": 0.0112,
+        "_row": "PERF  ->  CUSA"
+      },
+      {
+        "row": "PERF  ->  CUSL",
+        "Original Est.": 0.089356,
+        "Bootstrap Mean": 0.092002,
+        "Bootstrap SD": 0.044271,
+        "T Stat.": 2.018382,
+        "2.5% CI": 0.004259,
+        "97.5% CI": 0.178307,
+        "Bootstrap P Val": 0.0382,
+        "_row": "PERF  ->  CUSL"
+      },
+      {
+        "row": "CSOR  ->  COMP",
+        "Original Est.": 0.058886,
+        "Bootstrap Mean": 0.062034,
+        "Bootstrap SD": 0.05483,
+        "T Stat.": 1.07397,
+        "2.5% CI": -0.04597,
+        "97.5% CI": 0.170073,
+        "Bootstrap P Val": 0.2516,
+        "_row": "CSOR  ->  COMP"
+      },
+      {
+        "row": "CSOR  ->  LIKE",
+        "Original Est.": 0.178431,
+        "Bootstrap Mean": 0.178856,
+        "Bootstrap SD": 0.055804,
+        "T Stat.": 3.197467,
+        "2.5% CI": 0.066973,
+        "97.5% CI": 0.288434,
+        "Bootstrap P Val": 0.001,
+        "_row": "CSOR  ->  LIKE"
+      },
+      {
+        "row": "CSOR  ->  CUSA",
+        "Original Est.": 0.086305,
+        "Bootstrap Mean": 0.086946,
+        "Bootstrap SD": 0.027619,
+        "T Stat.": 3.1249,
+        "2.5% CI": 0.034683,
+        "97.5% CI": 0.142555,
+        "Bootstrap P Val": 0.0008,
+        "_row": "CSOR  ->  CUSA"
+      },
+      {
+        "row": "CSOR  ->  CUSL",
+        "Original Est.": 0.105303,
+        "Bootstrap Mean": 0.106034,
+        "Bootstrap SD": 0.033693,
+        "T Stat.": 3.125407,
+        "2.5% CI": 0.04152,
+        "97.5% CI": 0.17325,
+        "Bootstrap P Val": 0.0008,
+        "_row": "CSOR  ->  CUSL"
+      },
+      {
+        "row": "ATTR  ->  COMP",
+        "Original Est.": 0.086125,
+        "Bootstrap Mean": 0.085583,
+        "Bootstrap SD": 0.054116,
+        "T Stat.": 1.591503,
+        "2.5% CI": -0.015687,
+        "97.5% CI": 0.193209,
+        "Bootstrap P Val": 0.1032,
+        "_row": "ATTR  ->  COMP"
+      },
+      {
+        "row": "ATTR  ->  LIKE",
+        "Original Est.": 0.167058,
+        "Bootstrap Mean": 0.163069,
+        "Bootstrap SD": 0.064274,
+        "T Stat.": 2.599137,
+        "2.5% CI": 0.037289,
+        "97.5% CI": 0.287807,
+        "Bootstrap P Val": 0.0106,
+        "_row": "ATTR  ->  LIKE"
+      },
+      {
+        "row": "ATTR  ->  CUSA",
+        "Original Est.": 0.085315,
+        "Bootstrap Mean": 0.083647,
+        "Bootstrap SD": 0.030769,
+        "T Stat.": 2.772788,
+        "2.5% CI": 0.024427,
+        "97.5% CI": 0.146723,
+        "Bootstrap P Val": 0.0054,
+        "_row": "ATTR  ->  CUSA"
+      },
+      {
+        "row": "ATTR  ->  CUSL",
+        "Original Est.": 0.101045,
+        "Bootstrap Mean": 0.099317,
+        "Bootstrap SD": 0.03766,
+        "T Stat.": 2.683067,
+        "2.5% CI": 0.026194,
+        "97.5% CI": 0.17381,
+        "Bootstrap P Val": 0.0094,
+        "_row": "ATTR  ->  CUSL"
+      },
+      {
+        "row": "COMP  ->  CUSA",
+        "Original Est.": 0.145543,
+        "Bootstrap Mean": 0.14611,
+        "Bootstrap SD": 0.067073,
+        "T Stat.": 2.169917,
+        "2.5% CI": 0.013441,
+        "97.5% CI": 0.276363,
+        "Bootstrap P Val": 0.0298,
+        "_row": "COMP  ->  CUSA"
+      },
+      {
+        "row": "COMP  ->  CUSL",
+        "Original Est.": 0.079166,
+        "Bootstrap Mean": 0.079952,
+        "Bootstrap SD": 0.066985,
+        "T Stat.": 1.181846,
+        "2.5% CI": -0.049986,
+        "97.5% CI": 0.210824,
+        "Bootstrap P Val": 0.2406,
+        "_row": "COMP  ->  CUSL"
+      },
+      {
+        "row": "LIKE  ->  CUSA",
+        "Original Est.": 0.435659,
+        "Bootstrap Mean": 0.435521,
+        "Bootstrap SD": 0.059194,
+        "T Stat.": 7.359867,
+        "2.5% CI": 0.315063,
+        "97.5% CI": 0.550079,
+        "Bootstrap P Val": 0,
+        "_row": "LIKE  ->  CUSA"
+      },
+      {
+        "row": "LIKE  ->  CUSL",
+        "Original Est.": 0.564038,
+        "Bootstrap Mean": 0.564153,
+        "Bootstrap SD": 0.060103,
+        "T Stat.": 9.384592,
+        "2.5% CI": 0.446416,
+        "97.5% CI": 0.680678,
+        "Bootstrap P Val": 0,
+        "_row": "LIKE  ->  CUSL"
+      },
+      {
+        "row": "CUSA  ->  CUSL",
+        "Original Est.": 0.505012,
+        "Bootstrap Mean": 0.504516,
+        "Bootstrap SD": 0.042114,
+        "T Stat.": 11.991434,
+        "2.5% CI": 0.419594,
+        "97.5% CI": 0.584168,
+        "Bootstrap P Val": 0,
+        "_row": "CUSA  ->  CUSL"
+      }
+    ],
+    "boot_htmt": [
+      {
+        "row": "QUAL  ->  PERF",
+        "Original Est.": 0.918289,
+        "Bootstrap Mean": 0.918428,
+        "Bootstrap SD": 0.034617,
+        "T Stat.": 2.360451,
+        "2.5% CI": 0.846729,
+        "97.5% CI": 0.982786,
+        "Bootstrap P Val": 0.0114,
+        "_row": "QUAL  ->  PERF"
+      },
+      {
+        "row": "QUAL  ->  CSOR",
+        "Original Est.": 0.80896,
+        "Bootstrap Mean": 0.809408,
+        "Bootstrap SD": 0.028666,
+        "T Stat.": 6.664221,
+        "2.5% CI": 0.750916,
+        "97.5% CI": 0.86272,
+        "Bootstrap P Val": 0,
+        "_row": "QUAL  ->  CSOR"
+      },
+      {
+        "row": "QUAL  ->  ATTR",
+        "Original Est.": 0.896178,
+        "Bootstrap Mean": 0.897597,
+        "Bootstrap SD": 0.052017,
+        "T Stat.": 1.995936,
+        "2.5% CI": 0.791158,
+        "97.5% CI": 0.99584,
+        "Bootstrap P Val": 0.0422,
+        "_row": "QUAL  ->  ATTR"
+      },
+      {
+        "row": "QUAL  ->  COMP",
+        "Original Est.": 0.863847,
+        "Bootstrap Mean": 0.863975,
+        "Bootstrap SD": 0.028984,
+        "T Stat.": 4.697579,
+        "2.5% CI": 0.805256,
+        "97.5% CI": 0.918239,
+        "Bootstrap P Val": 0,
+        "_row": "QUAL  ->  COMP"
+      },
+      {
+        "row": "QUAL  ->  LIKE",
+        "Original Est.": 0.827502,
+        "Bootstrap Mean": 0.82716,
+        "Bootstrap SD": 0.02964,
+        "T Stat.": 5.819812,
+        "2.5% CI": 0.766659,
+        "97.5% CI": 0.882423,
+        "Bootstrap P Val": 0,
+        "_row": "QUAL  ->  LIKE"
+      },
+      {
+        "row": "QUAL  ->  CUSA",
+        "Original Est.": 0.564181,
+        "Bootstrap Mean": 0.563999,
+        "Bootstrap SD": 0.043191,
+        "T Stat.": 10.090557,
+        "2.5% CI": 0.476257,
+        "97.5% CI": 0.643485,
+        "Bootstrap P Val": 0,
+        "_row": "QUAL  ->  CUSA"
+      },
+      {
+        "row": "QUAL  ->  CUSL",
+        "Original Est.": 0.651663,
+        "Bootstrap Mean": 0.651732,
+        "Bootstrap SD": 0.046583,
+        "T Stat.": 7.477786,
+        "2.5% CI": 0.557602,
+        "97.5% CI": 0.740465,
+        "Bootstrap P Val": 0,
+        "_row": "QUAL  ->  CUSL"
+      },
+      {
+        "row": "PERF  ->  CSOR",
+        "Original Est.": 0.738467,
+        "Bootstrap Mean": 0.738715,
+        "Bootstrap SD": 0.044227,
+        "T Stat.": 5.913421,
+        "2.5% CI": 0.646211,
+        "97.5% CI": 0.822254,
+        "Bootstrap P Val": 0,
+        "_row": "PERF  ->  CSOR"
+      },
+      {
+        "row": "PERF  ->  ATTR",
+        "Original Est.": 0.91071,
+        "Bootstrap Mean": 0.912985,
+        "Bootstrap SD": 0.045533,
+        "T Stat.": 1.960969,
+        "2.5% CI": 0.822462,
+        "97.5% CI": 1.000536,
+        "Bootstrap P Val": 0.052,
+        "_row": "PERF  ->  ATTR"
+      },
+      {
+        "row": "PERF  ->  COMP",
+        "Original Est.": 0.946258,
+        "Bootstrap Mean": 0.947658,
+        "Bootstrap SD": 0.036453,
+        "T Stat.": 1.474285,
+        "2.5% CI": 0.873363,
+        "97.5% CI": 1.01692,
+        "Bootstrap P Val": 0.1384,
+        "_row": "PERF  ->  COMP"
+      },
+      {
+        "row": "PERF  ->  LIKE",
+        "Original Est.": 0.790401,
+        "Bootstrap Mean": 0.79058,
+        "Bootstrap SD": 0.044959,
+        "T Stat.": 4.661988,
+        "2.5% CI": 0.69959,
+        "97.5% CI": 0.874722,
+        "Bootstrap P Val": 0,
+        "_row": "PERF  ->  LIKE"
+      },
+      {
+        "row": "PERF  ->  CUSA",
+        "Original Est.": 0.478712,
+        "Bootstrap Mean": 0.478197,
+        "Bootstrap SD": 0.057524,
+        "T Stat.": 9.062025,
+        "2.5% CI": 0.363262,
+        "97.5% CI": 0.586156,
+        "Bootstrap P Val": 0,
+        "_row": "PERF  ->  CUSA"
+      },
+      {
+        "row": "PERF  ->  CUSL",
+        "Original Est.": 0.591215,
+        "Bootstrap Mean": 0.591878,
+        "Bootstrap SD": 0.057729,
+        "T Stat.": 7.08114,
+        "2.5% CI": 0.476998,
+        "97.5% CI": 0.703004,
+        "Bootstrap P Val": 0,
+        "_row": "PERF  ->  CUSL"
+      },
+      {
+        "row": "CSOR  ->  ATTR",
+        "Original Est.": 0.8255,
+        "Bootstrap Mean": 0.827077,
+        "Bootstrap SD": 0.050331,
+        "T Stat.": 3.467074,
+        "2.5% CI": 0.728636,
+        "97.5% CI": 0.924822,
+        "Bootstrap P Val": 0.0006,
+        "_row": "CSOR  ->  ATTR"
+      },
+      {
+        "row": "CSOR  ->  COMP",
+        "Original Est.": 0.677792,
+        "Bootstrap Mean": 0.677977,
+        "Bootstrap SD": 0.046991,
+        "T Stat.": 6.856852,
+        "2.5% CI": 0.583366,
+        "97.5% CI": 0.766308,
+        "Bootstrap P Val": 0,
+        "_row": "CSOR  ->  COMP"
+      },
+      {
+        "row": "CSOR  ->  LIKE",
+        "Original Est.": 0.741128,
+        "Bootstrap Mean": 0.741309,
+        "Bootstrap SD": 0.041565,
+        "T Stat.": 6.228132,
+        "2.5% CI": 0.655614,
+        "97.5% CI": 0.819049,
+        "Bootstrap P Val": 0,
+        "_row": "CSOR  ->  LIKE"
+      },
+      {
+        "row": "CSOR  ->  CUSA",
+        "Original Est.": 0.444412,
+        "Bootstrap Mean": 0.444419,
+        "Bootstrap SD": 0.049864,
+        "T Stat.": 11.142119,
+        "2.5% CI": 0.342754,
+        "97.5% CI": 0.536753,
+        "Bootstrap P Val": 0,
+        "_row": "CSOR  ->  CUSA"
+      },
+      {
+        "row": "CSOR  ->  CUSL",
+        "Original Est.": 0.460498,
+        "Bootstrap Mean": 0.461504,
+        "Bootstrap SD": 0.053212,
+        "T Stat.": 10.138716,
+        "2.5% CI": 0.353654,
+        "97.5% CI": 0.563155,
+        "Bootstrap P Val": 0,
+        "_row": "CSOR  ->  CUSL"
+      },
+      {
+        "row": "ATTR  ->  COMP",
+        "Original Est.": 0.847378,
+        "Bootstrap Mean": 0.849854,
+        "Bootstrap SD": 0.060001,
+        "T Stat.": 2.543652,
+        "2.5% CI": 0.732,
+        "97.5% CI": 0.963662,
+        "Bootstrap P Val": 0.0114,
+        "_row": "ATTR  ->  COMP"
+      },
+      {
+        "row": "ATTR  ->  LIKE",
+        "Original Est.": 0.840288,
+        "Bootstrap Mean": 0.842091,
+        "Bootstrap SD": 0.050354,
+        "T Stat.": 3.171816,
+        "2.5% CI": 0.741314,
+        "97.5% CI": 0.939851,
+        "Bootstrap P Val": 0.002,
+        "_row": "ATTR  ->  LIKE"
+      },
+      {
+        "row": "ATTR  ->  CUSA",
+        "Original Est.": 0.548085,
+        "Bootstrap Mean": 0.547839,
+        "Bootstrap SD": 0.057299,
+        "T Stat.": 7.886984,
+        "2.5% CI": 0.433155,
+        "97.5% CI": 0.655846,
+        "Bootstrap P Val": 0,
+        "_row": "ATTR  ->  CUSA"
+      },
+      {
+        "row": "ATTR  ->  CUSL",
+        "Original Est.": 0.619763,
+        "Bootstrap Mean": 0.62143,
+        "Bootstrap SD": 0.064285,
+        "T Stat.": 5.914881,
+        "2.5% CI": 0.495321,
+        "97.5% CI": 0.744172,
+        "Bootstrap P Val": 0,
+        "_row": "ATTR  ->  CUSL"
+      },
+      {
+        "row": "COMP  ->  LIKE",
+        "Original Est.": 0.779757,
+        "Bootstrap Mean": 0.780135,
+        "Bootstrap SD": 0.041279,
+        "T Stat.": 5.335533,
+        "2.5% CI": 0.695663,
+        "97.5% CI": 0.857925,
+        "Bootstrap P Val": 0,
+        "_row": "COMP  ->  LIKE"
+      },
+      {
+        "row": "COMP  ->  CUSA",
+        "Original Est.": 0.465471,
+        "Bootstrap Mean": 0.465677,
+        "Bootstrap SD": 0.05622,
+        "T Stat.": 9.507758,
+        "2.5% CI": 0.353052,
+        "97.5% CI": 0.57246,
+        "Bootstrap P Val": 0,
+        "_row": "COMP  ->  CUSA"
+      },
+      {
+        "row": "COMP  ->  CUSL",
+        "Original Est.": 0.532491,
+        "Bootstrap Mean": 0.53357,
+        "Bootstrap SD": 0.058321,
+        "T Stat.": 8.016119,
+        "2.5% CI": 0.41709,
+        "97.5% CI": 0.645597,
+        "Bootstrap P Val": 0,
+        "_row": "COMP  ->  CUSL"
+      },
+      {
+        "row": "LIKE  ->  CUSA",
+        "Original Est.": 0.576884,
+        "Bootstrap Mean": 0.576828,
+        "Bootstrap SD": 0.04279,
+        "T Stat.": 9.888286,
+        "2.5% CI": 0.489201,
+        "97.5% CI": 0.656464,
+        "Bootstrap P Val": 0,
+        "_row": "LIKE  ->  CUSA"
+      },
+      {
+        "row": "LIKE  ->  CUSL",
+        "Original Est.": 0.736666,
+        "Bootstrap Mean": 0.736845,
+        "Bootstrap SD": 0.040999,
+        "T Stat.": 6.422956,
+        "2.5% CI": 0.654207,
+        "97.5% CI": 0.813966,
+        "Bootstrap P Val": 0,
+        "_row": "LIKE  ->  CUSL"
+      },
+      {
+        "row": "CUSA  ->  CUSL",
+        "Original Est.": 0.754614,
+        "Bootstrap Mean": 0.754622,
+        "Bootstrap SD": 0.033456,
+        "T Stat.": 7.334599,
+        "2.5% CI": 0.686796,
+        "97.5% CI": 0.817065,
+        "Bootstrap P Val": 0,
+        "_row": "CUSA  ->  CUSL"
+      }
+    ],
+    "iterations": 8
+  }
+}

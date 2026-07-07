@@ -1,0 +1,377 @@
+{
+  "id": "ds_e25397deac72",
+  "filename": "corp_rep.csv",
+  "uploaded_at": "2026-07-05T09:56:25",
+  "missing_value": "-99",
+  "n_observations": 344,
+  "variables": [
+    {
+      "name": "servicetype",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 2,
+      "min": 1.0,
+      "max": 2.0
+    },
+    {
+      "name": "serviceprovider",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 4,
+      "min": 1.0,
+      "max": 4.0
+    },
+    {
+      "name": "cusa",
+      "dtype": "int64",
+      "n_missing": 1,
+      "n_unique": 8,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "cusl_1",
+      "dtype": "int64",
+      "n_missing": 3,
+      "n_unique": 8,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "cusl_2",
+      "dtype": "int64",
+      "n_missing": 4,
+      "n_unique": 8,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "cusl_3",
+      "dtype": "int64",
+      "n_missing": 3,
+      "n_unique": 8,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "qual_1",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "qual_2",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "qual_3",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "qual_4",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "qual_5",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "qual_6",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "qual_7",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "qual_8",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "perf_1",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "perf_2",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "perf_3",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "perf_4",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "perf_5",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "csor_1",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "csor_2",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "csor_3",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "csor_4",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "csor_5",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "attr_1",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "attr_2",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "attr_3",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "comp_1",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "comp_2",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "comp_3",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "like_1",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "like_2",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "like_3",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "qual_global",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 6,
+      "min": 2.0,
+      "max": 7.0
+    },
+    {
+      "name": "perf_global",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 5,
+      "min": 3.0,
+      "max": 7.0
+    },
+    {
+      "name": "csor_global",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 7,
+      "min": 1.0,
+      "max": 7.0
+    },
+    {
+      "name": "attr_global",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 6,
+      "min": 2.0,
+      "max": 7.0
+    },
+    {
+      "name": "switch_1",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 5,
+      "min": 1.0,
+      "max": 5.0
+    },
+    {
+      "name": "switch_2",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 5,
+      "min": 1.0,
+      "max": 5.0
+    },
+    {
+      "name": "switch_3",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 5,
+      "min": 1.0,
+      "max": 5.0
+    },
+    {
+      "name": "switch_4",
+      "dtype": "int64",
+      "n_missing": 0,
+      "n_unique": 4,
+      "min": 1.0,
+      "max": 4.0
+    }
+  ],
+  "audit": {
+    "n_observations": 344,
+    "n_variables": 41,
+    "missing_value_code": "-99",
+    "n_findings": 4,
+    "findings": [
+      {
+        "check": "missing_values",
+        "variable": "cusa",
+        "count": 1,
+        "pct": 0.29,
+        "severity": "info",
+        "suggestion": "mean replacement acceptable (< 5% missing)"
+      },
+      {
+        "check": "missing_values",
+        "variable": "cusl_1",
+        "count": 3,
+        "pct": 0.87,
+        "severity": "info",
+        "suggestion": "mean replacement acceptable (< 5% missing)"
+      },
+      {
+        "check": "missing_values",
+        "variable": "cusl_2",
+        "count": 4,
+        "pct": 1.16,
+        "severity": "info",
+        "suggestion": "mean replacement acceptable (< 5% missing)"
+      },
+      {
+        "check": "missing_values",
+        "variable": "cusl_3",
+        "count": 3,
+        "pct": 0.87,
+        "severity": "info",
+        "suggestion": "mean replacement acceptable (< 5% missing)"
+      }
+    ]
+  }
+}

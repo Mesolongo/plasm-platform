@@ -10,11 +10,15 @@ Swapped for Postgres + object storage in a later phase; the backend only touches
 this module, so the swap is contained.
 """
 import json
+import os
 import uuid
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-DATA_DIR = ROOT / "data"
+# Storage lives under <project>/data by default, but a deployment can point it
+# elsewhere with PLSEM_DATA_DIR — e.g. a Hugging Face Space's persistent disk at
+# /data — so uploaded datasets and analyses survive a container restart.
+DATA_DIR = Path(os.environ.get("PLSEM_DATA_DIR") or (ROOT / "data"))
 
 
 def new_id(prefix: str) -> str:

@@ -1,3 +1,19 @@
+---
+title: PLS-SEM Platform
+emoji: 📊
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+app_port: 8000
+pinned: false
+---
+
+<!-- The YAML block above configures the Hugging Face Space (Docker SDK). HF builds
+     the Dockerfile in this repo and serves the app on app_port (8000). To enable
+     the AI features, add ANTHROPIC_API_KEY as a Space *secret* (Settings →
+     Variables and secrets) — never commit it. To keep uploaded data across
+     restarts, attach persistent storage and set PLSEM_DATA_DIR=/data. -->
+
 # plsem-platform
 
 AI-powered PLS-SEM analysis platform — from raw survey data to a publication-ready

@@ -135,6 +135,41 @@ def test_overridden_gates_surface_as_high_concern():
     assert "sample_size_10x" in assumptions[0]["evidence"] or "n = 40" in assumptions[0]["evidence"]
 
 
+def test_cmb_reads_failed_full_collinearity_vif():
+    # A full-collinearity VIF above 3.3 (Kock 2015) upgrades the standing CMB
+    # concern to high severity with the offending construct named.
+    assessment = {"measurement_model": [], "structural_model": [
+        {"family": "common_method_bias", "construct": "QUAL",
+         "metric": "full collinearity VIF", "value": 4.28, "verdict": "fail"},
+        {"family": "common_method_bias", "construct": "COMP",
+         "metric": "full collinearity VIF", "value": 2.1, "verdict": "pass"}],
+        "hypotheses": []}
+    cmb = [c for c in publish.reviewer_checks(assessment, _req())
+           if c["area"] == "common_method_bias"]
+    assert len(cmb) == 1
+    assert cmb[0]["severity"] == "high"
+    assert "QUAL" in cmb[0]["evidence"] and "4.28" in cmb[0]["evidence"]
+
+
+def test_cmb_reads_passing_full_collinearity_vif():
+    assessment = {"measurement_model": [], "structural_model": [
+        {"family": "common_method_bias", "construct": "A",
+         "metric": "full collinearity VIF", "value": 2.4, "verdict": "pass"}],
+        "hypotheses": []}
+    cmb = [c for c in publish.reviewer_checks(assessment, _req())
+           if c["area"] == "common_method_bias"]
+    assert cmb and cmb[0]["severity"] == "low"
+    assert "passed" in cmb[0]["evidence"]
+
+
+def test_cmb_falls_back_when_full_collinearity_absent():
+    assessment = {"measurement_model": [], "structural_model": [], "hypotheses": []}
+    cmb = [c for c in publish.reviewer_checks(assessment, _req())
+           if c["area"] == "common_method_bias"]
+    assert cmb and cmb[0]["severity"] == "medium"
+    assert "not present" in cmb[0]["evidence"]
+
+
 def test_mga_present_suppresses_heterogeneity_concern():
     assessment = {"measurement_model": [], "structural_model": [
         {"family": "predictive_power", "construct": "x", "metric": "m",

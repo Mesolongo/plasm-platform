@@ -153,6 +153,18 @@ def build_report(dataset_meta: dict, request: dict, results: dict, assessment: d
         "Collinearity: " + "; ".join(f"{s['construct']} VIF = {_fmt(s['value'])} ({s['verdict']})"
                                      for s in vif_bad) + "."
     )
+    cmb = [s for s in assessment["structural_model"] if s["family"] == "common_method_bias"]
+    if cmb:
+        cmb_bad = [s for s in cmb if s["verdict"] == "fail"]
+        doc.add_paragraph(
+            "Common method bias (full collinearity test, Kock 2015): all "
+            "full-collinearity VIF values are at or below 3.3, so common method bias "
+            "is not a concern." if not cmb_bad else
+            "Common method bias (full collinearity test, Kock 2015): "
+            + "; ".join(f"{s['construct']} VIF = {_fmt(s['value'])}" for s in cmb_bad)
+            + " exceed the 3.3 threshold, indicating possible common method bias."
+        )
+
     r2 = [s for s in assessment["structural_model"] if s["family"] == "explanatory_power"]
     if r2:
         _table(doc, ["Endogenous construct", "R²", "Interpretation"],

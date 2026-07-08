@@ -14,8 +14,8 @@ MICOM measurement invariance (Henseler et al. 2016) — path comparisons are
 withheld unless at least partial invariance holds. Also: blindfolding Q²
 (cross-validated redundancy, D = 7), NFI and RMS_theta fit indices,
 simple-slopes plots for moderation, assumption-checking gates before every run
-(10-times rule, >5% missing, straight-lining; override is recorded), Excel and
-PowerPoint export, PDF report export (needs LibreOffice), a grounded
+(10-times rule, >5% missing, straight-lining; override is recorded), Excel
+export, PDF report export (needs LibreOffice), a grounded
 research-assistant chat, SQL / Google Sheets data connectors, token-based
 share links with a read-only viewer and comment threads,
 literature-grounded hypothesis citations (Crossref), and a **publishing
@@ -58,12 +58,11 @@ docs/references/                 # published SmartPLS case-study PDFs + extracte
 ## Requirements
 
 - R ≥ 4.6 with `seminr`, `jsonlite`
-- Python ≥ 3.12; `.venv` contains `fastapi`, `pandas`, `python-docx`, `pyreadstat`
-  (SPSS import), `openpyxl` + `python-pptx` (Excel/PowerPoint export), `sqlalchemy`
-  (SQL connector), `httpx` (Google Sheets connector), `anthropic`, `pydantic`
+- Python ≥ 3.12; runtime deps are pinned in [requirements.txt](requirements.txt)
+  (`pip install -r requirements-dev.txt` into `.venv` also brings `pytest`)
 - Optional: LibreOffice (`soffice` on PATH) for PDF report export; a database driver
   for the SQL connector's dialect (e.g. `psycopg` for PostgreSQL) — SQLite needs none
-- Anthropic API credentials for `ai/model_architect.py` (`ANTHROPIC_API_KEY` or `ant auth login`)
+- Anthropic API credentials for the AI features (`ANTHROPIC_API_KEY` or `ant auth login`)
 
 ## Run the backend (Phase 1)
 
@@ -71,6 +70,32 @@ docs/references/                 # published SmartPLS case-study PDFs + extracte
 .venv/bin/uvicorn backend.app.main:app --reload   # web app: http://127.0.0.1:8000
 .venv/bin/python -m pytest backend/tests/         # end-to-end test suite
 ```
+
+## Deploy (Docker)
+
+One image bundles R 4.6 + seminr and the Python backend, so pilot users don't
+install anything:
+
+```sh
+docker compose up --build          # web app: http://<host>:8000
+```
+
+or without compose:
+
+```sh
+docker build -t plsem-platform .
+docker run -p 8000:8000 -v plsem_data:/app/data \
+  -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY plsem-platform
+```
+
+All state (datasets, analyses, shares, jobs) lives in `/app/data`, mounted as the
+`plsem_data` volume, so it survives container upgrades. `ANTHROPIC_API_KEY` is
+optional — without it everything runs except the AI features (model architect,
+interpretation, chat, manuscript drafting), which answer 503. PDF export needs
+LibreOffice in the image: `docker build --build-arg LIBREOFFICE=1 …` (~500 MB
+larger). Anyone you send a share link to just needs the host to be reachable
+(e.g. `http://<host>:8000/app/shared.html?token=…`); for exposure beyond a
+trusted network, put the container behind a TLS reverse proxy (Caddy, nginx).
 
 The web UI (served at `/`) walks the full flow: bring in data (upload CSV/Excel/SPSS
 `.sav`, or pull from a SQL database or a link-viewable Google Sheet) →

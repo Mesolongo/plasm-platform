@@ -1,5 +1,5 @@
-"""Phase 2 completion tests: blindfolding Q², NFI/RMS_theta, Excel/PowerPoint
-export, PDF gating, assumption gates, and the research-chat endpoint.
+"""Phase 2 completion tests: blindfolding Q², NFI/RMS_theta, Excel export,
+PDF gating, assumption gates, and the research-chat endpoint.
 
 Blindfolding Q² is validated against the primer 2nd-edition corp-rep values
 (CUSA 0.280, CUSL 0.415, omission distance 7).
@@ -72,6 +72,20 @@ def test_fit_indices(analysis):
     assert all(f["verdict"] in ("pass", "review", "fail") for f in fits.values())
 
 
+def test_full_collinearity_cmb(analysis):
+    # Kock (2015) full-collinearity test: engine emits a VIF per construct and the
+    # assessment turns each into a common_method_bias verdict (threshold 3.3).
+    fc = analysis["results"]["full_collinearity_vif"]
+    assert fc and all("construct" in r and "vif" in r for r in fc)
+    cmb = [s for s in analysis["assessment"]["structural_model"]
+           if s["family"] == "common_method_bias"]
+    assert len(cmb) == len(fc)
+    # corp-rep QUAL is collinear with the other drivers (VIF > 3.3) -> a fail.
+    qual = next(s for s in cmb if s["construct"] == "QUAL")
+    assert qual["value"] > 3.3 and qual["verdict"] == "fail"
+    assert all(s["verdict"] in ("pass", "fail") for s in cmb)
+
+
 def test_excel_export(analysis):
     resp = client.get(f"/api/analyses/{analysis['id']}/results.xlsx")
     assert resp.status_code == 200
@@ -81,17 +95,6 @@ def test_excel_export(analysis):
             "Specific indirect", "IPMA performance"} <= set(wb.sheetnames)
     fit = {row[0].value: row[1].value for row in wb["Model fit"].iter_rows(min_row=2)}
     assert fit["SRMR"] == pytest.approx(analysis["results"]["srmr"], abs=1e-6)
-
-
-def test_powerpoint_export(analysis):
-    resp = client.get(f"/api/analyses/{analysis['id']}/summary.pptx")
-    assert resp.status_code == 200
-    from pptx import Presentation
-    prs = Presentation(io.BytesIO(resp.content))
-    titles = [s.shapes.title.text for s in prs.slides if s.shapes.title]
-    assert any("Key Findings" in t for t in titles)
-    assert any("Hypotheses" in t for t in titles)
-    assert any("Mediation" in t for t in titles)
 
 
 def test_pdf_gated_on_libreoffice(analysis, monkeypatch):

@@ -1,0 +1,14 @@
+services:
+  plsem:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - plsem_data:/app/data
+    environment:
+      # optional — enables the AI features when set in the host environment
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    restart: unless-stopped
+
+volumes:
+  plsem_data:

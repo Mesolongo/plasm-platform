@@ -221,22 +221,46 @@ def reviewer_checks(assessment: dict, request: dict, dataset_meta: dict | None =
         })
 
     # --- Standard concerns every PLS-SEM submission should pre-empt -----------
-    # Common method bias: single-source survey designs draw this every time.
-    vif_all = structural.get("collinearity") or []
-    cmb_evidence = ("Full collinearity VIFs are not reported in the assessment."
-                    if not vif_all else
-                    f"Inner VIFs range up to "
-                    f"{max(s['value'] for s in vif_all)}; values above 3.3 would signal "
-                    "possible common method bias.")
+    # Common method bias: single-source survey designs draw this every time. The
+    # platform now runs Kock's full-collinearity test, so the concern reports the
+    # actual result rather than telling the author to go compute it.
+    fc = structural.get("common_method_bias") or []
+    fc_fail = [s for s in fc if s["verdict"] == "fail"]
+    if fc_fail:
+        c = ", ".join(f"{s['construct']} (VIF {s['value']})" for s in fc_fail)
+        cmb = {
+            "severity": "high",
+            "evidence": f"Full-collinearity VIF above 3.3 for: {c} — Kock's threshold "
+                        "for pathological collinearity indicating possible common method bias.",
+            "recommendation": "This is evidence of possible CMB: identify the shared-method "
+                              "source, report the procedural remedies used in design, and "
+                              "consider a marker-variable or measured-latent-marker-variable "
+                              "test before drawing structural conclusions.",
+        }
+    elif fc:
+        top = max(fc, key=lambda s: s["value"])
+        cmb = {
+            "severity": "low",
+            "evidence": f"Full-collinearity test passed: all VIFs at or below 3.3 "
+                        f"(highest {top['construct']} at {top['value']}, threshold 3.3).",
+            "recommendation": "Report the full-collinearity test as evidence against common "
+                              "method bias, alongside the procedural remedies used in design.",
+        }
+    else:
+        cmb = {
+            "severity": "medium",
+            "evidence": "Full-collinearity VIFs are not present in the assessment.",
+            "recommendation": "Report the procedural remedies used in design, and a full "
+                              "collinearity test (all VIFs below 3.3); consider a marker "
+                              "variable if one is available.",
+        }
     concerns.append({
         "area": "common_method_bias",
-        "severity": "medium",
+        "severity": cmb["severity"],
         "concern": "For self-reported, single-source data a reviewer will ask how common "
                    "method bias was ruled out.",
-        "evidence": cmb_evidence,
-        "recommendation": "Report the procedural remedies used in design, and a full "
-                          "collinearity test (all VIFs below 3.3); consider a marker "
-                          "variable if one is available.",
+        "evidence": cmb["evidence"],
+        "recommendation": cmb["recommendation"],
         "citation": "Podsakoff et al. (2003); Kock (2015)",
     })
 

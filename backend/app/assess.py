@@ -272,6 +272,21 @@ def assess(results: dict, request: dict) -> dict:
                 "citation": "Hair et al. (2022)",
             })
 
+    # --- Full-collinearity VIF: common-method-bias check (Kock 2015) ----------
+    # Each construct regressed on all others; VIF > 3.3 signals possible CMB.
+    for rec in results.get("full_collinearity_vif") or []:
+        v = rec.get("vif")
+        if v is None:
+            continue
+        v = v[0] if isinstance(v, list) else v
+        structural.append({
+            "family": "common_method_bias", "construct": rec["construct"],
+            "metric": "full collinearity VIF", "value": round(v, 3),
+            "threshold": "< 3.3",
+            "verdict": "pass" if v <= 3.3 else "fail",
+            "citation": "Kock (2015)",
+        })
+
     # --- Explanatory power: R2 -----------------------------------------------
     for rec in _rows(results.get("paths_and_r2")):
         if rec["row"] != "R^2":

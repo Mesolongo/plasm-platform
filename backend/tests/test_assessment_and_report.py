@@ -73,6 +73,9 @@ def test_report_downloads(analysis):
     headings = [p.text for p in doc.paragraphs if p.style.name.startswith("Heading")]
     assert any("Measurement Model" in h for h in headings)
     assert any("Structural Model" in h for h in headings)
+    # The full-collinearity common-method-bias test is reported (Kock 2015).
+    body = "\n".join(p.text for p in doc.paragraphs)
+    assert "Common method bias" in body and "Kock 2015" in body
 
 
 def test_ai_gate(analysis, monkeypatch):

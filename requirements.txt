@@ -1,0 +1,15 @@
+# Python runtime dependencies (pinned to the versions the suite is green on).
+# R-side dependencies (R >= 4.6 with seminr + jsonlite) are installed separately;
+# see the Dockerfile or README Requirements.
+anthropic==0.116.0
+fastapi==0.139.0
+httpx==0.28.1
+numpy==2.5.1
+openpyxl==3.1.5
+pandas==3.0.3
+pydantic==2.13.4
+pyreadstat==1.3.5
+python-docx==1.2.0
+python-multipart==0.0.32
+sqlalchemy==2.0.51
+uvicorn==0.50.0

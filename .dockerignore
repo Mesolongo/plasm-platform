@@ -1,0 +1,10 @@
+.git
+.venv
+data
+docs
+parity
+backend/tests
+engine/corp_rep_results.json
+**/__pycache__
+**/.pytest_cache
+**/.DS_Store

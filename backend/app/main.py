@@ -30,7 +30,7 @@ from . import ai, citations, collab, jobs, publish
 from .assess import assess, assess_mga
 from .audit import run_audit, variable_dictionary
 from .engine import MGA_SCRIPT, run_engine
-from .export import write_pptx, write_xlsx
+from .export import write_xlsx
 from .report import build_report
 from .storage import ROOT, analysis_dir, dataset_dir, new_id, read_json, write_json
 
@@ -472,18 +472,6 @@ def get_xlsx(analysis_id: str):
     write_xlsx(out, results, assess(results, request), mga=_mga_if_any(a_dir))
     return FileResponse(out, filename=f"plsem_results_{analysis_id}.xlsx",
                         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-
-
-@app.get("/api/analyses/{analysis_id}/summary.pptx")
-def get_pptx(analysis_id: str):
-    """Compact findings deck (hypotheses, mediation, IPMA, MGA)."""
-    a_dir, meta, request, results = _load_analysis(analysis_id)
-    dataset_meta = read_json(dataset_dir(meta["dataset_id"]) / "meta.json")
-    out = a_dir / "summary.pptx"
-    write_pptx(out, dataset_meta, request, results, assess(results, request),
-               mga=_mga_if_any(a_dir))
-    return FileResponse(out, filename=f"plsem_summary_{analysis_id}.pptx",
-                        media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation")
 
 
 def _find_soffice() -> str | None:

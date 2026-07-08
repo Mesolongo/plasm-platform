@@ -143,6 +143,21 @@ rms_theta_of <- function(model) {
 }
 rms_theta <- tryCatch(rms_theta_of(model), error = function(e) NULL)
 
+# --- Full collinearity VIFs (Kock 2015): common-method-bias check ---------------
+# Regress every construct on all the others; VIF_j = 1/(1 - R2_j), which is the
+# j-th diagonal element of the inverse construct-correlation matrix. Kock's rule:
+# all full-collinearity VIFs <= 3.3 => the model is free of common method bias.
+# Interaction constructs are excluded (synthetic single-indicator scores).
+full_collinearity_vif <- function(model) {
+  keep <- colnames(model$construct_scores)[!grepl("*", colnames(model$construct_scores),
+                                                   fixed = TRUE)]
+  if (length(keep) < 2) return(NULL)
+  R <- cor(model$construct_scores[, keep, drop = FALSE])
+  vifs <- diag(solve(R))
+  lapply(keep, function(c) list(construct = c, vif = unname(vifs[c])))
+}
+full_vif <- tryCatch(full_collinearity_vif(model), error = function(e) NULL)
+
 # --- Blindfolding Q2 (Hair et al. 2022, ch. 6): cross-validated redundancy ------
 # Per endogenous construct block: omit every D-th data point (round-robin over
 # the block), mean-replace, re-estimate, and predict the omitted points from the
@@ -344,6 +359,7 @@ out <- list(
   fornell_larcker = mat_records(maybe(s$validity$fl_criteria)),
   cross_loadings  = mat_records(maybe(s$validity$cross_loadings)),
   vif_structural  = maybe(lapply(s$vif_antecedents, as.list)),
+  full_collinearity_vif = full_vif,
   paths_and_r2    = mat_records(s$paths),
   f_square        = mat_records(maybe(s$fSquare)),
   total_effects   = mat_records(maybe(s$total_effects)),

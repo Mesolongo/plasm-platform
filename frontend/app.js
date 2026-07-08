@@ -519,7 +519,6 @@ function renderResults() {
   const s = a.summary;
   $("#btn-report").href = `/api/analyses/${state.analysis.id}/report.docx`;
   $("#btn-xlsx").href = `/api/analyses/${state.analysis.id}/results.xlsx`;
-  $("#btn-pptx").href = `/api/analyses/${state.analysis.id}/summary.pptx`;
   $("#btn-json").href = `/api/analyses/${state.analysis.id}/results`;
   state.chatHistory = [];
   $("#chat-log").innerHTML = "";

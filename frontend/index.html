@@ -15,7 +15,45 @@
     <button class="step" data-step="3" disabled><span>3</span> Results</button>
   </nav>
   <div id="ai-badge" class="ai-badge" title="">AI: checking…</div>
+  <div id="user-chip" class="user-chip hidden">
+    <span id="user-name"></span>
+    <button id="btn-logout" title="Sign out">Sign out</button>
+  </div>
 </header>
+
+<!-- ============ Login / signup (shown until a session exists) ============ -->
+<div id="auth-overlay" class="auth-overlay hidden">
+  <div class="auth-card card">
+    <div class="brand">plsem<span>-platform</span></div>
+    <p class="lead">Sign in to run analyses — or create a free account.</p>
+    <a id="auth-google" class="button google-btn hidden" href="/api/auth/google">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.9-.1-1.5-.3-2.2H12v4.1h6.5c-.1 1.1-.8 2.7-2.4 3.8l3.7 2.9c2.3-2.1 3.7-5.1 3.7-8.6z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.7-2.9c-1 .7-2.4 1.2-4.2 1.2-3.2 0-6-2.1-6.9-5.1l-3.9 3C3.2 21.3 7.3 24 12 24z"/><path fill="#FBBC05" d="M5.1 14.3a7.3 7.3 0 0 1 0-4.6l-3.9-3a12 12 0 0 0 0 10.6l3.9-3z"/><path fill="#EA4335" d="M12 4.7c1.8 0 3 .8 3.7 1.4l3.3-3.2C17 1.1 15.2 0 12 0 7.3 0 3.2 2.7 1.2 6.7l3.9 3c.9-3 3.7-5 6.9-5z"/></svg>
+      Continue with Google
+    </a>
+    <div id="auth-divider" class="auth-divider hidden">or</div>
+    <div class="auth-tabs" role="tablist">
+      <button id="auth-tab-login" class="auth-tab active" type="button">Sign in</button>
+      <button id="auth-tab-register" class="auth-tab" type="button">Create account</button>
+    </div>
+    <form id="auth-form" class="form-col">
+      <label id="auth-username-label">Username
+        <input type="text" id="auth-username" autocomplete="username" required
+               minlength="3" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9._\-]*"
+               title="letters, digits, dots, dashes, underscores">
+      </label>
+      <label id="auth-email-label" class="hidden">Email
+        <input type="email" id="auth-email" autocomplete="email" maxlength="254" disabled>
+      </label>
+      <label id="auth-password-label">Password
+        <input type="password" id="auth-password" autocomplete="current-password"
+               required minlength="8">
+      </label>
+      <button type="submit" class="primary" id="auth-submit">Sign in</button>
+      <button type="button" id="auth-forgot" class="linklike">Forgot password?</button>
+      <div id="auth-status" class="status"></div>
+    </form>
+  </div>
+</div>
 
 <main>
   <!-- ============ Step 1: Data ============ -->

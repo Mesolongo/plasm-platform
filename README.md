@@ -53,6 +53,27 @@ and LIKE→CUSA→CUSL = 0.220 (complementary); blindfolding Q² CUSA = 0.279 /
 CUSL = 0.408 (published 0.280 / 0.415); servicetype MICOM reaches full
 invariance on the corp-rep data.
 
+**Accounts**: the app has open signup (username + email + password) with a
+login gate on every `/api` route (`backend/app/auth.py`; scrypt password
+hashes — plaintext passwords are never stored — and an HttpOnly session
+cookie). Accounts, sessions, and reset tokens live in PostgreSQL when
+`PLSEM_DATABASE_URL` is set (e.g. `postgresql+psycopg://user:pw@host:5432/plsem`;
+tables `plsem_users` / `plsem_sessions` / `plsem_resets` are created on first
+use — see `backend/app/accounts.py`), and fall back to files under `data/`
+otherwise. Token-based share links stay public by design. AI features run on the server's
+`ANTHROPIC_API_KEY` and each account is capped at `PLSEM_AI_DAILY_LIMIT` AI
+calls per day (default 25) so no single user can drain the credits. Signup
+sends a welcome mail and “Forgot password?” mails a single-use, 60-minute
+reset link (`backend/app/mailer.py`, plain SMTP): set `PLSEM_SMTP_HOST`,
+`PLSEM_SMTP_PORT` (587), `PLSEM_SMTP_USER`, `PLSEM_SMTP_PASSWORD`, optional
+`PLSEM_SMTP_FROM`, and `PLSEM_BASE_URL` (the public URL used in reset links).
+While SMTP is unconfigured, mails are printed to the server log instead, so
+the flows are testable locally. **Sign in with Google** (authorization-code
+flow, basic scopes only — no Google verification review needed) switches on
+when `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` are set; accounts are matched
+to password accounts by verified email, and the authorized redirect URI is
+`<PLSEM_BASE_URL>/api/auth/google/callback`.
+
 ## Layout
 
 ```

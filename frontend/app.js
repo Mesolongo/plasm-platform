@@ -9,6 +9,7 @@ async function api(path, opts = {}) {
   const resp = await fetch(path, opts);
   const body = await resp.json().catch(() => ({}));
   if (!resp.ok) {
+    if (resp.status === 401 && !path.startsWith("/api/auth/")) showAuth(true);
     const detail = body.detail;
     const msg = typeof detail === "string" ? detail
       : detail && detail.message ? `[${detail.stage}] ${detail.message}`
@@ -63,15 +64,127 @@ function goStep(n) {
 document.querySelectorAll(".step").forEach((s) =>
   s.addEventListener("click", () => !s.disabled && goStep(+s.dataset.step)));
 
+/* ------------------------------ Auth ------------------------------ */
+/* Session cookie is HttpOnly; the overlay stays up until /api/auth/me answers.
+   Any later 401 (expired/revoked session) re-raises the overlay via api(). */
+let authMode = "login";
+
+function showAuth(show) {
+  $("#auth-overlay").classList.toggle("hidden", !show);
+  $("#user-chip").classList.toggle("hidden", show);
+  if (show) $("#auth-username").focus();
+}
+
+/* Four modes share one form; hidden fields are disabled so HTML validation
+   skips them. reset mode is entered via the ?reset=… link from the mail. */
+const AUTH_MODES = {
+  login:    { fields: ["username", "password"], submit: "Sign in" },
+  register: { fields: ["username", "email", "password"], submit: "Create account" },
+  forgot:   { fields: ["email"], submit: "Send reset link" },
+  reset:    { fields: ["password"], submit: "Set new password" },
+};
+
+function setAuthMode(mode) {
+  authMode = mode;
+  const { fields, submit } = AUTH_MODES[mode];
+  for (const f of ["username", "email", "password"]) {
+    const on = fields.includes(f);
+    $(`#auth-${f}-label`).classList.toggle("hidden", !on);
+    $(`#auth-${f}`).disabled = !on;
+  }
+  $("#auth-tab-login").classList.toggle("active", mode === "login");
+  $("#auth-tab-register").classList.toggle("active", mode === "register");
+  $("#auth-submit").textContent = submit;
+  $("#auth-forgot").classList.toggle("hidden", mode !== "login");
+  $("#auth-password").autocomplete = mode === "login" ? "current-password" : "new-password";
+  $("#auth-password-label").firstChild.textContent = mode === "reset" ? "New password" : "Password";
+  setStatus("#auth-status", mode === "forgot"
+    ? "Enter your account's email — we'll mail a reset link."
+    : mode === "reset" ? "Pick a new password to finish the reset." : "");
+}
+$("#auth-tab-login").addEventListener("click", () => setAuthMode("login"));
+$("#auth-tab-register").addEventListener("click", () => setAuthMode("register"));
+$("#auth-forgot").addEventListener("click", () => setAuthMode("forgot"));
+
+function signedIn(me) {
+  $("#user-name").textContent = me.username;
+  showAuth(false);
+  refreshAiBadge();
+}
+
+$("#auth-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const payloads = {
+    login: () => ({ username: $("#auth-username").value.trim(),
+                    password: $("#auth-password").value }),
+    register: () => ({ username: $("#auth-username").value.trim(),
+                       email: $("#auth-email").value.trim(),
+                       password: $("#auth-password").value }),
+    forgot: () => ({ email: $("#auth-email").value.trim() }),
+    reset: () => ({ token: resetToken, password: $("#auth-password").value }),
+  };
+  setStatus("#auth-status", "Working…", false, true);
+  try {
+    const body = await api(`/api/auth/${authMode}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payloads[authMode]()),
+    });
+    if (authMode === "forgot") {
+      setStatus("#auth-status", body.detail || "Check your inbox for the reset link.");
+      return;
+    }
+    $("#auth-password").value = "";
+    setStatus("#auth-status", "");
+    if (authMode === "reset") {
+      resetToken = null;
+      history.replaceState(null, "", location.pathname); // drop ?reset=… from the URL
+    }
+    signedIn(body);
+  } catch (err) {
+    setStatus("#auth-status", err.message, true);
+  }
+});
+
+$("#btn-logout").addEventListener("click", async () => {
+  await api("/api/auth/logout", { method: "POST" }).catch(() => {});
+  location.reload();
+});
+
+/* Offer "Continue with Google" only when the server has OAuth credentials. */
+api("/api/auth/methods").then(({ google }) => {
+  $("#auth-google").classList.toggle("hidden", !google);
+  $("#auth-divider").classList.toggle("hidden", !google);
+}).catch(() => {});
+
+/* Boot: a ?reset=… link (from the password mail) beats the session check,
+   and a ?auth_error=… redirect (failed Google sign-in) shows the message. */
+const bootParams = new URLSearchParams(location.search);
+let resetToken = bootParams.get("reset");
+const authError = bootParams.get("auth_error");
+if (resetToken) {
+  showAuth(true);
+  setAuthMode("reset");
+} else if (authError) {
+  history.replaceState(null, "", location.pathname);
+  showAuth(true);
+  setAuthMode("login");
+  setStatus("#auth-status", authError, true);
+} else {
+  api("/api/auth/me").then(signedIn).catch(() => showAuth(true));
+}
+
 /* ------------------------------ AI badge ------------------------------ */
 let aiConfigured = false;
-api("/api/ai/status").then(({ configured }) => {
-  aiConfigured = configured;
-  const el = $("#ai-badge");
-  el.textContent = configured ? "AI: connected" : "AI: no API key";
-  el.classList.toggle("off", !configured);
-  el.title = configured ? "" : "Set ANTHROPIC_API_KEY and restart the server to enable AI features";
-});
+function refreshAiBadge() {
+  api("/api/ai/status").then(({ configured }) => {
+    aiConfigured = configured;
+    const el = $("#ai-badge");
+    el.textContent = configured ? "AI: connected" : "AI: no API key";
+    el.classList.toggle("off", !configured);
+    el.title = configured ? "" : "Set ANTHROPIC_API_KEY and restart the server to enable AI features";
+  }).catch(() => {});
+}
 
 /* ------------------------------ Step 1: data ------------------------------ */
 /* Source tabs: file upload, SQL database, or Google Sheet. All three land the same

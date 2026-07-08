@@ -21,3 +21,6 @@ __pycache__/
 data/
 # Large reference PDFs (kept locally, not in git — see docs/references/*.txt for extracted text)
 docs/references/*.pdf
+
+# Local launcher with this machine's secrets (Google OAuth, SMTP) — never commit
+run_local.sh

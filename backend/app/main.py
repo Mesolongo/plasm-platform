@@ -22,11 +22,11 @@ from typing import List, Literal, Optional
 import httpx
 import pandas as pd
 from fastapi import FastAPI, HTTPException, UploadFile, Form
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import ai, citations, collab, jobs, publish
+from . import ai, auth, citations, collab, jobs, publish
 from .assess import assess, assess_mga
 from .audit import run_audit, variable_dictionary
 from .engine import MGA_SCRIPT, run_engine
@@ -42,6 +42,37 @@ async def _lifespan(app: FastAPI):
 
 
 app = FastAPI(title="plsem-platform", version="0.3.0", lifespan=_lifespan)
+app.include_router(auth.router)
+
+
+# --------------------------------------------------------------------------- #
+# Login gate. Everything under /api needs a session, except auth itself and the
+# token-based share viewer (its capability URL is the credential). AI-powered
+# POSTs are additionally charged against the user's daily quota so a single
+# account can't drain the server's Anthropic credits.
+# --------------------------------------------------------------------------- #
+_PUBLIC_API_PREFIXES = ("/api/auth/", "/api/shared/")
+_AI_POST_SUFFIXES = ("/chat", "/interpretation", "/manuscript", "/propose-model")
+
+
+@app.middleware("http")
+async def _require_login(request, call_next):
+    path = request.url.path
+    if path.startswith("/api") and not path.startswith(_PUBLIC_API_PREFIXES):
+        username = auth.session_username(request.cookies.get(auth.COOKIE))
+        if not username:
+            return JSONResponse({"detail": "login required"}, status_code=401)
+        if (request.method == "POST" and path.endswith(_AI_POST_SUFFIXES)
+                and ai.is_configured() and not auth.charge_ai_call(username)):
+            return JSONResponse(
+                {"detail": f"daily AI limit reached ({auth.ai_daily_limit()} "
+                           "calls/day) — try again tomorrow"}, status_code=429)
+        token = auth.current_username.set(username)
+        try:
+            return await call_next(request)
+        finally:
+            auth.current_username.reset(token)
+    return await call_next(request)
 
 
 # --------------------------------------------------------------------------- #
@@ -76,6 +107,7 @@ def _persist_dataset(df: pd.DataFrame, source: str, missing_value: Optional[str]
 
     meta = {
         "id": dataset_id,
+        "owner": auth.current_username.get(),
         "filename": source,
         "uploaded_at": datetime.datetime.now().isoformat(timespec="seconds"),
         "missing_value": missing_value,
@@ -341,6 +373,7 @@ def create_analysis(req: AnalysisRequest):
     job_id = new_id("job")
     meta = {
         "id": analysis_id,
+        "owner": auth.current_username.get(),
         "dataset_id": req.dataset_id,
         "created_at": datetime.datetime.now().isoformat(timespec="seconds"),
         "status": "queued",

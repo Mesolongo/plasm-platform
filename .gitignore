@@ -19,3 +19,5 @@ __pycache__/
 
 # Runtime storage (uploaded datasets, analysis outputs)
 data/
+# Large reference PDFs (kept locally, not in git — see docs/references/*.txt for extracted text)
+docs/references/*.pdf

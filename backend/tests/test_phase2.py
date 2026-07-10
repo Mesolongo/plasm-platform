@@ -154,6 +154,24 @@ def test_spss_sav_upload(tmp_path):
     assert meta["variable_labels"]["cusa"] == "label cusa"
 
 
+def test_excel_upload(tmp_path):
+    df = pd.read_csv(CSV).iloc[:40, :4]
+    xlsx = tmp_path / "survey.xlsx"
+    df.to_excel(xlsx, index=False)
+    with xlsx.open("rb") as f:
+        resp = client.post("/api/datasets", files={"file": ("survey.xlsx", f, "application/octet-stream")})
+    assert resp.status_code == 200, resp.text
+    meta = resp.json()
+    assert meta["n_observations"] == 40
+    assert {v["name"] for v in meta["variables"]} == set(df.columns)
+
+
+def test_unsupported_file_type_415():
+    resp = client.post("/api/datasets",
+                       files={"file": ("notes.txt", io.BytesIO(b"hello"), "text/plain")})
+    assert resp.status_code == 415
+
+
 def test_invalid_phase2_specs(dataset):
     base = {"dataset_id": dataset["id"], "nboot": 100}
     # Higher-order construct with a single dimension

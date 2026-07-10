@@ -26,7 +26,7 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import ai, auth, citations, collab, jobs, publish
+from . import ai, auth, citations, collab, jobs, publish, workspace
 from .assess import assess, assess_mga
 from .audit import run_audit, variable_dictionary
 from .engine import MGA_SCRIPT, run_engine
@@ -43,6 +43,7 @@ async def _lifespan(app: FastAPI):
 
 app = FastAPI(title="plsem-platform", version="0.3.0", lifespan=_lifespan)
 app.include_router(auth.router)
+app.include_router(workspace.router)
 
 
 # --------------------------------------------------------------------------- #
@@ -413,6 +414,20 @@ def get_analysis(analysis_id: str):
     if not (a_dir / "meta.json").exists():
         raise HTTPException(404, "analysis not found")
     return read_json(a_dir / "meta.json")
+
+
+@app.get("/api/analyses/{analysis_id}/spec")
+def get_spec(analysis_id: str):
+    """The model spec an analysis was run with — lets the frontend reopen a past
+    analysis with its builder state intact. Server-side paths are not exposed."""
+    a_dir = analysis_dir(analysis_id)
+    if not (a_dir / "request.json").exists():
+        raise HTTPException(404, "analysis not found")
+    request = read_json(a_dir / "request.json")
+    return {"constructs": request.get("constructs", []),
+            "paths": request.get("paths", []),
+            "interactions": request.get("interactions", []),
+            "options": request.get("options", {})}
 
 
 @app.get("/api/analyses/{analysis_id}/results")

@@ -58,6 +58,33 @@
 <main>
   <!-- ============ Step 1: Data ============ -->
   <section id="panel-1" class="panel">
+
+    <!-- Workspace: everything the account did before, restored after login -->
+    <div id="workspace-panel" class="hidden">
+      <h1>Your workspace</h1>
+      <div id="resume-card" class="card resume-card hidden">
+        <div>
+          <b>Pick up where you left off</b>
+          <div class="hint" id="resume-info"></div>
+        </div>
+        <div class="form-row">
+          <button id="btn-resume" class="primary">Resume</button>
+          <button id="btn-discard-draft" title="Delete the saved draft">Discard</button>
+        </div>
+      </div>
+      <div class="two-col">
+        <div>
+          <h2>Recent datasets</h2>
+          <div id="ws-datasets"></div>
+        </div>
+        <div>
+          <h2>Past analyses</h2>
+          <div id="ws-analyses"></div>
+        </div>
+      </div>
+      <hr class="ws-divider">
+    </div>
+
     <h1>Bring in survey data</h1>
     <p class="lead">Each row is a respondent; columns are indicators.</p>
     <div class="source-tabs" role="tablist">

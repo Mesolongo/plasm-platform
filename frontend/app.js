@@ -53,7 +53,9 @@ function verdictBadge(v) {
   return badge(v, cls);
 }
 function fmt(v) { return typeof v === "number" ? v.toFixed(3) : (v ?? ""); }
+let currentStep = 1;
 function goStep(n) {
+  currentStep = n;
   document.querySelectorAll(".panel").forEach((p, i) => p.classList.toggle("hidden", i !== n - 1));
   document.querySelectorAll(".step").forEach((s) => {
     const num = +s.dataset.step;
@@ -110,6 +112,7 @@ function signedIn(me) {
   $("#user-name").textContent = me.username;
   showAuth(false);
   refreshAiBadge();
+  loadWorkspace();
 }
 
 $("#auth-form").addEventListener("submit", async (e) => {
@@ -186,6 +189,136 @@ function refreshAiBadge() {
   }).catch(() => {});
 }
 
+/* ------------------------------ Workspace ------------------------------ */
+/* Server-side continuity: past datasets and analyses are listed after login,
+   and the model builder autosaves a draft — logging out (or closing the tab)
+   mid-model loses nothing. */
+let restoring = false;   // suppress autosave while saved state is being restored
+let draftTimer = null;
+
+function saveDraft() {
+  if (restoring) return;
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(() => {
+    api("/api/workspace/draft", {
+      method: "PUT", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        dataset_id: state.dataset ? state.dataset.id : null,
+        analysis_id: state.analysis ? state.analysis.id : null,
+        step: currentStep,
+        constructs: state.constructs,
+        paths: state.paths,
+        interactions: state.interactions,
+      }),
+    }).catch(() => {});
+  }, 800);
+}
+
+async function loadWorkspace() {
+  try {
+    renderWorkspace(await api("/api/workspace"));
+  } catch { /* listing is best-effort; the app works without it */ }
+}
+
+function renderWorkspace(ws) {
+  const any = ws.datasets.length || ws.analyses.length || ws.draft;
+  $("#workspace-panel").classList.toggle("hidden", !any);
+  if (!any) return;
+
+  $("#ws-datasets").innerHTML = ws.datasets.length ? ws.datasets.slice(0, 8).map((d) => `
+    <div class="ws-item">
+      <div><b>${escapeHtml(d.filename || d.id)}</b>
+        <div class="hint">${d.n_observations} rows · ${d.n_variables} variables · ${escapeHtml(d.uploaded_at || "")}</div>
+      </div>
+      <button class="ws-open" data-kind="dataset" data-id="${d.id}">Open</button>
+    </div>`).join("") : `<p class="hint">No datasets yet — upload one below.</p>`;
+
+  $("#ws-analyses").innerHTML = ws.analyses.length ? ws.analyses.slice(0, 8).map((a) => `
+    <div class="ws-item">
+      <div><b>${escapeHtml(a.dataset_filename || a.dataset_id || "")}</b>
+        ${badge(a.status, { completed: "pass", failed: "fail" }[a.status] || "neutral")}
+        <div class="hint">${escapeHtml(a.created_at || "")}${a.has_mga ? " · MGA" : ""}${a.has_interpretation ? " · AI interpretation" : ""}</div>
+      </div>
+      ${a.status === "completed"
+        ? `<button class="ws-open" data-kind="analysis" data-id="${a.id}" data-ds="${a.dataset_id}">Open</button>` : ""}
+    </div>`).join("") : `<p class="hint">No analyses yet.</p>`;
+
+  $("#workspace-panel").querySelectorAll(".ws-open").forEach((b) =>
+    b.addEventListener("click", () => (b.dataset.kind === "dataset"
+      ? openDataset(b.dataset.id)
+      : openAnalysis(b.dataset.id, b.dataset.ds))));
+
+  const draft = ws.draft;
+  const resumable = draft && (draft.dataset_id || (draft.constructs || []).length);
+  $("#resume-card").classList.toggle("hidden", !resumable);
+  if (resumable) {
+    const bits = [];
+    if ((draft.constructs || []).length) bits.push(`${draft.constructs.length} construct(s) in the builder`);
+    if (draft.saved_at) bits.push(`saved ${draft.saved_at}`);
+    $("#resume-info").textContent = bits.join(" · ");
+    $("#btn-resume").onclick = () => resumeDraft(draft);
+    $("#btn-discard-draft").onclick = async () => {
+      await api("/api/workspace/draft", { method: "DELETE" }).catch(() => {});
+      $("#resume-card").classList.add("hidden");
+    };
+  }
+}
+
+async function openDataset(datasetId) {
+  setStatus("#upload-status", "Loading dataset…", false, true);
+  try {
+    state.dataset = await api(`/api/datasets/${datasetId}`);
+    renderDataset();
+    setStatus("#upload-status", "");
+    saveDraft();
+  } catch (err) {
+    setStatus("#upload-status", err.message, true);
+  }
+}
+
+async function openAnalysis(analysisId, datasetId) {
+  setStatus("#upload-status", "Reopening analysis…", false, true);
+  restoring = true;
+  try {
+    state.dataset = await api(`/api/datasets/${datasetId}`);
+    renderDataset();
+    loadSpec(await api(`/api/analyses/${analysisId}/spec`));  // rebuilds the model builder
+    const meta = await api(`/api/analyses/${analysisId}`);
+    const assessment = await api(`/api/analyses/${analysisId}/assessment`);
+    const results = await api(`/api/analyses/${analysisId}/results`);
+    state.analysis = { ...meta, assessment, results };
+    setStatus("#upload-status", "");
+    renderResults();
+    goStep(3);
+  } catch (err) {
+    setStatus("#upload-status", err.message, true);
+  } finally {
+    restoring = false;
+  }
+}
+
+async function resumeDraft(draft) {
+  if (draft.analysis_id && draft.step === 3 && draft.dataset_id) {
+    return openAnalysis(draft.analysis_id, draft.dataset_id);
+  }
+  restoring = true;
+  try {
+    if (draft.dataset_id) {
+      try {
+        state.dataset = await api(`/api/datasets/${draft.dataset_id}`);
+        renderDataset();
+      } catch { /* dataset may be gone; restore the builder anyway */ }
+    }
+    state.constructs = draft.constructs || [];
+    state.paths = draft.paths || [];
+    state.interactions = draft.interactions || [];
+    renderModel();
+    goStep(state.dataset ? Math.min(draft.step || 1, 2) : 1);
+  } finally {
+    restoring = false;
+  }
+}
+
 /* ------------------------------ Step 1: data ------------------------------ */
 /* Source tabs: file upload, SQL database, or Google Sheet. All three land the same
    dataset shape, so the rest of the app is source-agnostic. */
@@ -206,6 +339,7 @@ async function ingest(promise, busyMsg) {
     state.dataset = await promise;
     renderDataset();
     setStatus("#upload-status", "");
+    saveDraft();
   } catch (err) {
     setStatus("#upload-status", err.message, true);
   }
@@ -307,6 +441,7 @@ function renderModel() {
     row.querySelector(".items").addEventListener("change", (e) => {
       const values = [...e.target.selectedOptions].map((o) => o.value);
       if (isHOC(c)) { c.dimensions = values; } else { c.indicators = values; }
+      saveDraft();
     });
     row.querySelector(".rm").addEventListener("click", () => {
       state.constructs.splice(i, 1);
@@ -369,6 +504,7 @@ function renderPathsAndDiagram() {
     xList.appendChild(row);
   });
   drawDiagram();
+  saveDraft();  // every model edit re-renders, so this catches them all
 }
 
 $("#add-construct").addEventListener("click", () => {
@@ -584,6 +720,8 @@ $("#btn-run").addEventListener("click", async () => {
     setStatus("#run-status", "");
     renderResults();
     goStep(3);
+    saveDraft();
+    loadWorkspace();  // the new analysis shows up in the workspace list
   } catch (err) {
     setStatus("#run-status", err.message, true);
   } finally {

@@ -254,3 +254,17 @@ td { font-variant-numeric: tabular-nums; }
 .auth-divider::before, .auth-divider::after {
   content: ""; flex: 1; border-top: 1px solid var(--line);
 }
+
+/* ------------------------------ Workspace ------------------------------ */
+.ws-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.8rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 0.55rem 0.8rem; margin-bottom: 0.5rem;
+}
+.ws-item .hint { margin: 0.15rem 0 0; }
+.ws-open { font-size: 0.85rem; padding: 0.3rem 0.9rem; white-space: nowrap; }
+.resume-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  border-left: 4px solid var(--accent); margin-bottom: 1rem;
+}
+.ws-divider { border: none; border-top: 1px solid var(--line); margin: 1.4rem 0; }

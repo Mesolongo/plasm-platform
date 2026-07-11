@@ -13,7 +13,8 @@ async function api(path, opts = {}) {
     const detail = body.detail;
     const msg = typeof detail === "string" ? detail
       : detail && detail.message ? `[${detail.stage}] ${detail.message}`
-      : JSON.stringify(detail || body);
+      : detail ? JSON.stringify(detail)
+      : `the server hit an unexpected error (HTTP ${resp.status}) — check the server terminal for the traceback`;
     throw new Error(msg);
   }
   return body;
